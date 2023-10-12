@@ -9,13 +9,20 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+        - name: Get next version
+          uses: reecetech/version-increment@2023.9.3
+          id: version
+          with:
+            scheme: semver
+            increment: patch
+
         - name: Create tag
-          uses: actions/github-script@v5
+          uses: actions/github-script@v6
           with:
             script: |
               github.rest.git.createRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: 'refs/tags/<tagname>',
+                ref: 'refs/tags/${{ steps.version.outputs.version }}',
                 sha: context.sha
               })
