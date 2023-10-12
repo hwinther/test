@@ -1,4 +1,4 @@
-name: "Add tag on push to test"
+name: "Add tag on push to main or test"
 
 on:
   push:
