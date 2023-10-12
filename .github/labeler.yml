@@ -1,0 +1,22 @@
+workflow:
+  - .github/workflows/*
+
+github:
+  - .github/*
+
+documentation:
+  - docs/*
+  - "**/*.md"
+
+backend:
+  - "src/backend/**"
+
+frontend:
+  - "src/frontend/**"
+
+dependencies:
+  - "src/**/*.lock.json"
+  - "src/**/yarn.lock"
+
+platform:
+  - "src/platform/**"
