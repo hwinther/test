@@ -1,4 +1,4 @@
-name: Enable auto merge on dependabot and github actions PRs
+name: "Enable auto merge on dependabot and github actions PRs"
 
 on:
   pull_request_target:
@@ -9,9 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Debug output
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           echo user: ${{ github.event.pull_request.user.login }}
-          echo event: $${{ github.event }}
+          echo context: "$GITHUB_CONTEXT"
 
       - name: Enable auto merge on dependabot PRs
         uses: daneden/enable-automerge-action@v1
