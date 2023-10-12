@@ -1,0 +1,53 @@
+name: "Create promotion pull request"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - test
+      - dev
+
+jobs:
+  promote-test-to-main:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/test'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Reset promotion branch
+        run: |
+          git fetch origin test:test
+          git reset --hard test
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: test
+          title: Merging test changes to main
+          body: Automatically created pull-request in order to merge changes that were recently pushed to the test branch, back to main
+          assignees: hwinther-tietoevry
+          reviewers: hwinther-tietoevry
+
+  promote-dev-to-test:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test
+
+      - name: Reset promotion branch
+        run: |
+          git fetch origin dev:dev
+          git reset --hard dev
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: dev
+          title: Merging dev changes to test
+          body: Automatically created pull-request in order to merge changes that were recently pushed to the dev branch, back to test
+          assignees: hwinther-tietoevry
+          reviewers: hwinther-tietoevry

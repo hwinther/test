@@ -1,0 +1,27 @@
+name: Enable auto merge on dependabot and github actions PRs
+
+on:
+  pull_request_target:
+
+jobs:
+  auto-merge:
+    name: Enable auto merge on dependabot PRs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable auto merge on dependabot PRs
+        uses: daneden/enable-automerge-action@v1
+        if: github.event.pull_request.user.login == 'dependabot[bot]'
+        with:
+          github-token: ${{ secrets.AUTO_MERGE_TOKEN }}
+          allowed-author: "dependabot[bot]"
+          # Allowed values: MERGE | SQUASH | REBASE
+          merge-method: REBASE
+
+      - name: Enable auto merge on github actions PRs
+        uses: daneden/enable-automerge-action@v1
+        if: github.event.pull_request.user.login == 'github-actions[bot]'
+        with:
+          github-token: ${{ secrets.AUTO_MERGE_TOKEN }}
+          allowed-author: "github-actions[bot]"
+          # Allowed values: MERGE | SQUASH | REBASE
+          merge-method: MERGE
