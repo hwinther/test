@@ -8,6 +8,9 @@ jobs:
     name: Enable auto merge on dependabot PRs
     runs-on: ubuntu-latest
     steps:
+      - name: Debug output
+        run: echo ${{ github.event.pull_request.user.login }}
+
       - name: Enable auto merge on dependabot PRs
         uses: daneden/enable-automerge-action@v1
         if: github.event.pull_request.user.login == 'dependabot[bot]'
