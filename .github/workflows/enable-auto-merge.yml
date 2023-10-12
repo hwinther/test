@@ -17,7 +17,6 @@ jobs:
         with:
           github-token: ${{ secrets.WORKFLOW_TOKEN }}
           allowed-author: "dependabot[bot]"
-          # Allowed values: MERGE | SQUASH | REBASE
           merge-method: REBASE
 
       - name: Enable auto merge on github actions PRs
@@ -26,5 +25,12 @@ jobs:
         with:
           github-token: ${{ secrets.WORKFLOW_TOKEN }}
           allowed-author: "github-actions[bot]"
-          # Allowed values: MERGE | SQUASH | REBASE
           merge-method: MERGE
+
+      - name: Enable auto merge on feature PRs
+        uses: daneden/enable-automerge-action@v1
+        if: ${{ github.event.pull_request.user.login != 'dependabot[bot]' && github.event.pull_request.user.login != 'github-actions[bot]' }}
+        with:
+          github-token: ${{ secrets.WORKFLOW_TOKEN }}
+          allowed-author: ${{ github.event.pull_request.user.login }}
+          merge-method: SQUASH
