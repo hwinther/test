@@ -1,0 +1,50 @@
+#!/bin/bash
+#set -x
+##########################################################
+# Validates the commit message with the following rules: #
+# 1. The message cannot be empty                         #
+# 2. In dev branch, the format must follow the standard  #
+# 3. In main branch, the related JIRA issue needs to be  #
+#     mentioned before the standard message format       #
+##########################################################
+
+# shopt -s nocasematch  # Case insensitive Cases
+COMMIT_MSG_FILE=$1      # Recieve the commit message .git/COMMIT_EDITMSG
+
+if [[ -z $(grep '[^[:space:]]' $COMMIT_MSG_FILE) ]] ; then
+    echo "Empty commit message is not allowed" >&2
+    exit 1
+fi
+
+DEV_BRANCH="dev"
+MAIN_BRANCH="main"
+
+current_branch="$(git rev-parse --abbrev-ref HEAD)"
+
+case "$current_branch" in
+$DEV_BRANCH)
+    error_msg="Aborting commit. Please use the following format: <Imperative verb> <short description of change>"
+    commit_regex_string="^(Add|Change|Remove|Fix|Update|Bump|Merge) [A-Za-z0-9 \/\'\,\._-]+$"
+    ;;
+
+$MAIN_BRANCH)
+    error_msg="Aborting commit. Please prefix JIRA issue (NLNN-XXXX) and a verb (Add|Change|Remove|Fix|Update|Bump|Merge) to the commit message."
+    commit_regex_string="^NLNN-[0-9]+ (Add|Change|Remove|Fix|Update|Bump|Merge) [A-Za-z0-9 \/\'\,\._-]+$"
+    ;;
+
+\
+    *)
+    error_msg="Aborting commit. Please prefix JIRA issue (NLNN-XXXX) and a verb (Add|Change|Remove|Fix|Update|Bump|Merge) to the commit message."
+    commit_regex_string="^NLNN-[0-9]+ (Add|Change|Remove|Fix|Update|Bump|Merge) [A-Za-z0-9 \/\'\,\._-]+$"
+    # echo "Unhandled branch value $current_branch"
+    # exit 1
+    ;;
+esac
+
+COMMIT_MSG=$(cat ${COMMIT_MSG_FILE})
+if [[ ! $COMMIT_MSG =~ $commit_regex_string ]]; then
+    echo "$error_msg"
+    exit 1
+fi
+
+exit 0
