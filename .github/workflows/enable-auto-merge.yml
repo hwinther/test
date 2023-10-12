@@ -1,4 +1,4 @@
-name: Enable auto merge on dependabot and github actions PRs
+name: "Enable auto merge on dependabot and github actions PRs"
 
 on:
   pull_request_target:
