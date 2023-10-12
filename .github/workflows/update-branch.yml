@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - test
 
 permissions: write-all
 
@@ -14,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: main
+          # ref: main
           fetch-depth: 0
 
       - name: Setup git user
@@ -22,8 +23,16 @@ jobs:
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
 
-      - name: Update (rebase) branch
+      - name: Update (rebase) test branch
+        if: github.ref == 'main'
         run: |
           git checkout test
           git rebase main test
           git push origin test
+
+      - name: Update (rebase) dev branch
+        if: github.ref == 'test'
+        run: |
+          git checkout dev
+          git rebase test dev
+          git push origin dev
