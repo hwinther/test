@@ -9,8 +9,12 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-        - uses: actions/checkout@v4
-        
+        - name: checkout
+          uses: actions/checkout@v4
+          with:
+            ssh-key: "${{ secrets.DEPLOY_KEY }}"
+            fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
+
         - name: Get next version
           uses: reecetech/version-increment@2023.9.3
           id: version
