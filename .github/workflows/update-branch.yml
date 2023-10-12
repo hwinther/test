@@ -25,14 +25,14 @@ jobs:
           echo github.ref = ${{ github.ref }}
 
       - name: Update (rebase) test branch
-        if: github.ref == 'main'
+        if: github.ref == 'refs/heads/main'
         run: |
           git checkout test
           git rebase main test
           git push origin test
 
       - name: Update (rebase) dev branch
-        if: github.ref == 'test'
+        if: github.ref == 'refs/heads/test'
         run: |
           git checkout dev
           git rebase test dev
