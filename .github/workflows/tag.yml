@@ -1,0 +1,21 @@
+on:
+    push:
+      branches:
+        - test
+
+jobs:
+  tag-on-push:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+        - name: Create tag
+          uses: actions/github-script@v5
+          with:
+            script: |
+              github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'refs/tags/<tagname>',
+                sha: context.sha
+              })
