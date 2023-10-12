@@ -20,12 +20,17 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - name: Get next version
-        uses: reecetech/version-increment@2023.9.3
-        id: version
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          scheme: semver
-          increment: patch
+          fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
+
+      # - name: Get next version
+      #   uses: reecetech/version-increment@2023.9.3
+      #   id: version
+      #   with:
+      #     scheme: semver
+      #     increment: patch
 
       # (Optional) GitHub Enterprise requires GHE_HOST variable set
       #- name: Set GHE_HOST
