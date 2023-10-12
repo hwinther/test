@@ -12,7 +12,7 @@ jobs:
         uses: daneden/enable-automerge-action@v1
         if: github.event.pull_request.user.login == 'dependabot[bot]'
         with:
-          github-token: ${{ secrets.AUTO_MERGE_TOKEN }}
+          github-token: ${{ secrets.WORKFLOW_TOKEN }}
           allowed-author: "dependabot[bot]"
           # Allowed values: MERGE | SQUASH | REBASE
           merge-method: REBASE
@@ -21,7 +21,7 @@ jobs:
         uses: daneden/enable-automerge-action@v1
         if: github.event.pull_request.user.login == 'github-actions[bot]'
         with:
-          github-token: ${{ secrets.AUTO_MERGE_TOKEN }}
+          github-token: ${{ secrets.WORKFLOW_TOKEN }}
           allowed-author: "github-actions[bot]"
           # Allowed values: MERGE | SQUASH | REBASE
           merge-method: MERGE

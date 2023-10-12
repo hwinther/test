@@ -1,34 +1,32 @@
 on:
-    push:
-      branches:
-        - test
+  push:
+    branches:
+      - test
 
 jobs:
   tag-on-push:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
     steps:
-        - name: checkout
-          uses: actions/checkout@v4
-          with:
-            fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
 
-        - name: Get next version
-          uses: reecetech/version-increment@2023.9.3
-          id: version
-          with:
-            scheme: semver
-            increment: patch
+      - name: Get next version
+        uses: reecetech/version-increment@2023.9.3
+        id: version
+        with:
+          scheme: semver
+          increment: patch
 
-        - name: Create tag
-          uses: actions/github-script@v6
-          with:
-            github-token: ${{ secrets.WORKFLOW_TOKEN }}
-            script: |
-              github.rest.git.createRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: 'refs/tags/${{ steps.version.outputs.version }}',
-                sha: context.sha
-              })
+      - name: Create tag
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.WORKFLOW_TOKEN }}
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ steps.version.outputs.version }}',
+              sha: context.sha
+            })
