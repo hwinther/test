@@ -6,6 +6,7 @@ on:
     branches:
       - test
       - dev
+      - "feature/**"
 
 jobs:
   promote-test-to-main:
@@ -29,7 +30,6 @@ jobs:
           title: Merging test changes to main
           body: Automatically created pull-request in order to merge changes that were recently pushed to the test branch, back to main
           assignees: hwinther-tietoevry
-          reviewers: hwinther-tietoevry
 
   promote-dev-to-test:
     runs-on: ubuntu-latest
@@ -52,4 +52,26 @@ jobs:
           title: Merging dev changes to test
           body: Automatically created pull-request in order to merge changes that were recently pushed to the dev branch, back to test
           assignees: hwinther-tietoevry
-          reviewers: hwinther-tietoevry
+
+  promote-feature-branch-to-dev:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.ref, 'refs/heads/feature/') }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Reset promotion branch
+        run: |
+          git fetch origin ${{ github.ref }}:${{ github.ref }}
+          git reset --hard ${{ github.ref }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          branch: ${{ github.ref }}
+          title: Merging ${{ github.ref }} changes to dev
+          body-path: .github/PULL_REQUEST_TEMPLATE.md
+          assignees: ${{ github.actor }}
+          draft: true
