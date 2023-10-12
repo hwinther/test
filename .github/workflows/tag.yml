@@ -24,6 +24,7 @@ jobs:
         - name: Create tag
           uses: actions/github-script@v6
           with:
+            github-token: ${{ secrets.WORKFLOW_TOKEN }}
             script: |
               github.rest.git.createRef({
                 owner: context.repo.owner,
