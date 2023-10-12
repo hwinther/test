@@ -8,7 +8,7 @@ jobs:
   tag-on-push:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
