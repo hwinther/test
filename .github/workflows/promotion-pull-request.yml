@@ -29,7 +29,6 @@ jobs:
           title: Merging test changes to main
           body: Automatically created pull-request in order to merge changes that were recently pushed to the test branch, back to main
           assignees: hwinther-tietoevry
-          reviewers: hwinther-tietoevry
 
   promote-dev-to-test:
     runs-on: ubuntu-latest
@@ -52,4 +51,3 @@ jobs:
           title: Merging dev changes to test
           body: Automatically created pull-request in order to merge changes that were recently pushed to the dev branch, back to test
           assignees: hwinther-tietoevry
-          reviewers: hwinther-tietoevry
