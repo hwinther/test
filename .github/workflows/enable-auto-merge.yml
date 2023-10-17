@@ -5,7 +5,6 @@ on:
 
 jobs:
   auto-merge:
-    name: Enable auto merge on dependabot PRs
     runs-on: ubuntu-latest
     steps:
       - name: Debug output
@@ -17,7 +16,7 @@ jobs:
 
       # in an attempt to avoid the GraphQL PR in unstable state errors:
       - name: delay execution
-        run: sleep 10
+        run: sleep 20
 
       - name: Enable auto merge on dependabot PRs
         uses: daneden/enable-automerge-action@v1
