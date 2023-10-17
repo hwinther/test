@@ -55,7 +55,7 @@ jobs:
 
   promote-feature-branch-to-dev:
     runs-on: ubuntu-latest
-    if: ${{ contains(github.ref, 'refs/heads/feature/') }}
+    if: ${{ contains(github.ref, 'refs/heads/feature/') || contains(github.ref, 'refs/heads/bugfix/') }}
     steps:
       - uses: actions/checkout@v4
         with:
