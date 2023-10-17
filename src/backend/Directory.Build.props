@@ -13,14 +13,13 @@
 	</PropertyGroup>
 
   <ItemGroup>
-    <!-- <AssemblyAttribute Include="Demo.Backend.Common.Attributes.DefineConstantsAttribute">
+    <!--AssemblyAttribute Include="Demo.Backend.Common.Attributes.DefineConstantsAttribute">
       <_Parameter1>"$(DefineConstants)"</_Parameter1>
-    </AssemblyAttribute>
-
+    </AssemblyAttribute-->
     <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference> -->
+    </PackageReference>
     <!--PackageReference Include="SonarAnalyzer.CSharp" Version="9.11.0.78383">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
