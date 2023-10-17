@@ -20,6 +20,8 @@ jobs:
           git config user.email "${{ github.actor }}@users.noreply.github.com"
 
       - name: Update lockfiles
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         run: |
           cd src/backend
           dotnet restore
