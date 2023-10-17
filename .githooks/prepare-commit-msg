@@ -1,14 +1,15 @@
 #!/bin/bash
 #set -x
 ######################################################
-# Prepends NLNN-<issue number> to the commit message #
+# Prepends <JIRA_TAG>-<issue number> to the commit message #
 ######################################################
 
-ISSUE_NUMBER_REGEX="feature\/NLNN-([0-9]+)"
+source .githooks/config.sh
+ISSUE_NUMBER_REGEX="feature\/${JIRA_TAG}-([0-9]+)"
 
 if [[ $(git branch --show-current) =~ $ISSUE_NUMBER_REGEX ]]; then
   issue_number=$(echo ${BASH_REMATCH[1]})
-  echo "NLNN-$issue_number $(cat $1)" > $1
+  echo "${JIRA_TAG}-$issue_number $(cat $1)" > $1
 fi
 
 exit 0
