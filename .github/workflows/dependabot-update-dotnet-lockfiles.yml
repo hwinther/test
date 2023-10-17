@@ -5,7 +5,6 @@ on:
 
 jobs:
   update-lockfiles:
-    name: Update dotnet lockfiles and commit changes to dependabot PR
     runs-on: ubuntu-latest
     if: github.event.pull_request.user.login == 'dependabot[bot]'
     steps:
@@ -27,6 +26,7 @@ jobs:
           git status
           if output=$(git status --porcelain) && [ -z "$output" ]; then
             # Working directory clean - do nothing
+            exit 0
           else 
             # Uncommitted changes
             git add .
