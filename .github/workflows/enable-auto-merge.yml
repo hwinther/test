@@ -33,7 +33,7 @@ jobs:
 
       - name: Enable auto merge on feature PRs
         uses: daneden/enable-automerge-action@v1
-        if: ${{ github.event.pull_request.user.login != 'dependabot[bot]' && github.event.pull_request.user.login != 'github-actions[bot]' }}
+        if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login != 'dependabot[bot]' && github.event.pull_request.user.login != 'github-actions[bot]' }}
         with:
           github-token: ${{ secrets.WORKFLOW_TOKEN }}
           allowed-author: ${{ github.event.pull_request.user.login }}
