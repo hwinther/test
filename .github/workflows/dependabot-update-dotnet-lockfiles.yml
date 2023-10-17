@@ -1,0 +1,28 @@
+name: "Automatically update dotnet lockfiles in dependabot PRs"
+
+on:
+  pull_request_target:
+
+jobs:
+  update-lockfiles:
+    name: Update dotnet lockfiles and commit changes to dependabot PR
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup git user
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Update lockfiles
+        run: |
+          cd src/backend
+          dotnet restore
+          git add .
+          git commit -m "Update lockfiles"
+          git push
