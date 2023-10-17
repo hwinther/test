@@ -26,9 +26,11 @@ jobs:
           git status
           if output=$(git status --porcelain) && [ -z "$output" ]; then
             # Working directory clean - do nothing
+            echo Working directory clean
             exit 0
           else 
             # Uncommitted changes
+            echo Add and commit changes
             git add .
             git commit -m "Update lockfiles"
             git push
