@@ -17,7 +17,7 @@ jobs:
 
       # in an attempt to avoid the GraphQL PR in unstable state errors:
       - name: delay execution
-        run: sleep 5
+        run: sleep 10
 
       - name: Enable auto merge on dependabot PRs
         uses: daneden/enable-automerge-action@v1
