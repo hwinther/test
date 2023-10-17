@@ -6,17 +6,15 @@ on:
       - main
       - test
 
-permissions: write-all
-
 jobs:
-  sync:
+  rebase-branches:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # ref: main
           fetch-depth: 0
+          token: ${{ secrets.WORKFLOW_TOKEN }}
 
       - name: Setup git user
         run: |
@@ -28,15 +26,15 @@ jobs:
         run: |
           git checkout test
           git rebase main test
-          git push --force origin test
+          git push origin test
 
           git checkout dev
           git rebase test dev
-          git push --force origin dev
+          git push origin dev
 
       - name: Update (rebase) dev branch
         if: github.ref == 'refs/heads/test'
         run: |
           git checkout dev
           git rebase test dev
-          git push --force origin dev
+          git push origin dev
