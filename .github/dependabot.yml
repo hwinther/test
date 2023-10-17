@@ -11,7 +11,24 @@ updates:
     target-branch: "dev"
     schedule:
       interval: "daily"
-    reviewers:
-      - "hwinther-tietoevry"
     assignees:
       - "hwinther-tietoevry"
+
+  - package-ecosystem: "nuget"
+    directory: "/src/backend"
+    open-pull-requests-limit: 20
+    target-branch: "dev"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "hwinther-tietoevry"
+
+  # - package-ecosystem: "npm"
+  #   directory: "/src/frontend"
+  #   open-pull-requests-limit: 20
+  #   target-branch: "dev"
+  #   schedule:
+  #     interval: "weekly"
+  #     day: "sunday"
+  #   assignees:
+  #     - "hwinther-tietoevry"
