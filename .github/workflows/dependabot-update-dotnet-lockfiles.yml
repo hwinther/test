@@ -25,6 +25,11 @@ jobs:
           cd src/backend
           dotnet restore
           git status
-          git add .
-          git commit -m "Update lockfiles"
-          git push
+          if output=$(git status --porcelain) && [ -z "$output" ]; then
+            # Working directory clean - do nothing
+          else 
+            # Uncommitted changes
+            git add .
+            git commit -m "Update lockfiles"
+            git push
+          fi
