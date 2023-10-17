@@ -23,6 +23,7 @@ jobs:
         run: |
           cd src/backend
           dotnet restore
+          git status
           git add .
           git commit -m "Update lockfiles"
           git push
