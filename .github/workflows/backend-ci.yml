@@ -50,3 +50,39 @@ jobs:
 
       - name: dotnet restore
         run: dotnet restore --locked-mode
+
+      - name: dotnet build
+        run: dotnet build -c Release --no-restore
+
+  deploy:
+    # if: contains(github.ref, inputs.repo_name)
+    if: contains(github.ref, 'main')
+    needs: [build]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
+    # environment: ${{ inputs.deploy_target }}
+    environment: "prod"
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - uses: actions/cache@v3
+        id: nuget-cache
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('**/packages.lock.json') }}
+
+      - name: dotnet restore
+        run: dotnet restore --locked-mode
+
+      - name: dotnet build
+        run: dotnet build -c Release --no-restore
