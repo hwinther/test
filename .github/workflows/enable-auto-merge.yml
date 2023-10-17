@@ -15,6 +15,10 @@ jobs:
           echo user: ${{ github.event.pull_request.user.login }}
           echo context: "$GITHUB_CONTEXT"
 
+      # in an attempt to avoid the GraphQL PR in unstable state errors:
+      - name: delay execution
+        run: sleep 5
+
       - name: Enable auto merge on dependabot PRs
         uses: daneden/enable-automerge-action@v1
         if: github.event.pull_request.user.login == 'dependabot[bot]'
