@@ -28,15 +28,15 @@ jobs:
         run: |
           git checkout test
           git rebase main test
-          git push origin test
+          git push --force origin test
 
           git checkout dev
           git rebase test dev
-          git push origin dev
+          git push --force origin dev
 
       - name: Update (rebase) dev branch
         if: github.ref == 'refs/heads/test'
         run: |
           git checkout dev
           git rebase test dev
-          git push origin dev
+          git push --force origin dev
