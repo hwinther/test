@@ -1,0 +1,52 @@
+name: "Backend CI - placeholder"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - test
+      - dev
+    paths:
+      - "src/backend/**"
+      - "tests/backend/**"
+  pull_request:
+    branches:
+      - main
+      - test
+      - dev
+    paths:
+      - "src/backend/**"
+      - "tests/backend/**"
+      - ".github/workflows/backend-ci.yml"
+    types: [opened, reopened, labeled, synchronize]
+
+env:
+  DOTNET_VERSION: "7.0.x"
+  BACKEND_SOLUTION_PATH: "src/backend"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - uses: actions/cache@v3
+        id: nuget-cache
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('**/packages.lock.json') }}
+
+      - name: dotnet restore
+        run: dotnet restore --locked-mode
