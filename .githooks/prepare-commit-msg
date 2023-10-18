@@ -5,10 +5,10 @@
 ######################################################
 
 source .githooks/config.sh
-ISSUE_NUMBER_REGEX="feature\/${JIRA_TAG}-([0-9]+)"
+ISSUE_NUMBER_REGEX="${BRANCH_PREFIXES}\/${JIRA_TAG}-([0-9]+)"
 
 if [[ $(git branch --show-current) =~ $ISSUE_NUMBER_REGEX ]]; then
-  issue_number=$(echo ${BASH_REMATCH[1]})
+  issue_number=$(echo ${BASH_REMATCH[2]})
   echo "${JIRA_TAG}-$issue_number $(cat $1)" > $1
 fi
 
