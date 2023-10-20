@@ -58,16 +58,44 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ contains(github.ref, 'refs/heads/feature/') || contains(github.ref, 'refs/heads/bugfix/') }}
     steps:
+      - name: Check if PR exists
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+        run: |
+          echo "repo: $GITHUB_REPOSITORY"
+          echo "github ref: $GITHUB_REF"
+          ref=$(echo $GITHUB_REF | sed 's/refs\/heads\///g')
+          echo "ref: $ref"
+
+          prs=$(gh pr list \
+              --repo "$GITHUB_REPOSITORY" \
+              --json baseRefName,headRefName \
+              --jq "map(select(.baseRefName == \"dev\" and .headRefName == \"$ref\")) | length")
+
+          echo "prs: $prs"
+
+          if ((prs > 0)); then
+              echo "setting skip true"
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+              echo "setting skip false"
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: ${{ !steps.check.outputs.skip }}
         with:
           ref: dev
 
       - name: Reset promotion branch
+        if: ${{ !steps.check.outputs.skip }}
         run: |
           git fetch origin ${{ github.ref }}:${{ github.ref }}
           git reset --hard ${{ github.ref }}
 
       - name: Create Pull Request
+        if: ${{ !steps.check.outputs.skip }}
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
