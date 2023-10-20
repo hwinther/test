@@ -84,18 +84,18 @@ jobs:
           fi
 
       - uses: actions/checkout@v4
-        if: ${{ !steps.check.outputs.skip }}
+        if: ${{ steps.check.outputs.skip == 'false' }}
         with:
           ref: dev
 
       - name: Reset promotion branch
-        if: ${{ !steps.check.outputs.skip }}
+        if: ${{ steps.check.outputs.skip == 'false' }}
         run: |
           git fetch origin ${{ github.ref }}:${{ github.ref }}
           git reset --hard ${{ github.ref }}
 
       - name: Create Pull Request
-        if: ${{ !steps.check.outputs.skip }}
+        if: ${{ steps.check.outputs.skip == 'false' }}
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
