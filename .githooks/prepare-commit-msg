@@ -9,6 +9,7 @@ ISSUE_NUMBER_REGEX="${BRANCH_PREFIXES}\/${JIRA_TAG}-([0-9]+)"
 
 if [[ $(git branch --show-current) =~ $ISSUE_NUMBER_REGEX ]]; then
   issue_number=$(echo ${BASH_REMATCH[2]})
+  # TODO: fix double prefix issue by checking the beginning of $1
   echo "${JIRA_TAG}-$issue_number $(cat $1)" > $1
 fi
 
