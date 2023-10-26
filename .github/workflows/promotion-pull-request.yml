@@ -94,13 +94,20 @@ jobs:
           git fetch origin ${{ github.ref }}:${{ github.ref }}
           git reset --hard ${{ github.ref }}
 
+      # - name: Create Pull Request
+      #   if: ${{ steps.check.outputs.skip == 'false' }}
+      #   uses: peter-evans/create-pull-request@v5
+      #   with:
+      #     token: ${{ secrets.WORKFLOW_TOKEN }}
+      #     branch: ${{ github.ref }}
+      #     title: ${{ github.event.head_commit.message }}
+      #     body-path: .github/PULL_REQUEST_TEMPLATE.md
+      #     assignees: ${{ github.actor }}
+      #     draft: true
+
       - name: Create Pull Request
-        if: ${{ steps.check.outputs.skip == 'false' }}
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.WORKFLOW_TOKEN }}
-          branch: ${{ github.ref }}
-          title: ${{ github.event.head_commit.message }}
-          body-path: .github/PULL_REQUEST_TEMPLATE.md
-          assignees: ${{ github.actor }}
-          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REF: ${{ github.ref }}
+          TITLE: ${{ github.event.head_commit.message }}
+        run: gh pr create --base dev --head $REF --title '${TITLE}' --body-file .github/PULL_REQUEST_TEMPLATE.md
