@@ -24,6 +24,7 @@ jobs:
           git reset --hard test
 
       - name: Create Pull Request
+        id: create-pr
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
@@ -31,6 +32,14 @@ jobs:
           title: Merging test changes to main
           body: Automatically created pull-request in order to merge changes that were recently pushed to the test branch, back to main
           # assignees: hwinther-tietoevry
+          draft: true
+
+      # Not possible if draft: true above
+      # - name: Set auto merge on pull request
+      #   env:
+      #     GH_TOKEN: ${{ github.token }}
+      #     PR_URL: ${{ steps.create-pr.outputs.pull-request-url }}
+      #   run: gh pr merge --merge --auto $PR_URL
 
   promote-dev-to-test:
     runs-on: ubuntu-latest
@@ -46,6 +55,7 @@ jobs:
           git reset --hard dev
 
       - name: Create Pull Request
+        id: create-pr
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
@@ -53,6 +63,14 @@ jobs:
           title: Merging dev changes to test
           body: Automatically created pull-request in order to merge changes that were recently pushed to the dev branch, back to test
           # assignees: hwinther-tietoevry
+          draft: true
+
+      # Not possible if draft: true above
+      # - name: Set auto merge on pull request
+      #   env:
+      #     GH_TOKEN: ${{ github.token }}
+      #     PR_URL: ${{ steps.create-pr.outputs.pull-request-url }}
+      #   run: gh pr merge --merge --auto $PR_URL
 
   promote-feature-branch-to-dev:
     runs-on: ubuntu-latest
@@ -110,4 +128,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REF: ${{ github.ref }}
           TITLE: ${{ github.event.head_commit.message }}
-        run: gh pr create --base dev --head $REF --title '${TITLE}' --body-file .github/PULL_REQUEST_TEMPLATE.md
+        run: |
+          PR_URL=$(gh pr create --base dev --head $REF --title '${TITLE}' --body-file .github/PULL_REQUEST_TEMPLATE.md)
+          gh pr merge --squash --auto $PR_URL

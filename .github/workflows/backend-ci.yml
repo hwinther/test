@@ -28,6 +28,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.draft == false }}
     defaults:
       run:
         working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
@@ -56,7 +57,7 @@ jobs:
 
   deploy:
     # if: contains(github.ref, inputs.repo_name)
-    if: contains(github.ref, 'main')
+    if: ${{ contains(github.ref, 'main') }}
     needs: [build]
     runs-on: ubuntu-latest
     defaults:

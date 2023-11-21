@@ -3,7 +3,7 @@ name: "Enable auto merge on dependabot and github actions PRs"
 on:
   pull_request_target:
   pull_request:
-    types: [opened, reopened, labeled, synchronize, ready_for_review]
+    types: [opened, reopened, ready_for_review]
 
 jobs:
   auto-merge:
@@ -16,30 +16,36 @@ jobs:
           echo user: ${{ github.event.pull_request.user.login }}
           echo context: "$GITHUB_CONTEXT"
 
-      # in an attempt to avoid the GraphQL PR in unstable state errors:
-      - name: delay execution
-        run: sleep 20
-
       - name: Enable auto merge on dependabot PRs
         uses: daneden/enable-automerge-action@v1
-        if: github.event.pull_request.user.login == 'dependabot[bot]'
+        if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login == 'dependabot[bot]' }}
         with:
           github-token: ${{ secrets.WORKFLOW_TOKEN }}
           allowed-author: "dependabot[bot]"
-          merge-method: REBASE
+          # Allowed values: MERGE | SQUASH | REBASE
+          merge-method: SQUASH
 
-      - name: Enable auto merge on github actions PRs
+      - name: Enable auto squash merge on github actions PRs related to feature branches
         uses: daneden/enable-automerge-action@v1
-        if: github.event.pull_request.user.login == 'github-actions[bot]'
+        if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login == 'github-actions[bot]' && (contains(github.head_ref, 'feature') || contains(github.head_ref, 'bugfix')) }}
+        with:
+          github-token: ${{ secrets.WORKFLOW_TOKEN }}
+          allowed-author: "github-actions[bot]"
+          merge-method: SQUASH
+
+      - name: Enable auto merge on github actions PRs related to environment promotions
+        uses: daneden/enable-automerge-action@v1
+        if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login == 'github-actions[bot]' && (github.head_ref == 'main' || github.head_ref == 'qa' || github.head_ref == 'test' || github.head_ref == 'dev') }}
         with:
           github-token: ${{ secrets.WORKFLOW_TOKEN }}
           allowed-author: "github-actions[bot]"
           merge-method: MERGE
 
-      - name: Enable auto merge on feature PRs
-        uses: daneden/enable-automerge-action@v1
-        if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login != 'dependabot[bot]' && github.event.pull_request.user.login != 'github-actions[bot]' }}
-        with:
-          github-token: ${{ secrets.WORKFLOW_TOKEN }}
-          allowed-author: ${{ github.event.pull_request.user.login }}
-          merge-method: SQUASH
+      # Works only for for single person repo, or potentially it can be expanded on with a key for each user
+      # - name: Enable auto merge on feature PRs
+      #   uses: daneden/enable-automerge-action@v1
+      #   if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login != 'dependabot[bot]' && github.event.pull_request.user.login != 'github-actions[bot]' }}
+      #   with:
+      #     github-token: ${{ secrets.WORKFLOW_TOKEN }}
+      #     allowed-author: ${{ github.event.pull_request.user.login }}
+      #     merge-method: SQUASH
