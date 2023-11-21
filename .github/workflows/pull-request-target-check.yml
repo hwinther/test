@@ -2,6 +2,7 @@ name: "Check PR target branch"
 
 on:
   pull_request:
+    types: [opened, reopened, edited]
   pull_request_target:
 
 jobs:

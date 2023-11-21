@@ -19,7 +19,7 @@ on:
       - "src/backend/**"
       - "tests/backend/**"
       - ".github/workflows/backend-ci.yml"
-    types: [opened, reopened, labeled, synchronize]
+    types: [opened, reopened, labeled, synchronize, ready_for_review]
 
 env:
   DOTNET_VERSION: "7.0.x"
