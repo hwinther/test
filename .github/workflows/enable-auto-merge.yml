@@ -16,6 +16,11 @@ jobs:
           echo user: ${{ github.event.pull_request.user.login }}
           echo context: "$GITHUB_CONTEXT"
 
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ github.token }}
+
       - name: Enable auto merge on dependabot PRs
         if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login == 'dependabot[bot]' }}
         env:
@@ -31,7 +36,7 @@ jobs:
         run: gh pr merge --squash --auto $PR_NUMBER
 
       - name: Enable auto merge on github actions PRs related to environment promotions
-        if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login == 'github-actions[bot]' && (github.head_ref == 'main' || github.head_ref == 'qa' || github.head_ref == 'test' || github.head_ref == 'dev') }}
+        if: ${{ github.event.pull_request.draft == false && (github.head_ref == 'main' || github.head_ref == 'qa' || github.head_ref == 'test' || github.head_ref == 'dev') }}
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.number }}
@@ -40,7 +45,7 @@ jobs:
       # Works only for for single person repo, or potentially it can be expanded on with a key for each user
       # - name: Enable auto merge on feature PRs
       #   uses: daneden/enable-automerge-action@v1
-      #   if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login != 'dependabot[bot]' && github.event.pull_request.user.login != 'github-actions[bot]' }}
+      #   if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login != 'dependabot[bot]' && github.event.pull_request.user.login != 'github-actions[bot]' && github.head_ref == 'dev' }}
       #   with:
       #     github-token: ${{ secrets.WORKFLOW_TOKEN }}
       #     allowed-author: ${{ github.event.pull_request.user.login }}
