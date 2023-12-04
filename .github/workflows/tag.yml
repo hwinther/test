@@ -15,6 +15,12 @@ jobs:
         with:
           fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
 
+      - name: Debug output
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo context: "$GITHUB_CONTEXT"
+
       - name: Get next version
         uses: reecetech/version-increment@2023.10.1
         id: version
