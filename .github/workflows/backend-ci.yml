@@ -86,4 +86,9 @@ jobs:
         run: dotnet restore --locked-mode
 
       - name: dotnet build
-        run: dotnet build -c Release --no-restore
+        run: |
+          dotnet build -c Release --no-restore
+
+          # To see the version we would have deployed:
+          dotnet tool install --global GitVersion.Tool
+          dotnet gitversion
