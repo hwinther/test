@@ -23,12 +23,12 @@ updates:
     assignees:
       - "hwinther-tietoevry"
 
-  # - package-ecosystem: "npm"
-  #   directory: "/src/frontend"
-  #   open-pull-requests-limit: 20
-  #   target-branch: "dev"
-  #   schedule:
-  #     interval: "weekly"
-  #     day: "sunday"
-  #   assignees:
-  #     - "hwinther-tietoevry"
+  - package-ecosystem: "npm"
+    directory: "/src/frontend"
+    open-pull-requests-limit: 20
+    target-branch: "dev"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    assignees:
+      - "hwinther-tietoevry"

@@ -17,29 +17,25 @@ jobs:
           echo context: "$GITHUB_CONTEXT"
 
       - name: Enable auto merge on dependabot PRs
-        uses: daneden/enable-automerge-action@v1
         if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login == 'dependabot[bot]' }}
-        with:
-          github-token: ${{ secrets.WORKFLOW_TOKEN }}
-          allowed-author: "dependabot[bot]"
-          # Allowed values: MERGE | SQUASH | REBASE
-          merge-method: SQUASH
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: gh pr merge --squash --auto $PR_NUMBER
 
       - name: Enable auto squash merge on github actions PRs related to feature branches
-        uses: daneden/enable-automerge-action@v1
-        if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login == 'github-actions[bot]' && (contains(github.head_ref, 'feature') || contains(github.head_ref, 'bugfix')) }}
-        with:
-          github-token: ${{ secrets.WORKFLOW_TOKEN }}
-          allowed-author: "github-actions[bot]"
-          merge-method: SQUASH
+        if: ${{ github.event.pull_request.draft == false && (contains(github.head_ref, 'feature') || contains(github.head_ref, 'bugfix')) }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: gh pr merge --squash --auto $PR_NUMBER
 
       - name: Enable auto merge on github actions PRs related to environment promotions
-        uses: daneden/enable-automerge-action@v1
         if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login == 'github-actions[bot]' && (github.head_ref == 'main' || github.head_ref == 'qa' || github.head_ref == 'test' || github.head_ref == 'dev') }}
-        with:
-          github-token: ${{ secrets.WORKFLOW_TOKEN }}
-          allowed-author: "github-actions[bot]"
-          merge-method: MERGE
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: gh pr merge --merge --auto $PR_NUMBER
 
       # Works only for for single person repo, or potentially it can be expanded on with a key for each user
       # - name: Enable auto merge on feature PRs

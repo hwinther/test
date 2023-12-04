@@ -14,11 +14,38 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/test'
     steps:
+      - name: Check if PR exists
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+        run: |
+          echo "repo: $GITHUB_REPOSITORY"
+          echo "github ref: $GITHUB_REF"
+          ref=$(echo $GITHUB_REF | sed 's/refs\/heads\///g')
+          echo "ref: $ref"
+
+          prs=$(gh pr list \
+              --repo "$GITHUB_REPOSITORY" \
+              --json baseRefName,headRefName \
+              --jq "map(select(.baseRefName == \"main\" and .headRefName == \"$ref\")) | length")
+
+          echo "prs: $prs"
+
+          if ((prs > 0)); then
+              echo "setting skip true"
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+              echo "setting skip false"
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: ${{ steps.check.outputs.skip == 'false' }}
         with:
           ref: main
 
       - name: Reset promotion branch
+        if: ${{ steps.check.outputs.skip == 'false' }}
         run: |
           git fetch origin test:test
           git reset --hard test
@@ -26,6 +53,7 @@ jobs:
       - name: Create Pull Request
         id: create-pr
         uses: peter-evans/create-pull-request@v5
+        if: ${{ steps.check.outputs.skip == 'false' }}
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
           branch: test
@@ -36,6 +64,7 @@ jobs:
 
       # Not possible if draft: true above
       # - name: Set auto merge on pull request
+      #   if: ${{ steps.check.outputs.skip == 'false' }}
       #   env:
       #     GH_TOKEN: ${{ github.token }}
       #     PR_URL: ${{ steps.create-pr.outputs.pull-request-url }}
@@ -45,11 +74,38 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev'
     steps:
+      - name: Check if PR exists
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+        run: |
+          echo "repo: $GITHUB_REPOSITORY"
+          echo "github ref: $GITHUB_REF"
+          ref=$(echo $GITHUB_REF | sed 's/refs\/heads\///g')
+          echo "ref: $ref"
+
+          prs=$(gh pr list \
+              --repo "$GITHUB_REPOSITORY" \
+              --json baseRefName,headRefName \
+              --jq "map(select(.baseRefName == \"test\" and .headRefName == \"$ref\")) | length")
+
+          echo "prs: $prs"
+
+          if ((prs > 0)); then
+              echo "setting skip true"
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+              echo "setting skip false"
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: ${{ steps.check.outputs.skip == 'false' }}
         with:
           ref: test
 
       - name: Reset promotion branch
+        if: ${{ steps.check.outputs.skip == 'false' }}
         run: |
           git fetch origin dev:dev
           git reset --hard dev
@@ -57,6 +113,7 @@ jobs:
       - name: Create Pull Request
         id: create-pr
         uses: peter-evans/create-pull-request@v5
+        if: ${{ steps.check.outputs.skip == 'false' }}
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
           branch: dev
@@ -67,6 +124,7 @@ jobs:
 
       # Not possible if draft: true above
       # - name: Set auto merge on pull request
+      #   if: ${{ steps.check.outputs.skip == 'false' }}
       #   env:
       #     GH_TOKEN: ${{ github.token }}
       #     PR_URL: ${{ steps.create-pr.outputs.pull-request-url }}
@@ -124,6 +182,7 @@ jobs:
       #     draft: true
 
       - name: Create Pull Request
+        if: ${{ steps.check.outputs.skip == 'false' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REF: ${{ github.ref }}

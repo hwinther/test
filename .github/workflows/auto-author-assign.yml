@@ -1,6 +1,5 @@
 name: "Auto Author Assign"
 
-# TODO: Not required when promotion-pull-request.yml is creating the PR - deprecated?
 on:
   pull_request_target:
     types: [opened, reopened]
