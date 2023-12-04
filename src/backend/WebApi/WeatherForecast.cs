@@ -1,13 +1,27 @@
-namespace WebApi
+namespace WebApi;
+
+/// <summary>
+///     Weather forecast model
+/// </summary>
+public class WeatherForecast
 {
-    public class WeatherForecast
-    {
-        public DateOnly Date { get; set; }
+    /// <summary>
+    ///     Date of forecast
+    /// </summary>
+    public DateOnly Date { get; set; }
 
-        public int TemperatureC { get; set; }
+    /// <summary>
+    ///     Temperature in celsius
+    /// </summary>
+    public int TemperatureC { get; set; }
 
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    /// <summary>
+    ///     Temperature in fahrenheit
+    /// </summary>
+    public int TemperatureF => 32 + (int) (TemperatureC / 0.5556);
 
-        public string? Summary { get; set; }
-    }
+    /// <summary>
+    ///     Summary text
+    /// </summary>
+    public string? Summary { get; set; }
 }

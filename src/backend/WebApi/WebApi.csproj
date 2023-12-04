@@ -3,6 +3,8 @@
   <PropertyGroup>
     <UserSecretsId>6bc0ffdf-8845-4a70-a19b-b04e4adbcbb0</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileTag>api</DockerfileTag>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
