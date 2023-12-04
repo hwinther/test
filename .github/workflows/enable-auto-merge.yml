@@ -8,6 +8,7 @@ on:
 jobs:
   auto-merge:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - name: Debug output
         env:
