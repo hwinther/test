@@ -26,7 +26,8 @@ jobs:
         id: version
         with:
           scheme: semver
-          increment: patch
+          increment: minor
+          # TODO: Could we use increment patch when bugfixes land on dev?
 
       - name: Create tag
         uses: actions/github-script@v6
