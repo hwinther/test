@@ -1,16 +1,16 @@
 assembly-versioning-scheme: MajorMinorPatch
 assembly-file-versioning-scheme: MajorMinorPatch
 mode: ContinuousDelivery
-tag-prefix: '[vV]'
+tag-prefix: "[vV]"
 branches:
   develop:
     mode: ContinuousDelivery
-    tag: pre
+    tag: "pre"
     increment: Patch
     regex: ^(dev|(feature|bugfix)\/.*)$
   main:
     mode: ContinuousDelivery
-    tag: ''
+    tag: ""
     increment: Patch
     prevent-increment-of-merged-branch-version: true
     track-merge-target: false
