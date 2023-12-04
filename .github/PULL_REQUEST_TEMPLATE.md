@@ -15,7 +15,7 @@
 - [ ] Local tests
 - [ ] (optional) Local run and endpoint tested in swagger
 
-## Screenshots (if appropriate):
+## Screenshots (if appropriate)
 
 ## Types of changes
 <!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
@@ -23,10 +23,10 @@
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 
-## Checklist:
+## Checklist
 <!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
 <!--- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
-- [ ] The pull request title starts with the jira case number (when applicable), e.g. "NLNN-1234 Add some feature"
+- [ ] The pull request title starts with the jira case number (when applicable), e.g. "TEST-1234 Add some feature"
 - [ ] The person responsible for following up on requested review changes has been assigned to the pull request
 - [ ] My code follows the code style of this project.
 - [ ] I've added *create-diagram* or similar labels to generate extra PR artifacts to assist reviewers
