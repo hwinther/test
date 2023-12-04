@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
 
       - name: Get version
-        uses: reecetech/version-increment@2023.9.3
+        uses: reecetech/version-increment@2023.10.1
         id: version
         with:
           scheme: semver
