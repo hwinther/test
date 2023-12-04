@@ -1,0 +1,20 @@
+assembly-versioning-scheme: MajorMinorPatch
+assembly-file-versioning-scheme: MajorMinorPatch
+mode: ContinuousDelivery
+tag-prefix: '[vV]'
+branches:
+  develop:
+    mode: ContinuousDelivery
+    tag: pre
+    increment: Patch
+    regex: ^(dev|(feature|bugfix)\/.*)$
+  main:
+    mode: ContinuousDelivery
+    tag: ''
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    regex: ^main|qa|test|dev$
+ignore:
+  sha: []
+merge-message-formats: {}
