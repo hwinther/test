@@ -21,6 +21,22 @@ jobs:
         run: |
           echo context: "$GITHUB_CONTEXT"
 
+          echo "Diff head commit:"
+          git diff ${{ github.event.head_commit.id }}
+          git diff --stat ${{ github.event.head_commit.id }}
+          echo "Lines:"
+          git diff ${{ github.event.head_commit.id }} | wc -l
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v40
+
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
+
       - name: Get next version
         uses: reecetech/version-increment@2023.10.1
         id: version
