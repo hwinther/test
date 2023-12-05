@@ -14,6 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/test'
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
       - name: Check if PR exists
         id: check
         env:
@@ -34,7 +38,9 @@ jobs:
               echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
-          diffs=$(git diff --name-status ${{ github.event.before }}..${{ github.event.after }} | wc -l)
+          # If we get "fatal: Invalid revision range id1..id2" we pipe the error to stdout and still get higher than 0,
+          #  which means we fall back to creating a PR if there is an issue by design
+          diffs=$(git diff --name-status ${{ github.event.before }}..${{ github.event.after }} 2>&1 | wc -l)
           echo "diffs=$diffs"
 
           if ((diffs > 0)); then
@@ -44,11 +50,6 @@ jobs:
             echo "setting has_diff false"
             echo "has_diff=false" >> "$GITHUB_OUTPUT"
           fi
-
-      - uses: actions/checkout@v4
-        if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
-        with:
-          ref: main
 
       - name: Reset promotion branch
         if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
@@ -80,6 +81,10 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev'
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test
+
       - name: Check if PR exists
         id: check
         env:
@@ -99,7 +104,9 @@ jobs:
               echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
-          diffs=$(git diff --name-status ${{ github.event.before }}..${{ github.event.after }} | wc -l)
+          # If we get "fatal: Invalid revision range id1..id2" we pipe the error to stdout and still get higher than 0,
+          #  which means we fall back to creating a PR if there is an issue by design
+          diffs=$(git diff --name-status ${{ github.event.before }}..${{ github.event.after }} 2>&1 | wc -l)
           echo "diffs=$diffs"
 
           if ((diffs > 0)); then
@@ -109,11 +116,6 @@ jobs:
             echo "setting has_diff false"
             echo "has_diff=false" >> "$GITHUB_OUTPUT"
           fi
-
-      - uses: actions/checkout@v4
-        if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
-        with:
-          ref: test
 
       - name: Reset promotion branch
         if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
@@ -145,6 +147,10 @@ jobs:
   #   runs-on: ubuntu-latest
   #   if: ${{ contains(github.ref, 'refs/heads/feature/') || contains(github.ref, 'refs/heads/bugfix/') }}
   #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: dev
+
   #     - name: Check if PR exists
   #       id: check
   #       env:
@@ -164,7 +170,9 @@ jobs:
   #             echo "skip=false" >> "$GITHUB_OUTPUT"
   #         fi
 
-  #         diffs=$(git diff --name-status ${{ github.event.before }}..${{ github.event.after }} | wc -l)
+  #         # If we get "fatal: Invalid revision range id1..id2" we pipe the error to stdout and still get higher than 0,
+  #         #  which means we fall back to creating a PR if there is an issue by design
+  #         diffs=$(git diff --name-status ${{ github.event.before }}..${{ github.event.after }} 2>&1 | wc -l)
   #         echo "diffs=$diffs"
 
   #         if ((diffs > 0)); then
@@ -174,11 +182,6 @@ jobs:
   #           echo "setting has_diff false"
   #           echo "has_diff=false" >> "$GITHUB_OUTPUT"
   #         fi
-
-  #     - uses: actions/checkout@v4
-  #       if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
-  #       with:
-  #         ref: dev
 
   #     - name: Reset promotion branch
   #       if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}

@@ -10,6 +10,8 @@ on:
     paths:
       - "src/backend/**"
       - "tests/backend/**"
+    tags:
+      - "v*"
   pull_request:
     branches:
       - main
