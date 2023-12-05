@@ -25,6 +25,7 @@ jobs:
               --repo "$GITHUB_REPOSITORY" \
               --json baseRefName,headRefName \
               --jq "map(select(.baseRefName == \"main\" and .headRefName == \"$ref\")) | length")
+
           if ((prs > 0)); then
               echo "setting skip true"
               echo "skip=true" >> "$GITHUB_OUTPUT"
@@ -33,13 +34,24 @@ jobs:
               echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
+          diffs=$(git diff --name-status ${{ github.event.before }}..${{ github.event.after }} | wc -l)
+          echo "diffs=$diffs"
+
+          if ((diffs > 0)); then
+            echo "setting has_diff true"
+            echo "has_diff=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "setting has_diff false"
+            echo "has_diff=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
-        if: ${{ steps.check.outputs.skip == 'false' }}
+        if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
         with:
           ref: main
 
       - name: Reset promotion branch
-        if: ${{ steps.check.outputs.skip == 'false' }}
+        if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
         run: |
           git fetch origin test:test
           git reset --hard test
@@ -47,7 +59,7 @@ jobs:
       - name: Create Pull Request
         id: create-pr
         uses: peter-evans/create-pull-request@v5
-        if: ${{ steps.check.outputs.skip == 'false' }}
+        if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
           branch: test
@@ -58,7 +70,7 @@ jobs:
 
       # Not possible if draft: true above
       # - name: Set auto merge on pull request
-      #   if: ${{ steps.check.outputs.skip == 'false' }}
+      #   if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
       #   env:
       #     GH_TOKEN: ${{ github.token }}
       #     PR_URL: ${{ steps.create-pr.outputs.pull-request-url }}
@@ -87,13 +99,24 @@ jobs:
               echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
+          diffs=$(git diff --name-status ${{ github.event.before }}..${{ github.event.after }} | wc -l)
+          echo "diffs=$diffs"
+
+          if ((diffs > 0)); then
+            echo "setting has_diff true"
+            echo "has_diff=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "setting has_diff false"
+            echo "has_diff=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
-        if: ${{ steps.check.outputs.skip == 'false' }}
+        if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
         with:
           ref: test
 
       - name: Reset promotion branch
-        if: ${{ steps.check.outputs.skip == 'false' }}
+        if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
         run: |
           git fetch origin dev:dev
           git reset --hard dev
@@ -101,7 +124,7 @@ jobs:
       - name: Create Pull Request
         id: create-pr
         uses: peter-evans/create-pull-request@v5
-        if: ${{ steps.check.outputs.skip == 'false' }}
+        if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
           branch: dev
@@ -112,7 +135,7 @@ jobs:
 
       # Not possible if draft: true above
       # - name: Set auto merge on pull request
-      #   if: ${{ steps.check.outputs.skip == 'false' }}
+      #   if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
       #   env:
       #     GH_TOKEN: ${{ github.token }}
       #     PR_URL: ${{ steps.create-pr.outputs.pull-request-url }}
@@ -141,19 +164,30 @@ jobs:
   #             echo "skip=false" >> "$GITHUB_OUTPUT"
   #         fi
 
+  #         diffs=$(git diff --name-status ${{ github.event.before }}..${{ github.event.after }} | wc -l)
+  #         echo "diffs=$diffs"
+
+  #         if ((diffs > 0)); then
+  #           echo "setting has_diff true"
+  #           echo "has_diff=true" >> "$GITHUB_OUTPUT"
+  #         else
+  #           echo "setting has_diff false"
+  #           echo "has_diff=false" >> "$GITHUB_OUTPUT"
+  #         fi
+
   #     - uses: actions/checkout@v4
-  #       if: ${{ steps.check.outputs.skip == 'false' }}
+  #       if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
   #       with:
   #         ref: dev
 
   #     - name: Reset promotion branch
-  #       if: ${{ steps.check.outputs.skip == 'false' }}
+  #       if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
   #       run: |
   #         git fetch origin ${{ github.ref }}:${{ github.ref }}
   #         git reset --hard ${{ github.ref }}
 
   #     - name: Create Pull Request
-  #       if: ${{ steps.check.outputs.skip == 'false' }}
+  #       if: ${{ steps.check.outputs.skip == 'false' && steps.check.outputs.has_diff == 'true' }}
   #       env:
   #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   #         REF: ${{ github.ref }}
