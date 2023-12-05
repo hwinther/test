@@ -10,6 +10,7 @@ on:
     paths:
       - "src/backend/**"
       - "tests/backend/**"
+  push:
     tags:
       - "v*"
   pull_request:
