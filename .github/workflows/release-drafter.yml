@@ -12,6 +12,10 @@ on:
       - main
     types: [opened, reopened, synchronize]
 
+# The default contents permission should be read outside of the update_release_draft job
+permissions:
+  contents: read
+
 jobs:
   update_release_draft:
     permissions:
