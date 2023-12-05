@@ -1,5 +1,6 @@
 name: "Maintain version tag PR comment"
 
+# TODO: delete this if it works to change tag.yml to handle this
 on:
   push:
     tags:
