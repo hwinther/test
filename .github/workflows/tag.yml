@@ -15,16 +15,13 @@ jobs:
         with:
           fetch-depth: 0 # used by version (git) operations to find the most recent tag outside of this branch
 
-      - name: Debug output
-        id: check
+      - name: Check files changed
+        id: check-changes
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           echo context: "$GITHUB_CONTEXT"
-
-          echo "Diff head commit:"
-          git diff --name-status ${{ github.event.before }}..${{ github.event.after }}
-          git diff --stat ${{ github.event.head_commit.id }}
+          # git diff --name-status ${{ github.event.before }}..${{ github.event.after }}
 
           diffs=$(git diff --name-status ${{ github.event.before }}..${{ github.event.after }} | wc -l)
           echo "diffs=$diffs"
@@ -37,20 +34,10 @@ jobs:
             echo "has_diff=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v40
-
-      - name: List all changed files
-        run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            echo "$file was changed"
-          done
-
       - name: Get next version
         uses: reecetech/version-increment@2023.10.1
         id: version
-        if: ${{ steps.check.outputs.has_diff == 'true' }}
+        if: ${{ steps.check-changes.outputs.has_diff == 'true' }}
         with:
           scheme: semver
           increment: minor
@@ -58,7 +45,7 @@ jobs:
 
       - name: Create tag
         uses: actions/github-script@v6
-        if: ${{ steps.check.outputs.has_diff == 'true' }}
+        if: ${{ steps.check-changes.outputs.has_diff == 'true' }}
         with:
           github-token: ${{ secrets.WORKFLOW_TOKEN }}
           script: |
