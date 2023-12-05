@@ -19,18 +19,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         run: |
-          echo "repo: $GITHUB_REPOSITORY"
-          echo "github ref: $GITHUB_REF"
-          ref=$(echo $GITHUB_REF | sed 's/refs\/heads\///g')
-          echo "ref: $ref"
-
           prs=$(gh pr list \
               --repo "$GITHUB_REPOSITORY" \
               --json baseRefName,headRefName \
               --jq "map(select(.baseRefName == \"main\" and .headRefName == \"$ref\")) | length")
-
-          echo "prs: $prs"
-
           if ((prs > 0)); then
               echo "setting skip true"
               echo "skip=true" >> "$GITHUB_OUTPUT"
@@ -57,7 +49,7 @@ jobs:
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
           branch: test
-          title: Merging test changes to main
+          title: Merge test changes to main
           body: Automatically created pull-request in order to merge changes that were recently pushed to the test branch, back to main
           # assignees: hwinther-tietoevry
           draft: true
@@ -79,18 +71,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         run: |
-          echo "repo: $GITHUB_REPOSITORY"
-          echo "github ref: $GITHUB_REF"
-          ref=$(echo $GITHUB_REF | sed 's/refs\/heads\///g')
-          echo "ref: $ref"
-
           prs=$(gh pr list \
               --repo "$GITHUB_REPOSITORY" \
               --json baseRefName,headRefName \
               --jq "map(select(.baseRefName == \"test\" and .headRefName == \"$ref\")) | length")
-
-          echo "prs: $prs"
-
           if ((prs > 0)); then
               echo "setting skip true"
               echo "skip=true" >> "$GITHUB_OUTPUT"
@@ -117,7 +101,7 @@ jobs:
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
           branch: dev
-          title: Merging dev changes to test
+          title: Merge dev changes to test
           body: Automatically created pull-request in order to merge changes that were recently pushed to the dev branch, back to test
           # assignees: hwinther-tietoevry
           draft: true
@@ -139,18 +123,10 @@ jobs:
   #       env:
   #         GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
   #       run: |
-  #         echo "repo: $GITHUB_REPOSITORY"
-  #         echo "github ref: $GITHUB_REF"
-  #         ref=$(echo $GITHUB_REF | sed 's/refs\/heads\///g')
-  #         echo "ref: $ref"
-
   #         prs=$(gh pr list \
   #             --repo "$GITHUB_REPOSITORY" \
   #             --json baseRefName,headRefName \
   #             --jq "map(select(.baseRefName == \"dev\" and .headRefName == \"$ref\")) | length")
-
-  #         echo "prs: $prs"
-
   #         if ((prs > 0)); then
   #             echo "setting skip true"
   #             echo "skip=true" >> "$GITHUB_OUTPUT"
