@@ -9,6 +9,8 @@ on:
 jobs:
   tag-on-push:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,3 +57,27 @@ jobs:
               ref: 'refs/tags/v${{ steps.version.outputs.version }}',
               sha: context.sha
             })
+
+      - name: Update PR
+        id: update-pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ steps.check-changes.outputs.has_diff == 'true' && github.ref == 'refs/heads/test' }}
+        run: |
+          # Debug output:
+          gh pr list --json baseRefName,headRefName,number
+
+          pr_number=$(gh pr list --json baseRefName,headRefName,number --jq 'map(select(.baseRefName == "main" and .headRefName == "test")) | .[0].number')
+          echo "pr_number=$pr_number"
+          echo "pr_number=$pr_number" >> "$GITHUB_OUTPUT"
+
+          gh pr edit $pr_number --title "Merge test changes to main - ${{ steps.version.outputs.v-version }}"
+
+      - name: "Create or update version tag comment in test PR"
+        uses: im-open/update-pr-comment@v1.1.3
+        if: ${{ steps.check-changes.outputs.has_diff == 'true' && github.ref == 'refs/heads/test' }}
+        with:
+          pr-number: ${{ steps.update-pr.outputs.pr_number }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-identifier: "current-tag"
+          comment-content: "🕔 This PR currently contains the tag: ${{ steps.version.outputs.v-version }} which supersedes ${{ steps.version.outputs.current-v-version }}"
