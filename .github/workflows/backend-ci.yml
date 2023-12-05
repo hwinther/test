@@ -10,6 +10,8 @@ on:
     paths:
       - "src/backend/**"
       - "tests/backend/**"
+    tags:
+      - "v*"
   pull_request:
     branches:
       - main
@@ -39,7 +41,7 @@ jobs:
           fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -72,7 +74,7 @@ jobs:
           fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
