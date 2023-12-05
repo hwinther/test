@@ -58,6 +58,8 @@ jobs:
             })
 
       - name: Update PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ steps.check-changes.outputs.has_diff == 'true' && github.ref == 'refs/heads/test' }}
         run: |
           pr_number=$(gh pr list --json baseRefName,headRefName,number --jq 'map(select(.baseRefName == "qa" and .headRefName == "test")) | .[0].number')
