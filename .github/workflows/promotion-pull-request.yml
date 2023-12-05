@@ -20,6 +20,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         run: |
           ref=$(echo $GITHUB_REF | sed 's/refs\/heads\///g')
+          echo "ref=$ref"
           prs=$(gh pr list \
               --repo "$GITHUB_REPOSITORY" \
               --json baseRefName,headRefName \
@@ -73,6 +74,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         run: |
           ref=$(echo $GITHUB_REF | sed 's/refs\/heads\///g')
+          echo "ref=$ref"
           prs=$(gh pr list \
               --repo "$GITHUB_REPOSITORY" \
               --json baseRefName,headRefName \
@@ -126,6 +128,7 @@ jobs:
   #         GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
   #       run: |
   #         ref=$(echo $GITHUB_REF | sed 's/refs\/heads\///g')
+  #         echo "ref=$ref"
   #         prs=$(gh pr list \
   #             --repo "$GITHUB_REPOSITORY" \
   #             --json baseRefName,headRefName \
