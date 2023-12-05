@@ -82,6 +82,13 @@ jobs:
         with:
           fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
 
+      - name: Debug output
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo user: ${{ github.event.pull_request.user.login }}
+          echo context: "$GITHUB_CONTEXT"
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
