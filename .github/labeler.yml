@@ -1,22 +1,27 @@
 workflow:
-  - .github/workflows/*
+  - changed-files:
+      - any-glob-to-any-file: ".github/workflows/*"
 
 github:
-  - .github/*
+  - changed-files:
+      - any-glob-to-any-file: ".github/*"
 
 documentation:
-  - docs/*
-  - "**/*.md"
+  - changed-files:
+      - any-glob-to-any-file: ["docs/*", "**/*.md"]
 
 backend:
-  - "src/backend/**"
+  - changed-files:
+      - any-glob-to-any-file: "src/backend/**"
 
 frontend:
-  - "src/frontend/**"
+  - changed-files:
+      - any-glob-to-any-file: "src/frontend/**"
 
 dependencies:
-  - "src/**/*.lock.json"
-  - "src/**/yarn.lock"
+  - changed-files:
+      - any-glob-to-any-file: ["src/**/*.lock.json", "src/**/yarn.lock"]
 
 platform:
-  - "src/platform/**"
+  - changed-files:
+      - any-glob-to-any-file: "src/platform/**"
