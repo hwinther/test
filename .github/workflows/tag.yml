@@ -57,15 +57,18 @@ jobs:
               sha: context.sha
             })
 
-            pr_number=$(gh pr list --json baseRefName,headRefName,number --jq 'map(select(.baseRefName == "dev" and .headRefName == "feature/BOGI-805-new-db-admin")) | .[0].number')
-            echp "pr_number=$pr_number"
-            echo "pr_number=$pr_number" >> "$GITHUB_OUTPUT"
+      - name: Update PR
+        if: ${{ steps.check-changes.outputs.has_diff == 'true' && github.ref == 'refs/heads/test' }}
+        run: |
+          pr_number=$(gh pr list --json baseRefName,headRefName,number --jq 'map(select(.baseRefName == "qa" and .headRefName == "test")) | .[0].number')
+          echp "pr_number=$pr_number"
+          echo "pr_number=$pr_number" >> "$GITHUB_OUTPUT"
 
-            gh pr edit $pr_number --title "Merge test changes to main - ${{ steps.version.outputs.v-version }}"
+          gh pr edit $pr_number --title "Merge test changes to main - ${{ steps.version.outputs.v-version }}"
 
       - name: "Create or update version tag comment in test PR"
         uses: im-open/update-pr-comment@v1.1.3
-        if: github.ref == 'refs/heads/test'
+        if: ${{ steps.check-changes.outputs.has_diff == 'true' && github.ref == 'refs/heads/test' }}
         with:
           pr-number: ${{ steps.create-tag.outputs.pr_number }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
