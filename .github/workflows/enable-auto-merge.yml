@@ -25,21 +25,21 @@ jobs:
       - name: Enable auto merge on dependabot PRs
         if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login == 'dependabot[bot]' }}
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ github.token }} # We're using the github token here which means pushes to dev will not trigger CI
           PR_NUMBER: ${{ github.event.number }}
         run: gh pr merge --squash --auto $PR_NUMBER
 
       - name: Enable auto squash merge on github actions PRs related to feature branches
         if: ${{ github.event.pull_request.draft == false && (contains(github.head_ref, 'feature') || contains(github.head_ref, 'bugfix')) }}
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}
         run: gh pr merge --squash --auto $PR_NUMBER
 
       - name: Enable auto merge on github actions PRs related to environment promotions
         if: ${{ github.event.pull_request.draft == false && (github.head_ref == 'main' || github.head_ref == 'qa' || github.head_ref == 'test' || github.head_ref == 'dev') }}
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}
         run: gh pr merge --merge --auto $PR_NUMBER
 
