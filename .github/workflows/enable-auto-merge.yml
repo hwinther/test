@@ -20,12 +20,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ github.token }}
+          token: ${{ secrets.WORKFLOW_TOKEN }}
 
       - name: Enable auto merge on dependabot PRs
         if: ${{ github.event.pull_request.draft == false && github.event.pull_request.user.login == 'dependabot[bot]' }}
         env:
-          GH_TOKEN: ${{ github.token }} # We're using the github token here which means pushes to dev will not trigger CI
+          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }} # We're using the github token here which means pushes to dev will not trigger CI
           PR_NUMBER: ${{ github.event.number }}
         run: gh pr merge --squash --auto $PR_NUMBER
 

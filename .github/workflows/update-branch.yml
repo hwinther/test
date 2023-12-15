@@ -23,6 +23,7 @@ jobs:
 
       - name: Update (rebase) test and dev branch
         if: github.ref == 'refs/heads/main'
+        continue-on-error: true
         run: |
           git checkout test
           git rebase main test
@@ -34,6 +35,7 @@ jobs:
 
       - name: Update (rebase) dev branch
         if: github.ref == 'refs/heads/test'
+        continue-on-error: true
         run: |
           git checkout dev
           git rebase test dev
