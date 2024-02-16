@@ -22,6 +22,14 @@ updates:
       interval: "daily"
     assignees:
       - "hwinther-tietoevry"
+    groups:
+      microsoft:
+        patterns:
+          - "Microsoft.*"
+      xunit:
+        patterns:
+          - "xunit"
+          - "xunit.*"
 
   - package-ecosystem: "npm"
     directory: "/src/frontend"
@@ -32,3 +40,17 @@ updates:
       day: "sunday"
     assignees:
       - "hwinther-tietoevry"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
+    groups:
+      types:
+        patterns:
+          - "@types/*"
+      eslint:
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@typescript-eslint/*"
+          - "*/eslint-plugin"
+          - "*/eslint-plugin-*"
