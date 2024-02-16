@@ -25,12 +25,8 @@ jobs:
 
       - name: Check files changed
         id: check-changes
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
-          echo context: "$GITHUB_CONTEXT"
           # git diff --name-status ${{ github.event.before }}..${{ github.event.after }}
-
           diffs=$(git diff --name-status ${{ github.event.before }}..${{ github.event.after }} | wc -l)
           echo "diffs=$diffs"
 
