@@ -30,15 +30,13 @@ $DEV_BRANCH)
 
 $MAIN_BRANCH)
     error_msg="Aborting commit. Please prefix JIRA issue (${JIRA_TAG}-XXXX) and a verb ${IMPERATIVE_VERBS} to the commit message."
-    commit_regex_string="^${JIRA_TAG}-[0-9]+ ${IMPERATIVE_VERBS} [A-Za-z0-9 \/\'\,\._-]+$"
+    commit_regex_string="^${JIRA_TAG}-[0-9]+ ${IMPERATIVE_VERBS} .*$"
     ;;
 
 \
     *)
     error_msg="Aborting commit. Please prefix JIRA issue (${JIRA_TAG}-XXXX) and a verb ${IMPERATIVE_VERBS} to the commit message."
-    commit_regex_string="^${JIRA_TAG}-[0-9]+ ${IMPERATIVE_VERBS} [A-Za-z0-9 \/\'\,\._-]+$"
-    # echo "Unhandled branch value $current_branch"
-    # exit 1
+    commit_regex_string="^${JIRA_TAG}-[0-9]+ ${IMPERATIVE_VERBS} .*$"
     ;;
 esac
 
