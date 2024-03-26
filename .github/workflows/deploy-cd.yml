@@ -1,0 +1,191 @@
+name: "Deploy CD"
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        required: true
+        type: string
+        description: prod|qa|test|dev
+      repo_name:
+        required: true
+        type: string
+        description: main|qa|test|dev (repo name defined separate because main maps to prod)
+      labels:
+        required: true
+        type: string
+        description: labels from conditions in trigger workflow
+  workflow_call:
+    inputs:
+      deploy_target:
+        required: true
+        type: string
+        description: prod|qa|test|dev
+      repo_name:
+        required: true
+        type: string
+        description: main|qa|test|dev (repo name defined separate because main maps to prod)
+      labels:
+        required: true
+        type: string
+        description: labels from conditions in trigger workflow
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  TRAILING_AGENT_WORK_PATH: "/home/runner/work/test/test/"
+  DOTNET_VERSION: "8.0.x"
+  BACKEND_SOLUTION_PATH: "src/backend"
+  AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+  DOCKER_REGISTRY_SERVER: "crtest${{ inputs.deploy_target }}ne.azurecr.io"
+  DOCKER_REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+  DOCKER_REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  POWERAPPS_ENVIRONMENTURL: ${{ secrets.POWERAPPS_ENVIRONMENTURL }}
+  POWERAPPS_APPID: ${{ secrets.POWERAPPS_APPID }}
+  POWERAPPS_TENANTID: ${{ secrets.POWERAPPS_TENANTID }}
+  POWERAPPS_SECRET: ${{ secrets.POWERAPPS_SECRET }}
+
+jobs:
+  deploy:
+    name: Deploy to target environment
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.deploy_target }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version
+        uses: reecetech/version-increment@2023.10.2
+        id: version
+        with:
+          scheme: semver
+          increment: minor
+
+      # TODO: Only check version once and set environment variables (GITHUB_ENV) so that the values become available to all actions/workflows afterwards
+      # Then replace the many calls to reecetech/version-increment afterwards - partially solved here now:
+      - name: "Set version environment variables"
+        shell: bash
+        id: set-version
+        working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
+        env:
+          INFORMATIONAL_VERSION: ${{ (github.ref == 'test' || github.ref == 'dev') && steps.version.outputs.version || steps.version.outputs.current-version }}
+        run: |
+          VERSION=$(echo "${INFORMATIONAL_VERSION}" | sed -re "s/^([0-9]+\.[0-9]+\.[0-9]+\.*[0-9]*)-.*$/\1/g")
+          echo "VERSION=$VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "INFORMATIONAL_VERSION=$INFORMATIONAL_VERSION"
+          echo "INFORMATIONAL_VERSION=$INFORMATIONAL_VERSION" >> $GITHUB_ENV
+          echo "INFORMATIONAL_VERSION=$INFORMATIONAL_VERSION" >> $GITHUB_OUTPUT
+          echo "version.outputs.v-version=${{ steps.version.outputs.v-version }}"
+
+      - name: Deploy platform via terraform
+        uses: ./.github/actions/platform-deploy
+        with:
+          deploy_target: ${{ inputs.deploy_target }}
+          working_directory: "./templates/terraform/"
+          config_path: "./config/conf-${{ inputs.deploy_target }}.conf"
+          var_path: "./variables/${{ inputs.deploy_target }}.tfvars"
+
+      - name: Deploy PowerApps - BASIL
+        uses: ./.github/actions/powerapps-deploy
+        if: ${{ inputs.deploy_target != 'dev' }}
+        with:
+          deploy_target: ${{ inputs.deploy_target }}
+          solution_name: "basilgsi"
+          solution_folder: "src/PowerApps/Basil"
+          environment_file: "src/PowerApps/Basil-environment.json"
+
+      - name: Deploy PowerApps - GSI
+        uses: ./.github/actions/powerapps-deploy
+        if: ${{ inputs.deploy_target != 'dev' }}
+        with:
+          deploy_target: ${{ inputs.deploy_target }}
+          solution_name: "gsi"
+          solution_folder: "src/PowerApps/Gsi"
+          environment_file: "src/PowerApps/Gsi-environment.json"
+
+      - name: "Set version environment variables"
+        shell: bash
+        working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
+        run: |
+          # Passing the build parameters does not override the default values in Directory.Build.props, so we have to replace the default values here
+          sed -ri "s|0.0.0.1-local-dev|$INFORMATIONAL_VERSION|" Directory.Build.props
+          sed -ri "s|0.0.0.1|$VERSION|" Directory.Build.props
+          echo "Directory.Build.props content after version replacement:"
+          cat Directory.Build.props
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - uses: actions/cache@v4
+        id: nuget-cache
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('**/packages.lock.json') }}
+      - name: dotnet restore
+        shell: bash
+        working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
+        run: |
+          dotnet restore --locked-mode
+          dotnet tool restore
+
+      - name: Update database via entity framework
+        working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
+        env:
+          TestConnectionString: ${{ secrets.SQL_BASIL_CONNECTION_STRING }}
+        run: |
+          dotnet ef database update --project Test.Common --context TestDbContext
+
+      - name: Deploy TEST function app
+        uses: ./.github/actions/backend-deploy
+        with:
+          deploy_target: ${{ inputs.deploy_target }}
+          repo_name: ${{ inputs.repo_name }}
+          labels: ${{ inputs.labels }}
+          base_name: functions
+          project_type: function
+          dockerfile_path: "Test.Functions/Dockerfile"
+          docker_image_name: "functions"
+          azure_resource_name: "func-functions-${{ inputs.deploy_target }}-ne"
+          skip_setup: true
+
+      - name: Deploy TEST api
+        uses: ./.github/actions/backend-deploy
+        with:
+          deploy_target: ${{ inputs.deploy_target }}
+          repo_name: ${{ inputs.repo_name }}
+          labels: ${{ inputs.labels }}
+          base_name: login
+          project_type: app
+          dockerfile_path: "Test.Api/Dockerfile"
+          docker_image_name: "api"
+          azure_resource_name: "app-api-${{ inputs.deploy_target }}-ne"
+          skip_setup: true
+
+      # - name: Send deploy success message to slack
+      #   if: ${{ success() }}
+      #   uses: slackapi/slack-github-action@v1.25.0
+      #   with:
+      #     payload: |
+      #       {
+      #         "message": "Deploy succeeded (${{ steps.set-version.outputs.INFORMATIONAL_VERSION }})",
+      #         "deploy_target": "${{ inputs.deploy_target }}"
+      #       }
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      # - name: Send deploy failed message to slack
+      #   if: ${{ failure() }}
+      #   uses: slackapi/slack-github-action@v1.25.0
+      #   with:
+      #     payload: |
+      #       {
+      #         "message": "Deploy failed (${{ steps.set-version.outputs.INFORMATIONAL_VERSION }})",
+      #         "deploy_target": "${{ inputs.deploy_target }}"
+      #       }
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

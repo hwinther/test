@@ -1,0 +1,93 @@
+name: "Deploy CD - trigger"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - qa
+      - test
+      - dev
+    paths:
+      - "src/**"
+      - "templates/terraform/**"
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - dev
+    paths:
+      - "src/**"
+      - "templates/terraform/**"
+      - ".github/workflows/deploy-*.yml"
+      - ".github/actions/backend-deploy/action.yml"
+    types: [opened, reopened, labeled, synchronize, ready_for_review]
+
+# Sets permissions of the GITHUB_TOKEN to allow creating checks and updating PR
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+# This allows a subsequently queued workflow run to interrupt previous runs
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  conditions:
+    runs-on: ubuntu-latest
+    outputs:
+      labels: ${{ steps.vars.outputs.labels }}
+    steps:
+      - name: Set variables
+        id: vars
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          labels="$(gh api repos/$OWNER/$REPO_NAME/pulls/$PULL_REQUEST_NUMBER --jq '.labels.[].name' | tr '\n' ' ')"
+          echo "labels=$labels" >> $GITHUB_OUTPUT
+          echo "labels=$labels"
+
+  call-deploy-workflow-main:
+    if: ${{ github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.base_ref == 'main' && github.event.pull_request.draft == false) }}
+    needs: [conditions]
+    uses: hwinther-tietoevry/test/.github/workflows/deploy-cd.yml@main
+    with:
+      deploy_target: prod
+      repo_name: main
+      labels: ${{ needs.conditions.outputs.labels }}
+    secrets: inherit
+
+  call-deploy-workflow-qa:
+    if: ${{ github.ref == 'refs/heads/qa' || (github.event_name == 'pull_request' && github.base_ref == 'qa' && github.event.pull_request.draft == false) }}
+    needs: [conditions]
+    uses: hwinther-tietoevry/test/.github/workflows/deploy-cd.yml@qa
+    with:
+      deploy_target: qa
+      repo_name: qa
+      labels: ${{ needs.conditions.outputs.labels }}
+    secrets: inherit
+
+  call-deploy-workflow-test:
+    if: ${{ github.ref == 'refs/heads/test' || (github.event_name == 'pull_request' && github.base_ref == 'test' && github.event.pull_request.draft == false) }}
+    needs: [conditions]
+    uses: hwinther-tietoevry/test/.github/workflows/deploy-cd.yml@test
+    with:
+      deploy_target: test
+      repo_name: test
+      labels: ${{ needs.conditions.outputs.labels }}
+    secrets: inherit
+
+  call-deploy-workflow-dev:
+    if: ${{ github.ref == 'refs/heads/dev' || (github.event_name == 'pull_request' && contains(needs.conditions.outputs.labels, 'deploy-azure')) }}
+    needs: [conditions]
+    uses: hwinther-tietoevry/test/.github/workflows/deploy-cd.yml@dev
+    with:
+      deploy_target: dev
+      repo_name: dev
+      labels: ${{ needs.conditions.outputs.labels }}
+    secrets: inherit

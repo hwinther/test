@@ -1,0 +1,83 @@
+name: "Backend deploy"
+
+inputs:
+  deploy_target:
+    required: true
+    type: string
+    description: prod|qa|test|dev
+  working_directory:
+    required: true
+    type: string
+    description: root folder where the main terraform plan resides, e.g. ./templates/terraform/
+  config_path:
+    required: true
+    type: string
+    description: .conf file relative to working_directory
+  var_path:
+    required: true
+    type: string
+    description: .var file path relative to working_directory
+
+runs:
+  using: "composite"
+  steps:
+    - name: Output Subscription Id
+      shell: bash
+      run: |
+        echo "ARM_SUBSCRIPTION_ID=$ARM_SUBSCRIPTION_ID"
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_wrapper: false
+
+    - name: Terraform Init
+      working-directory: ${{ inputs.working_directory }}
+      shell: bash
+      run: terraform init -backend-config="${{ inputs.config_path }}"
+
+    - name: Terraform Plan
+      working-directory: ${{ inputs.working_directory }}
+      id: tf-plan
+      shell: bash
+      run: |
+        export exitcode=0
+        terraform plan -detailed-exitcode -no-color -out tfplan -var-file="${{ inputs.var_path }}" || export exitcode=$?
+        echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
+        if [ $exitcode -eq 1 ]; then
+          echo Terraform Plan Failed!
+          exit 1
+        else 
+          echo Terraform Plan Successful!
+          exit 0
+        fi
+
+    - name: Create String Output
+      working-directory: ${{ inputs.working_directory }}
+      id: tf-plan-string
+      shell: bash
+      run: |
+        TERRAFORM_PLAN=$(terraform show -no-color tfplan)
+        delimiter="$(openssl rand -hex 8)"
+        echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
+        echo "## Terraform Plan Output" >> $GITHUB_OUTPUT
+        echo "<details><summary>Click to expand</summary>" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo '```terraform' >> $GITHUB_OUTPUT
+        echo "$TERRAFORM_PLAN" >> $GITHUB_OUTPUT
+        echo '```' >> $GITHUB_OUTPUT
+        echo "</details>" >> $GITHUB_OUTPUT
+        echo "${delimiter}" >> $GITHUB_OUTPUT
+
+    - name: Publish Terraform Plan to Task Summary
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        SUMMARY: ${{ steps.tf-plan-string.outputs.summary }}
+      shell: bash
+      run: |
+        echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+
+    - name: Terraform Apply
+      working-directory: ${{ inputs.working_directory }}
+      shell: bash
+      run: terraform apply -auto-approve tfplan

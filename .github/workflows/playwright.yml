@@ -1,0 +1,231 @@
+name: "Playwright e2e tests"
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        required: true
+        type: string
+        description: prod|qa|test|dev
+      repo_name:
+        required: true
+        type: string
+        description: main|qa|test|dev (repo name defined separate because main maps to prod)
+      url_prefix:
+        required: true
+        type: string
+        description: (empty)|qa-|test-|dev-
+  workflow_call:
+    inputs:
+      deploy_target:
+        required: true
+        type: string
+        description: prod|qa|test|dev
+      repo_name:
+        required: true
+        type: string
+        description: main|qa|test|dev (repo name defined separate because main maps to prod)
+      url_prefix:
+        required: true
+        type: string
+        description: (empty)|qa-|test-|dev-
+
+env:
+  NODE_VERSION: "20"
+  WORKFLOW_SHORT_NAME: "test-e2e"
+  PLAYWRIGHT_PATH: "tests/playwright"
+  TRAILING_AGENT_WORK_PATH: "/home/runner/work/test/test/"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    defaults:
+      run:
+        working-directory: ${{ env.PLAYWRIGHT_PATH }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        name: Setup node
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: "${{ env.PLAYWRIGHT_PATH }}/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        id: npm-build
+        run: |
+          npm run build 1>npm-npm.out 2>&1 || (exit 0)
+          grep "): error " npm-npm.out > npm-npm.err || (exit 0)
+
+          if [ ! -s npm-npm.err ]
+          then
+            echo "## ✅ Build successful" > npm-npm.md
+          else
+            # Reformat error output as github error annotations
+            error_regex="(.+)\(([0-9]+),[0-9]+\): error (.+)"
+            cat npm-npm.err | while read line
+            do
+              if [[ $line =~ $error_regex ]]; then
+                echo "::error file=${BASH_REMATCH[1]},line=${BASH_REMATCH[2]}::${BASH_REMATCH[3]}"
+              fi
+            done
+
+            cp npm-npm.err npm-npm.md
+            sed -i '/^$/d' npm-npm.md             # removes empty lines
+            sed -i -e 's/^/- ❌ /' npm-npm.md     # prefix with markdown list item and cross mark emoji
+            echo "## ❌ The following build issues should be fixed:" | cat - npm-npm.md > npm-npm.md.temp && mv npm-npm.md.temp npm-npm.md
+          fi
+
+          echo "result<<EOF"$'\n'"$(cat npm-npm.md)"$'\n'EOF >> $GITHUB_OUTPUT
+          cat npm-npm.md >> $GITHUB_STEP_SUMMARY
+
+          if [ -s npm-npm.err ]
+          then
+            exit 1
+          fi
+
+      - name: "Create or Update PR Comment"
+        uses: im-open/update-pr-comment@v1.1.3
+        if: ${{ always() && github.event_name == 'pull_request' }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-build-results"
+          comment-content: ${{ steps.npm-build.outputs.result }}
+
+      - name: Lint
+        if: always()
+        id: yarn-lint
+        run: |
+          (npm run lint -- -f compact | grep ": line " | sed -e 's|${{ env.TRAILING_AGENT_WORK_PATH }}||') 1>yarn-lint.err 2>&1 || (exit 0)
+
+          if [ ! -s yarn-lint.err ]
+          then
+            echo "## ✅ No linting issues 🎊" > yarn-lint.md
+          else
+            # Reformat lint output as github error annotations
+            error_regex="(.+): line ([0-9]+), col [0-9]+, [A-Za-z]+ - (.+)"
+            cat yarn-lint.err | while read line
+            do
+              if [[ $line =~ $error_regex ]]; then
+                echo "::error file=${BASH_REMATCH[1]},line=${BASH_REMATCH[2]}::${BASH_REMATCH[3]}"
+              fi
+            done
+
+            cp yarn-lint.err yarn-lint.md
+            sed -i '/^$/d' yarn-lint.md             # removes empty lines
+            sed -i -e 's/^/- ❌ /' yarn-lint.md     # prefix with markdown list item and cross mark emoji
+            echo "## ❌ The following linting issues should be fixed:" | cat - yarn-lint.md > yarn-lint.md.temp && mv yarn-lint.md.temp yarn-lint.md
+          fi
+
+          echo "result<<EOF"$'\n'"$(cat yarn-lint.md)"$'\n'EOF >> $GITHUB_OUTPUT
+          cat yarn-lint.md >> $GITHUB_STEP_SUMMARY
+
+          if [ -s yarn-lint.err ]
+          then
+            exit 1
+          fi
+
+      - name: "Create or Update PR Comment"
+        uses: im-open/update-pr-comment@v1.1.3
+        if: ${{ always() && github.event_name == 'pull_request' }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-lint-results"
+          comment-content: ${{ steps.yarn-lint.outputs.result }}
+
+  run-e2e-tests:
+    runs-on: ubuntu-latest
+    if: ${{ (github.event_name == 'pull_request' && github.event.pull_request.draft == false) || contains(github.ref, inputs.repo_name) }}
+    needs: ["build"]
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: ${{ env.PLAYWRIGHT_PATH }}
+    environment: ${{ inputs.deploy_target }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        name: Setup node
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: "${{ env.PLAYWRIGHT_PATH }}/package-lock.json"
+
+      - name: Get API token and set environment variables
+        run: |
+          TOKEN=$(curl ${{ secrets.UIDP_AUTHORITY }}/connect/token -H "Content-Type: application/x-www-form-urlencoded" --data "grant_type=client_credentials&client_id=${{ secrets.API_TEST_CLIENT_ID }}&client_secret=${{ secrets.API_TEST_CLIENT_SECRET }}&scope=${{ secrets.API_TEST_CLIENT_SCOPE }}" | jq -j '.access_token')
+          echo "setting API_TOKEN=$(echo ${TOKEN})"
+          echo "API_TOKEN=$(echo ${TOKEN})" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: |
+          echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")" >> $GITHUB_ENV
+          echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")" >> $GITHUB_OUTPUT
+          echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")"
+      - name: Cache playwright binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.PLAYWRIGHT_VERSION }}
+      - run: npx playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+      - run: npx playwright install-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - name: Run Playwright tests
+        env:
+          BASIL_URL: https://${{ inputs.url_prefix }}basil-gsi-login.udir.no
+          BASIL_API_URL: https://${{ inputs.url_prefix }}basil-gsi-api.udir.no
+        run: |
+          echo "Using BASIL_URL: $BASIL_URL"
+          echo "Using BASIL_API_URL: $BASIL_API_URL"
+          npx playwright test
+
+      - uses: daun/playwright-report-summary@v3
+        if: ${{ (github.event_name == 'pull_request' || github.event_name == 'pull_request_target' || github.event_name == 'push') && always() }}
+        id: playwright-report-summary
+        with:
+          report-file: "${{ env.PLAYWRIGHT_PATH }}/playwright-report/results.json"
+          comment-title: "Playwright results"
+          job-summary: true
+          icon-style: "emojis"
+
+      - name: Convert markdown to slack format
+        uses: denis-trofimov/slackify-markdown-action@v1.0.0
+        if: ${{ (github.event_name == 'pull_request' || github.event_name == 'pull_request_target' || github.event_name == 'push') && always() }}
+        id: slackify-markdown
+        with:
+          text: ${{ steps.playwright-report-summary.outputs.summary }}
+
+      - name: Send custom JSON data to Slack workflow
+        if: ${{ (github.event_name == 'pull_request' || github.event_name == 'pull_request_target' || github.event_name == 'push') && always() }}
+        id: slack
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "message": "${{ steps.slackify-markdown.outputs.text }}",
+              "deploy_target": "${{ inputs.deploy_target }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: ${{ env.PLAYWRIGHT_PATH }}/playwright-report/
+          retention-days: 30

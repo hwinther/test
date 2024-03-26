@@ -1,0 +1,22 @@
+name: Terraform - publish rover visualization docker image to ghcr repo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build the docker image
+        run: |
+          cd .github/actions/rover-terraform-action
+          docker build . -t ghcr.io/hwinther-tietoevry/test-rover:latest -f Inner.Dockerfile
+          # docker run ghcr.io/hwinther-tietoevry/test-rover:latest
+          docker push ghcr.io/hwinther-tietoevry/test-rover:latest
