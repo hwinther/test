@@ -1,0 +1,9 @@
+name: Rover Terraform Action
+description: Run rover standalone to output results.
+branding:
+  icon: map
+  color: black
+
+runs:
+  using: "docker"
+  image: "Dockerfile"

@@ -1,0 +1,116 @@
+name: "Backend deploy"
+
+inputs:
+  deploy_target:
+    required: true
+    type: string
+    description: prod|qa|test|dev
+  repo_name:
+    required: true
+    type: string
+    description: main|qa|test|dev (repo name defined separate because main maps to prod)
+  labels:
+    required: true
+    type: string
+    description: labels from conditions in trigger workflow
+  base_name:
+    required: true
+    type: string
+    description: basil|gsi|login|ext
+  project_type:
+    required: true
+    type: string
+    description: function|app
+  dockerfile_path:
+    required: true
+    type: string
+    description: path to dockerfile
+  docker_image_name:
+    required: true
+    type: string
+    description: docker image name
+  azure_resource_name:
+    required: true
+    type: string
+    description: azure resource name
+  skip_setup:
+    required: false
+    default: false
+    type: bool
+    description: if true skips setting up .net and nuget package restore
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Login via Azure CLI"
+      uses: azure/login@v1
+      with:
+        creds: ${{ env.AZURE_CREDENTIALS }}
+
+    - name: "Docker Login"
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.DOCKER_REGISTRY_SERVER }}
+        username: ${{ env.DOCKER_REGISTRY_USERNAME }}
+        password: ${{ env.DOCKER_REGISTRY_PASSWORD }}
+
+    - name: Setup .NET
+      if: ${{ !inputs.skip_setup }}
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - uses: actions/cache@v3
+      if: ${{ !inputs.skip_setup }}
+      id: nuget-cache
+      with:
+        path: ~/.nuget/packages
+        key: nuget-${{ hashFiles('**/packages.lock.json') }}
+
+    - name: dotnet restore
+      if: ${{ !inputs.skip_setup }}
+      shell: bash
+      working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
+      run: dotnet restore --locked-mode
+
+    - name: "Compose Customized Docker Image"
+      shell: bash
+      working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
+      run: |
+        docker build . -f ${{ inputs.dockerfile_path }} -t ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:${{ env.INFORMATIONAL_VERSION }} -t ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:latest --build-arg VERSION=${{ env.VERSION }} --build-arg INFORMATIONAL_VERSION=${{ env.INFORMATIONAL_VERSION }}
+        docker push ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:${{ env.INFORMATIONAL_VERSION }}
+        docker push ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:latest
+
+    # Disse trengs kun første gang man deployer til et miljø
+    # TODO: terraform has to configure a web hook for each application first in order to skip this step, the web hook url is available from the app deployment center
+    - name: "Run Azure Functions Container Action"
+      uses: Azure/functions-container-action@v1
+      if: ${{ inputs.project_type == 'function' }}
+      id: fa
+      with:
+        app-name: ${{ inputs.azure_resource_name }}
+        image: ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:${{ env.INFORMATIONAL_VERSION }}
+
+    - name: "Deploy azure webapp"
+      uses: azure/webapps-deploy@v3
+      if: ${{ inputs.project_type == 'app' }}
+      id: webapps-deploy
+      with:
+        app-name: ${{ inputs.azure_resource_name }}
+        images: ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:${{ env.INFORMATIONAL_VERSION }}
+
+    - name: "Create or update deploy results PR comment"
+      uses: im-open/update-pr-comment@v1.1.3
+      if: ${{ github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
+      with:
+        github-token: ${{ env.GH_TOKEN }}
+        comment-identifier: "${{ inputs.base_name }}-deploy-results"
+        comment-content: "🚀 Deployed with URL: ${{ steps.fa.outputs.app-url }}${{ steps.webapps-deploy.outputs.webapp-url }} from CR: ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:${{ env.INFORMATIONAL_VERSION }}"
+
+    - name: Annotate deploy results
+      shell: bash
+      run: 'echo "🚀 Deployed with URL: ${{ steps.fa.outputs.app-url }}${{ steps.webapps-deploy.outputs.webapp-url }} from CR: ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:${{ env.INFORMATIONAL_VERSION }}" >> $GITHUB_STEP_SUMMARY'
+
+    - name: Azure logout
+      shell: bash
+      run: az logout

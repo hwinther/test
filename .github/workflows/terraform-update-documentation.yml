@@ -1,0 +1,46 @@
+name: "Automatically update terraform markdown files"
+
+on:
+  pull_request_target:
+    paths: "templates/terraform/**"
+  pull_request:
+    paths: "templates/terraform/**"
+
+env:
+  TERRAFORM_PATH: "templates/terraform"
+
+jobs:
+  update-lockfiles:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    steps:
+      - name: Checkout ${{ github.head_ref }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+
+      - name: Setup git user
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Generate TF Docs
+        uses: terraform-docs/gh-actions@v1.1.0
+        with:
+          find-dir: ${{ env.TERRAFORM_PATH }}
+          output-file: USAGE.md
+
+      - name: Update branch
+        run: |
+          git status
+          if output=$(git status --porcelain) && [ -z "$output" ]; then
+            # Working directory clean - do nothing
+            echo Working directory clean
+            exit 0
+          else 
+            # Uncommitted changes
+            echo Add and commit changes
+            git commit -a -m "Update TF markdown"
+            git push
+          fi
