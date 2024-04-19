@@ -24,6 +24,8 @@ public class WeatherForecastController(ILogger<WeatherForecastController> logger
     {
         logger.LogInformation("GetWeatherForecast was called");
 
+        var i = 0;
+
         return Enumerable.Range(1, 5)
                          .Select(static index => new WeatherForecast
                          {
