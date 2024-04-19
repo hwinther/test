@@ -65,8 +65,11 @@ jobs:
       - name: dotnet restore
         run: dotnet restore --locked-mode
 
+      - name: dotnet tool restore
+        run: dotnet tool restore
+
       - name: Build
-        id: npm-build
+        id: dotnet-build
         run: |
           dotnet build -c Release --no-restore --nologo -consoleLoggerParameters:NoSummary -verbosity:quiet 1>build.out 2>&1 || (exit 0)
           grep "): error " build.out > build.err || (exit 0)
@@ -105,14 +108,10 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-build-results"
-          comment-content: ${{ steps.npm-build.outputs.result }}
+          comment-content: ${{ steps.dotnet-build.outputs.result }}
 
       - name: WebApi Tests
-        run: |
-          dotnet tool restore
-          dotnet test ../../tests/backend/WebApi.Tests --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
-          ls -la ../../tests/backend/WebApi.Tests/TestResults
-          dotnet reportgenerator -reports:"../../tests/backend/WebApi.Tests/TestResults/**/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:Html
+        run: dotnet test ../../tests/backend/WebApi.Tests --no-restore --no-build --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput='../../tests/backend/WebApi.Tests/TestResults/' /p:CoverletOutputFormat=cobertura
 
       - uses: dorny/test-reporter@v1
         with:
@@ -121,10 +120,25 @@ jobs:
           reporter: dotnet-trx
           fail-on-error: true
 
+      - name: Generate report for all tests
+        id: reportgenerator
+        run: |
+          dotnet reportgenerator -reports:"../../tests/backend/**/TestResults/**/coverage.cobertura.xml" -targetdir:"../../tests/backend/CoverageReport" -reporttypes:Html;Cobertura;MarkdownSummaryGithub;Badges
+          content=`cat ../../tests/backend/CoverageReport/SummaryGithub.md`
+          echo markdown=$content >> $GITHUB_OUTPUT
+
+      - name: "Create or Update PR Comment"
+        uses: im-open/update-pr-comment@v1.2.2
+        if: ${{ always() && github.event_name == 'pull_request' }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-reportgenerator-results"
+          comment-content: ${{ steps.reportgenerator.outputs.markdown }}
+
       - name: Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: coverage/**/coverage.cobertura.xml
+          filename: ../../tests/backend/CoverageReport/Cobertura.xml
           badge: true
           fail_below_min: true
           format: markdown
