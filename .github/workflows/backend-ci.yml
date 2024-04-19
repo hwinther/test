@@ -111,7 +111,7 @@ jobs:
           comment-content: ${{ steps.dotnet-build.outputs.result }}
 
       - name: WebApi Tests
-        run: dotnet test ../../tests/backend/WebApi.Tests --no-restore --no-build --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput='../../tests/backend/WebApi.Tests/TestResults/' /p:CoverletOutputFormat=cobertura
+        run: dotnet test ../../tests/backend/WebApi.Tests --no-restore --no-build --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput="../../tests/backend/WebApi.Tests/TestResults/" /p:CoverletOutputFormat=cobertura
 
       - uses: dorny/test-reporter@v1
         with:
@@ -148,20 +148,8 @@ jobs:
           output: both
           thresholds: "60 80"
 
-      # - name: Unit tests
-      #   uses: zyborg/dotnet-tests-report@v1
-      #   with:
-      #     project_path: tests/backend/WebApi.Tests
-      #     report_name: contoso_business_tests
-      #     report_title: Contos Business Tests
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     gist_name: contoso_business_tests.md
-      #     gist_badge_label: "Contoso Business: %Counters_passed%/%Counters_total%"
-      #     gist_token: ${{ secrets.GIST_TOKEN }}
-
       - name: Inspect code
         uses: muno92/resharper_inspectcode@v1
-        if: always()
         with:
           workingDirectory: ${{ env.BACKEND_SOLUTION_PATH }}
           solutionPath: Backend.sln
