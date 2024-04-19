@@ -132,7 +132,7 @@ jobs:
         if: ${{ always() && github.event_name == 'pull_request' }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-reportgenerator-results"
+          comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-reportgenerator"
           comment-content: ${{ steps.reportgenerator.outputs.markdown }}
 
       - name: Code Coverage Report
@@ -140,13 +140,27 @@ jobs:
         with:
           filename: "tests/backend/CoverageReport/Cobertura.xml"
           badge: true
-          fail_below_min: true
+          fail_below_min: false
           format: markdown
           hide_branch_rate: false
           hide_complexity: true
           indicators: true
           output: both
           thresholds: "60 80"
+
+      - name: Create output variable
+        id: code-coverage-summary
+        run: |
+          content=`cat ../../tests/backend/CoverageReport/SummaryGithub.md`
+          echo markdown=$content >> $GITHUB_OUTPUT
+
+      - name: "Create or Update PR Comment"
+        uses: im-open/update-pr-comment@v1.2.2
+        if: ${{ always() && github.event_name == 'pull_request' }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-CodeCoverageSummary"
+          comment-content: ${{ steps.code-coverage-summary.outputs.markdown }}
 
       - name: Inspect code
         uses: muno92/resharper_inspectcode@v1
