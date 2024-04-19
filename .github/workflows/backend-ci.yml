@@ -111,7 +111,7 @@ jobs:
           comment-content: ${{ steps.dotnet-build.outputs.result }}
 
       - name: WebApi Tests
-        run: dotnet test ../../tests/backend/WebApi.Tests/WebApi.Tests.csproj --no-restore --no-build --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput="../../tests/backend/WebApi.Tests/TestResults/" /p:CoverletOutputFormat=cobertura
+        run: dotnet test ../../tests/backend/WebApi.Tests --no-restore --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput="../../tests/backend/WebApi.Tests/TestResults/" /p:CoverletOutputFormat=cobertura
 
       - uses: dorny/test-reporter@v1
         with:
