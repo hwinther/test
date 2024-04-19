@@ -123,7 +123,7 @@ jobs:
       - name: Generate report for all tests
         id: reportgenerator
         run: |
-          dotnet reportgenerator -reports:"../../tests/backend/**/TestResults/**/coverage.cobertura.xml" -targetdir:"../../tests/backend/CoverageReport" -reporttypes:Html;Cobertura;MarkdownSummaryGithub;Badges
+          dotnet reportgenerator -reports:"../../tests/backend/**/TestResults/**/coverage.cobertura.xml" -targetdir:"../../tests/backend/CoverageReport" -reporttypes:"Html;Cobertura;MarkdownSummaryGithub;Badges"
           content=`cat ../../tests/backend/CoverageReport/SummaryGithub.md`
           echo markdown=$content >> $GITHUB_OUTPUT
 
