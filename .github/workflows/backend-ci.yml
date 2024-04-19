@@ -36,7 +36,7 @@ env:
   DOTNET_VERSION: "8.0.x"
   BACKEND_SOLUTION_PATH: "src/backend"
   WORKFLOW_SHORT_NAME: "backend-ci"
-  WORKFLOW_AGENT_PATH: "TODO"
+  WORKFLOW_AGENT_PATH: "/home/runner/work/test/test/"
 
 jobs:
   build:
@@ -85,7 +85,7 @@ jobs:
               fi
             done
 
-            cp build.err build.md
+            cat build.err | sed 's|${{ env.WORKFLOW_AGENT_PATH }}||' ; 's|${{ env.WORKFLOW_AGENT_PATH }}||' > build.md
             sed -i '/^$/d' build.md             # removes empty lines
             sed -i -e 's/^/- ❌ /' build.md     # prefix with markdown list item and cross mark emoji
             echo "## ❌ The following build issues should be fixed:" | cat - build.md > build.md.temp && mv build.md.temp build.md
