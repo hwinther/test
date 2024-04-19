@@ -114,7 +114,7 @@ jobs:
       - uses: dorny/test-reporter@v1
         with:
           name: WebApi Tests # Name of the check run which will be created
-          path: "../../tests/backend/WebApi.Tests/TestResults/test-results.trx"
+          path: "tests/backend/WebApi.Tests/TestResults/test-results.trx"
           reporter: dotnet-trx
 
       # - name: Unit tests
