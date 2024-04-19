@@ -124,6 +124,7 @@ jobs:
         id: reportgenerator
         run: |
           dotnet reportgenerator -reports:"../../tests/backend/**/TestResults/**/coverage.cobertura.xml" -targetdir:"../../tests/backend/CoverageReport" -reporttypes:"Html;Cobertura;MarkdownSummaryGithub;Badges"
+          cat ../../tests/backend/CoverageReport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
           echo "markdown<<EOF" >> $GITHUB_OUTPUT
           cat ../../tests/backend/CoverageReport/SummaryGithub.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -152,6 +153,7 @@ jobs:
       - name: Create output variable
         id: code-coverage-summary
         run: |
+          cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
           echo "markdown<<EOF" >> $GITHUB_OUTPUT
           cat code-coverage-results.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
