@@ -109,7 +109,7 @@ jobs:
 
       - name: WebApi Tests
         run: |
-          dotnet test tests/backend/WebApi.Tests --logger "trx;LogFileName=test-results.trx"
+          dotnet test ../../tests/backend/WebApi.Tests --logger "trx;LogFileName=test-results.trx"
 
       - uses: dorny/test-reporter@v1
         with:
