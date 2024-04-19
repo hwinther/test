@@ -36,6 +36,7 @@ env:
   DOTNET_VERSION: "8.0.x"
   BACKEND_SOLUTION_PATH: "src/backend"
   WORKFLOW_SHORT_NAME: "backend-ci"
+  WORKFLOW_AGENT_PATH: "TODO"
 
 jobs:
   build:
@@ -75,11 +76,12 @@ jobs:
             echo "## ✅ Build successful" > build.md
           else
             # Reformat error output as github error annotations
-            error_regex="(.+)\(([0-9]+),[0-9]+\): error (.+)"
+            error_regex="(.+)\(([0-9]+),([0-9]+)\): error (.+) \[(.+)\]"
+            # Capture groups: 1=file path 2=line 3=character 4=warn: message 5=project path
             cat build.err | while read line
             do
               if [[ $line =~ $error_regex ]]; then
-                echo "::error file=${BASH_REMATCH[1]},line=${BASH_REMATCH[2]}::${BASH_REMATCH[3]}"
+                echo "::error file=${BASH_REMATCH[1]},line=${BASH_REMATCH[2]}::${BASH_REMATCH[4]}"
               fi
             done
 

@@ -203,25 +203,25 @@ jobs:
           job-summary: true
           icon-style: "emojis"
 
-      - name: Convert markdown to slack format
-        uses: denis-trofimov/slackify-markdown-action@v1.0.0
-        if: ${{ (github.event_name == 'pull_request' || github.event_name == 'pull_request_target' || github.event_name == 'push') && always() }}
-        id: slackify-markdown
-        with:
-          text: ${{ steps.playwright-report-summary.outputs.summary }}
+      # - name: Convert markdown to slack format
+      #   uses: denis-trofimov/slackify-markdown-action@v1.0.0
+      #   if: ${{ (github.event_name == 'pull_request' || github.event_name == 'pull_request_target' || github.event_name == 'push') && always() }}
+      #   id: slackify-markdown
+      #   with:
+      #     text: ${{ steps.playwright-report-summary.outputs.summary }}
 
-      - name: Send custom JSON data to Slack workflow
-        if: ${{ (github.event_name == 'pull_request' || github.event_name == 'pull_request_target' || github.event_name == 'push') && always() }}
-        id: slack
-        uses: slackapi/slack-github-action@v1.25.0
-        with:
-          payload: |
-            {
-              "message": "${{ steps.slackify-markdown.outputs.text }}",
-              "deploy_target": "${{ inputs.deploy_target }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      # - name: Send custom JSON data to Slack workflow
+      #   if: ${{ (github.event_name == 'pull_request' || github.event_name == 'pull_request_target' || github.event_name == 'push') && always() }}
+      #   id: slack
+      #   uses: slackapi/slack-github-action@v1.25.0
+      #   with:
+      #     payload: |
+      #       {
+      #         "message": "${{ steps.slackify-markdown.outputs.text }}",
+      #         "deploy_target": "${{ inputs.deploy_target }}"
+      #       }
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - uses: actions/upload-artifact@v4
         if: always()
