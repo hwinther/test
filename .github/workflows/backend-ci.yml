@@ -110,7 +110,7 @@ jobs:
       - name: Unit tests
         uses: zyborg/dotnet-tests-report@v1
         with:
-          project_path: ../../tests/backend/WebApi.Tests
+          project_path: tests/backend/WebApi.Tests
           report_name: contoso_business_tests
           report_title: Contos Business Tests
           github_token: ${{ secrets.GITHUB_TOKEN }}
