@@ -151,8 +151,9 @@ jobs:
       - name: Create output variable
         id: code-coverage-summary
         run: |
-          content=`cat ../../tests/backend/CoverageReport/SummaryGithub.md`
-          echo markdown=$content >> $GITHUB_OUTPUT
+          echo "markdown<<EOF" >> $GITHUB_OUTPUT
+          cat ../../tests/backend/CoverageReport/SummaryGithub.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: "Create or Update PR Comment"
         uses: im-open/update-pr-comment@v1.2.2
