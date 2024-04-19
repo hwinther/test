@@ -82,31 +82,13 @@ jobs:
           echo "INFORMATIONAL_VERSION=$INFORMATIONAL_VERSION" >> $GITHUB_OUTPUT
           echo "version.outputs.v-version=${{ steps.version.outputs.v-version }}"
 
-      - name: Deploy platform via terraform
-        uses: ./.github/actions/platform-deploy
-        with:
-          deploy_target: ${{ inputs.deploy_target }}
-          working_directory: "./templates/terraform/"
-          config_path: "./config/conf-${{ inputs.deploy_target }}.conf"
-          var_path: "./variables/${{ inputs.deploy_target }}.tfvars"
-
-      - name: Deploy PowerApps - BASIL
-        uses: ./.github/actions/powerapps-deploy
-        if: ${{ inputs.deploy_target != 'dev' }}
-        with:
-          deploy_target: ${{ inputs.deploy_target }}
-          solution_name: "basilgsi"
-          solution_folder: "src/PowerApps/Basil"
-          environment_file: "src/PowerApps/Basil-environment.json"
-
-      - name: Deploy PowerApps - GSI
-        uses: ./.github/actions/powerapps-deploy
-        if: ${{ inputs.deploy_target != 'dev' }}
-        with:
-          deploy_target: ${{ inputs.deploy_target }}
-          solution_name: "gsi"
-          solution_folder: "src/PowerApps/Gsi"
-          environment_file: "src/PowerApps/Gsi-environment.json"
+      # - name: Deploy platform via terraform
+      #   uses: ./.github/actions/platform-deploy
+      #   with:
+      #     deploy_target: ${{ inputs.deploy_target }}
+      #     working_directory: "./templates/terraform/"
+      #     config_path: "./config/conf-${{ inputs.deploy_target }}.conf"
+      #     var_path: "./variables/${{ inputs.deploy_target }}.tfvars"
 
       - name: "Set version environment variables"
         shell: bash
@@ -133,25 +115,25 @@ jobs:
           dotnet restore --locked-mode
           dotnet tool restore
 
-      - name: Update database via entity framework
-        working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
-        env:
-          TestConnectionString: ${{ secrets.SQL_BASIL_CONNECTION_STRING }}
-        run: |
-          dotnet ef database update --project Test.Common --context TestDbContext
+      # - name: Update database via entity framework
+      #   working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
+      #   env:
+      #     TestConnectionString: ${{ secrets.SQL_BASIL_CONNECTION_STRING }}
+      #   run: |
+      #     dotnet ef database update --project Test.Common --context TestDbContext
 
-      - name: Deploy TEST function app
-        uses: ./.github/actions/backend-deploy
-        with:
-          deploy_target: ${{ inputs.deploy_target }}
-          repo_name: ${{ inputs.repo_name }}
-          labels: ${{ inputs.labels }}
-          base_name: functions
-          project_type: function
-          dockerfile_path: "Test.Functions/Dockerfile"
-          docker_image_name: "functions"
-          azure_resource_name: "func-functions-${{ inputs.deploy_target }}-ne"
-          skip_setup: true
+      # - name: Deploy TEST function app
+      #   uses: ./.github/actions/backend-deploy
+      #   with:
+      #     deploy_target: ${{ inputs.deploy_target }}
+      #     repo_name: ${{ inputs.repo_name }}
+      #     labels: ${{ inputs.labels }}
+      #     base_name: functions
+      #     project_type: function
+      #     dockerfile_path: "Test.Functions/Dockerfile"
+      #     docker_image_name: "functions"
+      #     azure_resource_name: "func-functions-${{ inputs.deploy_target }}-ne"
+      #     skip_setup: true
 
       - name: Deploy TEST api
         uses: ./.github/actions/backend-deploy
@@ -161,7 +143,7 @@ jobs:
           labels: ${{ inputs.labels }}
           base_name: login
           project_type: app
-          dockerfile_path: "Test.Api/Dockerfile"
+          dockerfile_path: "WebApi/Dockerfile"
           docker_image_name: "api"
           azure_resource_name: "app-api-${{ inputs.deploy_target }}-ne"
           skip_setup: true
