@@ -111,6 +111,7 @@ jobs:
         run: |
           dotnet tool restore
           dotnet test ../../tests/backend/WebApi.Tests --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+          ls -la ../../tests/backend/WebApi.Tests
           dotnet reportgenerator -reports:"../../tests/backend/WebApi.Tests/TestResults/**/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:Html
 
       - uses: dorny/test-reporter@v1
