@@ -55,7 +55,7 @@ jobs:
   call-deploy-workflow-main:
     if: ${{ github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.base_ref == 'main' && github.event.pull_request.draft == false) }}
     needs: [conditions]
-    uses: hwinther-tietoevry/test/.github/workflows/deploy-cd.yml@main
+    uses: hwinther/test/.github/workflows/deploy-cd.yml@main
     with:
       deploy_target: prod
       repo_name: main
@@ -65,7 +65,7 @@ jobs:
   call-deploy-workflow-qa:
     if: ${{ github.ref == 'refs/heads/qa' || (github.event_name == 'pull_request' && github.base_ref == 'qa' && github.event.pull_request.draft == false) }}
     needs: [conditions]
-    uses: hwinther-tietoevry/test/.github/workflows/deploy-cd.yml@qa
+    uses: hwinther/test/.github/workflows/deploy-cd.yml@qa
     with:
       deploy_target: qa
       repo_name: qa
@@ -75,7 +75,7 @@ jobs:
   call-deploy-workflow-test:
     if: ${{ github.ref == 'refs/heads/test' || (github.event_name == 'pull_request' && github.base_ref == 'test' && github.event.pull_request.draft == false) }}
     needs: [conditions]
-    uses: hwinther-tietoevry/test/.github/workflows/deploy-cd.yml@test
+    uses: hwinther/test/.github/workflows/deploy-cd.yml@test
     with:
       deploy_target: test
       repo_name: test
@@ -85,7 +85,7 @@ jobs:
   call-deploy-workflow-dev:
     if: ${{ github.ref == 'refs/heads/dev' || (github.event_name == 'pull_request' && contains(needs.conditions.outputs.labels, 'deploy-azure')) }}
     needs: [conditions]
-    uses: hwinther-tietoevry/test/.github/workflows/deploy-cd.yml@dev
+    uses: hwinther/test/.github/workflows/deploy-cd.yml@dev
     with:
       deploy_target: dev
       repo_name: dev

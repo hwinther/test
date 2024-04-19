@@ -17,6 +17,6 @@ jobs:
       - name: Build the docker image
         run: |
           cd .github/actions/rover-terraform-action
-          docker build . -t ghcr.io/hwinther-tietoevry/test-rover:latest -f Inner.Dockerfile
-          # docker run ghcr.io/hwinther-tietoevry/test-rover:latest
-          docker push ghcr.io/hwinther-tietoevry/test-rover:latest
+          docker build . -t ghcr.io/hwinther/test-rover:latest -f Inner.Dockerfile
+          # docker run ghcr.io/hwinther/test-rover:latest
+          docker push ghcr.io/hwinther/test-rover:latest

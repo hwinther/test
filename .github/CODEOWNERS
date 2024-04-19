@@ -1,5 +1,6 @@
 # Global rule
-* @hwinther-tietoevry @oliverbyhring94 @hwinther
 
-/src/backend @hwinther-tietoevry @oliverbyhring94 @hwinther
-/tests/backend @hwinther-tietoevry @oliverbyhring94 @hwinther
+* @hwinther
+
+/src/backend @hwinther
+/tests/backend @hwinther

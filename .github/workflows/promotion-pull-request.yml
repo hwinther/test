@@ -66,7 +66,7 @@ jobs:
           branch: test
           title: Merge test changes to main
           body: Automatically created pull-request in order to merge changes that were recently pushed to the test branch, back to main
-          # assignees: hwinther-tietoevry
+          # assignees: hwinther
           draft: true
 
       # Not possible if draft: true above
@@ -132,7 +132,7 @@ jobs:
           branch: dev
           title: Merge dev changes to test
           body: Automatically created pull-request in order to merge changes that were recently pushed to the dev branch, back to test
-          # assignees: hwinther-tietoevry
+          # assignees: hwinther
           draft: true
 
       # Not possible if draft: true above

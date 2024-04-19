@@ -29,7 +29,7 @@ concurrency:
 jobs:
   call-workflow-main:
     if: ${{ github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.base_ref == 'main' && github.event.pull_request.draft == false) }}
-    uses: hwinther-tietoevry/test/.github/workflows/playwright.yml@main
+    uses: hwinther/test/.github/workflows/playwright.yml@main
     with:
       deploy_target: prod
       repo_name: main
@@ -37,7 +37,7 @@ jobs:
     secrets: inherit
   call-workflow-qa:
     if: ${{ github.ref == 'refs/heads/qa' || (github.event_name == 'pull_request' && github.base_ref == 'qa' && github.event.pull_request.draft == false) }}
-    uses: hwinther-tietoevry/test/.github/workflows/playwright.yml@qa
+    uses: hwinther/test/.github/workflows/playwright.yml@qa
     with:
       deploy_target: qa
       repo_name: qa
@@ -45,7 +45,7 @@ jobs:
     secrets: inherit
   call-workflow-test:
     if: ${{ github.ref == 'refs/heads/test' || (github.event_name == 'pull_request' && github.base_ref == 'test' && github.event.pull_request.draft == false) }}
-    uses: hwinther-tietoevry/test/.github/workflows/playwright.yml@test
+    uses: hwinther/test/.github/workflows/playwright.yml@test
     with:
       deploy_target: test
       repo_name: test
@@ -53,7 +53,7 @@ jobs:
     secrets: inherit
   call-workflow-dev:
     if: ${{ github.ref == 'refs/heads/dev' || (github.event_name == 'pull_request' && github.base_ref == 'dev' && github.event.pull_request.draft == false) }}
-    uses: hwinther-tietoevry/test/.github/workflows/playwright.yml@dev
+    uses: hwinther/test/.github/workflows/playwright.yml@dev
     with:
       deploy_target: dev
       repo_name: dev

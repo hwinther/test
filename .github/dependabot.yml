@@ -12,7 +12,7 @@ updates:
     schedule:
       interval: "daily"
     assignees:
-      - "hwinther-tietoevry"
+      - "hwinther"
 
   - package-ecosystem: "nuget"
     directory: "/src/backend"
@@ -21,7 +21,7 @@ updates:
     schedule:
       interval: "daily"
     assignees:
-      - "hwinther-tietoevry"
+      - "hwinther"
     groups:
       microsoft:
         patterns:
@@ -39,7 +39,7 @@ updates:
       interval: "weekly"
       day: "sunday"
     assignees:
-      - "hwinther-tietoevry"
+      - "hwinther"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
