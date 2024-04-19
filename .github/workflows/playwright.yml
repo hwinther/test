@@ -60,32 +60,32 @@ jobs:
       - name: Build
         id: npm-build
         run: |
-          npm run build 1>npm-npm.out 2>&1 || (exit 0)
-          grep "): error " npm-npm.out > npm-npm.err || (exit 0)
+          npm run build 1>build.out 2>&1 || (exit 0)
+          grep "): error " build.out > build.err || (exit 0)
 
-          if [ ! -s npm-npm.err ]
+          if [ ! -s build.err ]
           then
-            echo "## ✅ Build successful" > npm-npm.md
+            echo "## ✅ Build successful" > build.md
           else
             # Reformat error output as github error annotations
             error_regex="(.+)\(([0-9]+),[0-9]+\): error (.+)"
-            cat npm-npm.err | while read line
+            cat build.err | while read line
             do
               if [[ $line =~ $error_regex ]]; then
                 echo "::error file=${BASH_REMATCH[1]},line=${BASH_REMATCH[2]}::${BASH_REMATCH[3]}"
               fi
             done
 
-            cp npm-npm.err npm-npm.md
-            sed -i '/^$/d' npm-npm.md             # removes empty lines
-            sed -i -e 's/^/- ❌ /' npm-npm.md     # prefix with markdown list item and cross mark emoji
-            echo "## ❌ The following build issues should be fixed:" | cat - npm-npm.md > npm-npm.md.temp && mv npm-npm.md.temp npm-npm.md
+            cp build.err build.md
+            sed -i '/^$/d' build.md             # removes empty lines
+            sed -i -e 's/^/- ❌ /' build.md     # prefix with markdown list item and cross mark emoji
+            echo "## ❌ The following build issues should be fixed:" | cat - build.md > build.md.temp && mv build.md.temp build.md
           fi
 
-          echo "result<<EOF"$'\n'"$(cat npm-npm.md)"$'\n'EOF >> $GITHUB_OUTPUT
-          cat npm-npm.md >> $GITHUB_STEP_SUMMARY
+          echo "result<<EOF"$'\n'"$(cat build.md)"$'\n'EOF >> $GITHUB_OUTPUT
+          cat build.md >> $GITHUB_STEP_SUMMARY
 
-          if [ -s npm-npm.err ]
+          if [ -s build.err ]
           then
             exit 1
           fi

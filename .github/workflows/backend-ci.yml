@@ -35,6 +35,7 @@ concurrency:
 env:
   DOTNET_VERSION: "8.0.x"
   BACKEND_SOLUTION_PATH: "src/backend"
+  WORKFLOW_SHORT_NAME: "backend-ci"
 
 jobs:
   build:
@@ -65,3 +66,51 @@ jobs:
 
       - name: dotnet build
         run: dotnet build -c Release --no-restore
+
+      - name: Build
+        id: npm-build
+        run: |
+          dotnet build -c Release --no-restore --nologo -consoleLoggerParameters:NoSummary -verbosity:quiet 1>build.out 2>&1 || (exit 0)
+          grep "): error " build.out > build.err || (exit 0)
+
+          if [ ! -s build.err ]
+          then
+            echo "## ✅ Build successful" > build.md
+          else
+            # Reformat error output as github error annotations
+            error_regex="(.+)\(([0-9]+),[0-9]+\): error (.+)"
+            cat build.err | while read line
+            do
+              if [[ $line =~ $error_regex ]]; then
+                echo "::error file=${BASH_REMATCH[1]},line=${BASH_REMATCH[2]}::${BASH_REMATCH[3]}"
+              fi
+            done
+
+            cp build.err build.md
+            sed -i '/^$/d' build.md             # removes empty lines
+            sed -i -e 's/^/- ❌ /' build.md     # prefix with markdown list item and cross mark emoji
+            echo "## ❌ The following build issues should be fixed:" | cat - build.md > build.md.temp && mv build.md.temp build.md
+          fi
+
+          echo "result<<EOF"$'\n'"$(cat build.md)"$'\n'EOF >> $GITHUB_OUTPUT
+          cat build.md >> $GITHUB_STEP_SUMMARY
+
+          if [ -s build.err ]
+          then
+            exit 1
+          fi
+
+      - name: "Create or Update PR Comment"
+        uses: im-open/update-pr-comment@v1.2.2
+        if: ${{ always() && github.event_name == 'pull_request' }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-build-results"
+          comment-content: ${{ steps.npm-build.outputs.result }}
+
+      # - name: Inspect code
+      #   uses: muno92/resharper_inspectcode@v1
+      #   with:
+      #     solutionPath: ${{ env.BACKEND_SOLUTION_PATH }}
+      #     include: |
+      #       **.cs
