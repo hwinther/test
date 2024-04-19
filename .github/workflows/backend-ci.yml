@@ -115,7 +115,7 @@ jobs:
 
       - uses: dorny/test-reporter@v1
         with:
-          name: WebApi Tests # Name of the check run which will be created
+          name: "WebApi Tests"
           path: "tests/backend/WebApi.Tests/TestResults/test-results.trx"
           reporter: dotnet-trx
           fail-on-error: true
@@ -128,6 +128,7 @@ jobs:
           echo "markdown<<EOF" >> $GITHUB_OUTPUT
           cat ../../tests/backend/CoverageReport/SummaryGithub.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+          # TODO: commit the badges for README.md
 
       - name: "Create or Update PR Comment"
         uses: im-open/update-pr-comment@v1.2.2
