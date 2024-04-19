@@ -85,7 +85,7 @@ jobs:
               fi
             done
 
-            cat build.err | sed 's|${{ env.WORKFLOW_AGENT_PATH }}||' ; 's|${{ env.WORKFLOW_AGENT_PATH }}||' > build.md
+            cat build.err | sed 's|${{ env.WORKFLOW_AGENT_PATH }}|| ; s|${{ env.WORKFLOW_AGENT_PATH }}||' > build.md
             sed -i '/^$/d' build.md             # removes empty lines
             sed -i -e 's/^/- ❌ /' build.md     # prefix with markdown list item and cross mark emoji
             echo "## ❌ The following build issues should be fixed:" | cat - build.md > build.md.temp && mv build.md.temp build.md
