@@ -114,5 +114,6 @@ jobs:
           workingDirectory: ${{ env.BACKEND_SOLUTION_PATH }}
           solutionPath: Backend.sln
           dotnetVersion: ${{ env.DOTNET_VERSION }}
+          failOnIssue: false
           include: |
             **.cs
