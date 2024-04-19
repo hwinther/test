@@ -1,4 +1,4 @@
-namespace WebApi;
+namespace WebApi.Entities;
 
 /// <summary>
 ///     Weather forecast model
