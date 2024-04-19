@@ -14,3 +14,7 @@ Several QOL workflows are in place to enforce set rules and assist the developer
 - Reset head between dev/test/main after PR has been merged
 - Automatically set PR creator as PR author
 - Automatically create PR when a feature branch has changes pushed to it
+
+## Setup
+
+`git config --local include.path ../.gitconfig`
