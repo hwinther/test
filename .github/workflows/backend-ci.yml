@@ -124,8 +124,9 @@ jobs:
         id: reportgenerator
         run: |
           dotnet reportgenerator -reports:"../../tests/backend/**/TestResults/**/coverage.cobertura.xml" -targetdir:"../../tests/backend/CoverageReport" -reporttypes:"Html;Cobertura;MarkdownSummaryGithub;Badges"
-          content=`cat ../../tests/backend/CoverageReport/SummaryGithub.md`
-          echo markdown=$content >> $GITHUB_OUTPUT
+          echo "markdown<<EOF" >> $GITHUB_OUTPUT
+          cat ../../tests/backend/CoverageReport/SummaryGithub.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: "Create or Update PR Comment"
         uses: im-open/update-pr-comment@v1.2.2
@@ -152,7 +153,7 @@ jobs:
         id: code-coverage-summary
         run: |
           echo "markdown<<EOF" >> $GITHUB_OUTPUT
-          cat ../../tests/backend/CoverageReport/SummaryGithub.md >> $GITHUB_OUTPUT
+          cat code-coverage-results.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: "Create or Update PR Comment"
