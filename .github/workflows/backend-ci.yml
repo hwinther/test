@@ -64,9 +64,6 @@ jobs:
       - name: dotnet restore
         run: dotnet restore --locked-mode
 
-      - name: dotnet build
-        run: dotnet build -c Release --no-restore
-
       - name: Build
         id: npm-build
         run: |
