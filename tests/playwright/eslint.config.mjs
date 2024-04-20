@@ -8,15 +8,27 @@ import { FlatCompat } from '@eslint/eslintrc';
 import pluginJs from '@eslint/js';
 
 // mimic CommonJS variables -- not needed if using CommonJS
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const compatFilename = fileURLToPath(import.meta.url);
+const compatDirname = path.dirname(compatFilename);
 const compat = new FlatCompat({
-  baseDirectory: __dirname,
+  baseDirectory: compatDirname,
   recommendedConfig: pluginJs.configs.recommended,
 });
 
 export default [
-  { languageOptions: { globals: globals.browser } },
+  {
+    languageOptions: {
+      globals: globals.browser,
+    },
+    files: ['*.ts'],
+    ignores: [
+      'node_modules/',
+      'playwright-report/',
+      'test-results/',
+      '!tests/*',
+      '!test-examples/*',
+    ],
+  },
   ...compat.extends('standard-with-typescript'),
   pluginReactConfig,
   eslintConfigPrettier,
