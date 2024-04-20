@@ -402,3 +402,6 @@ FodyWeavers.xsd
 
 # OS-specific files
 .DS_Store
+
+# Coverage report files
+CoverageReport/
