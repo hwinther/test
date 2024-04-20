@@ -13,7 +13,7 @@ test('get started link', async ({ page }) => {
   // Click the get started link.
   await page.getByRole('link', { name: 'Get started' }).click();
 
-  const s = null;
+  const s = null; // test
 
   // Expects page to have a heading with the name of Installation.
   await expect(
