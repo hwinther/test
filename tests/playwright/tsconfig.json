@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@tests/*": ["tests/*"]
+    },
+    "strictNullChecks": true
+  },
+  "exclude": ["node_modules", "playwright-report", "test-results"]
+}

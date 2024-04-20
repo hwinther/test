@@ -51,16 +51,19 @@ jobs:
         name: Setup node
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
-          cache-dependency-path: "${{ env.PLAYWRIGHT_PATH }}/package-lock.json"
+          cache: "yarn"
+          cache-dependency-path: "${{ env.PLAYWRIGHT_PATH }}/yarn.lock"
+          # cache: "npm"
+          # cache-dependency-path: "${{ env.PLAYWRIGHT_PATH }}/package-lock.json"
 
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --immutable --immutable-cache --check-cache # yarn install --frozen-lockfile # npm ci
 
       - name: Build
-        id: npm-build
+        id: node-build
         run: |
-          npm run build 1>build.out 2>&1 || (exit 0)
+          yarn build 1>build.out 2>&1 || (exit 0)
+          # npm run build 1>build.out 2>&1 || (exit 0)
           grep "): error " build.out > build.err || (exit 0)
 
           if [ ! -s build.err ]
@@ -96,37 +99,38 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-build-results"
-          comment-content: ${{ steps.npm-build.outputs.result }}
+          comment-content: ${{ steps.node-build.outputs.result }}
 
       - name: Lint
         if: always()
-        id: yarn-lint
+        id: node-lint
         run: |
-          (npm run lint -- -f compact | grep ": line " | sed -e 's|${{ env.TRAILING_AGENT_WORK_PATH }}||') 1>yarn-lint.err 2>&1 || (exit 0)
+          (yarn lint -- -f compact | grep ": line " | sed -e 's|${{ env.TRAILING_AGENT_WORK_PATH }}||') 1>lint.err 2>&1 || (exit 0)
+          # (npm run lint -- -f compact | grep ": line " | sed -e 's|${{ env.TRAILING_AGENT_WORK_PATH }}||') 1>lint.err 2>&1 || (exit 0)
 
-          if [ ! -s yarn-lint.err ]
+          if [ ! -s lint.err ]
           then
-            echo "## ✅ No linting issues 🎊" > yarn-lint.md
+            echo "## ✅ No linting issues 🎊" > lint.md
           else
             # Reformat lint output as github error annotations
             error_regex="(.+): line ([0-9]+), col [0-9]+, [A-Za-z]+ - (.+)"
-            cat yarn-lint.err | while read line
+            cat lint.err | while read line
             do
               if [[ $line =~ $error_regex ]]; then
                 echo "::error file=${BASH_REMATCH[1]},line=${BASH_REMATCH[2]}::${BASH_REMATCH[3]}"
               fi
             done
 
-            cp yarn-lint.err yarn-lint.md
-            sed -i '/^$/d' yarn-lint.md             # removes empty lines
-            sed -i -e 's/^/- ❌ /' yarn-lint.md     # prefix with markdown list item and cross mark emoji
-            echo "## ❌ The following linting issues should be fixed:" | cat - yarn-lint.md > yarn-lint.md.temp && mv yarn-lint.md.temp yarn-lint.md
+            cp lint.err lint.md
+            sed -i '/^$/d' lint.md             # removes empty lines
+            sed -i -e 's/^/- ❌ /' lint.md     # prefix with markdown list item and cross mark emoji
+            echo "## ❌ The following linting issues should be fixed:" | cat - lint.md > lint.md.temp && mv lint.md.temp lint.md
           fi
 
-          echo "result<<EOF"$'\n'"$(cat yarn-lint.md)"$'\n'EOF >> $GITHUB_OUTPUT
-          cat yarn-lint.md >> $GITHUB_STEP_SUMMARY
+          echo "result<<EOF"$'\n'"$(cat lint.md)"$'\n'EOF >> $GITHUB_OUTPUT
+          cat lint.md >> $GITHUB_STEP_SUMMARY
 
-          if [ -s yarn-lint.err ]
+          if [ -s lint.err ]
           then
             exit 1
           fi
@@ -137,7 +141,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-lint-results"
-          comment-content: ${{ steps.yarn-lint.outputs.result }}
+          comment-content: ${{ steps.node-lint.outputs.result }}
 
   run-e2e-tests:
     runs-on: ubuntu-latest
@@ -180,9 +184,9 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.PLAYWRIGHT_VERSION }}
-      - run: npx playwright install --with-deps
+      - run: yarn playwright install --with-deps # npx playwright install --with-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-      - run: npx playwright install-deps
+      - run: yarn playwright install-deps # npx playwright install-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
 
       - name: Run Playwright tests
@@ -192,7 +196,8 @@ jobs:
         run: |
           echo "Using BASIL_URL: $BASIL_URL"
           echo "Using BASIL_API_URL: $BASIL_API_URL"
-          npx playwright test
+          yarn playwright test
+          # npx playwright test
 
       - uses: daun/playwright-report-summary@v3
         if: ${{ (github.event_name == 'pull_request' || github.event_name == 'pull_request_target' || github.event_name == 'push') && always() }}

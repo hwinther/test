@@ -169,6 +169,7 @@ jobs:
 
       - name: Inspect code
         uses: muno92/resharper_inspectcode@v1
+        if: ${{ github.event_name == 'pull_request' }}
         with:
           workingDirectory: ${{ env.BACKEND_SOLUTION_PATH }}
           solutionPath: Backend.sln
