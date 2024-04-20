@@ -8,6 +8,9 @@ on:
       - test
   pull_request:
     branches:
+      - main
+      - qa
+      - test
       - dev
       - "feature/*"
       - "bugfix/*"
