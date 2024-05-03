@@ -51,4 +51,3 @@ jobs:
       - uses: ./.github/actions/frontend-build
         with:
           working_directory: ${{ env.FRONTEND_PATH }}
-          component_name: ${{ env.WORKFLOW_SHORT_NAME }}
