@@ -35,6 +35,7 @@ concurrency:
 env:
   DOTNET_VERSION: "8.0.x"
   BACKEND_SOLUTION_PATH: "src/backend"
+  BACKEND_SOLUTION_FILE: "Backend.sln"
   WORKFLOW_SHORT_NAME: "backend-ci"
   WORKFLOW_AGENT_PATH: "/home/runner/work/test/test/"
 
@@ -63,7 +64,7 @@ jobs:
           key: nuget-${{ hashFiles('**/packages.lock.json') }}
 
       - name: dotnet restore
-        run: dotnet restore --locked-mode
+        run: dotnet restore --locked-mode ${{ env.BACKEND_SOLUTION_FILE }}
 
       - name: dotnet tool restore
         run: dotnet tool restore
@@ -71,7 +72,7 @@ jobs:
       - name: Build
         id: dotnet-build
         run: |
-          dotnet build -c Release --no-restore --nologo -consoleLoggerParameters:NoSummary -verbosity:quiet 1>build.out 2>&1 || (exit 0)
+          dotnet build ${{ env.BACKEND_SOLUTION_FILE }} -c Release --no-restore --nologo -consoleLoggerParameters:NoSummary -verbosity:quiet 1>build.out 2>&1 || (exit 0)
           grep "): error " build.out > build.err || (exit 0)
 
           if [ ! -s build.err ]
