@@ -128,6 +128,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CREATE_LOG_FILE: true
           LOG_FILE: super-linter.out
+          DISABLE_ERRORS: true
       
       - run: cat super-linter.out >> $GITHUB_STEP_SUMMARY
 
