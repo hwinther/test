@@ -33,14 +33,17 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       run: |
+        echo "::group::Install dependencies"
         [[ "${{ inputs.package_manager }}" == "npm" ]] && npm ci || true
         [[ "${{ inputs.package_manager }}" == "yarn" ]] && yarn install --immutable --immutable-cache --check-cache || true
+        echo "::endgroup::"
 
     - name: Build
       id: node-build
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       run: |
+        echo "::group::Build"
         [[ "${{ inputs.package_manager }}" == "npm" ]] && npm run build 1>build.out 2>&1 || (exit 0)
         [[ "${{ inputs.package_manager }}" == "yarn" ]] && yarn build 1>build.out 2>&1 || (exit 0)
         echo -e "\nBuild output:\n"
@@ -73,14 +76,7 @@ runs:
         then
           exit 1
         fi
-
-    - name: "Create or Update PR Comment"
-      uses: im-open/update-pr-comment@v1.2.2
-      if: always() && github.event_name == 'pull_request'
-      with:
-        github-token: ${{ env.GH_TOKEN }}
-        comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-build-results"
-        comment-content: ${{ steps.node-build.outputs.result }}
+        echo "::endgroup::"
 
     - name: Lint
       if: always()
@@ -88,6 +84,7 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       run: |
+        echo "::group::Lint"
         [[ "${{ inputs.package_manager }}" == "npm" ]] && npm run lint -- -f compact 1>lint.out 2>&1 || (exit 0)
         [[ "${{ inputs.package_manager }}" == "yarn" ]] && yarn lint -f compact 1>lint.out 2>&1 || (exit 0)
         echo -e "\nLint output:\n"
@@ -120,11 +117,22 @@ runs:
         then
           exit 1
         fi
+        echo "::endgroup::"
+
+    - name: Combine outputs to single PR comment
+      if: always()
+      id: pr-comment-combiner
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        cat build.md > combined.md
+        cat lint.md >> combined.md
+        echo "result<<EOF"$'\n'"$(cat combined.md)"$'\n'EOF >> $GITHUB_OUTPUT
 
     - name: "Create or Update PR Comment"
       uses: im-open/update-pr-comment@v1.2.2
       if: always() && github.event_name == 'pull_request'
       with:
         github-token: ${{ env.GH_TOKEN }}
-        comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-lint-results"
-        comment-content: ${{ steps.node-lint.outputs.result }}
+        comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-results"
+        comment-content: ${{ steps.pr-comment-combiner.outputs.result }}
