@@ -11,11 +11,12 @@ WORKDIR /src
 COPY ["WebApi/WebApi.csproj", "WebApi/"]
 #COPY ["Common/Common.csproj", "Common/"]
 COPY ["Directory.Build.props", "./"]
-COPY [".git/", "./.git/"]
+# COPY [".git/", "./.git/"]
 RUN dotnet restore "WebApi/WebApi.csproj"
 COPY . .
 WORKDIR "/src/WebApi"
 RUN dotnet build "WebApi.csproj" -c Release -o /app/build
+RUN dotnet dev-certs https
 
 FROM build AS publish
 RUN dotnet publish "WebApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
@@ -23,4 +24,5 @@ RUN dotnet publish "WebApi.csproj" -c Release -o /app/publish /p:UseAppHost=fals
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY --from=build /root/.dotnet/corefx/cryptography/x509stores/my/* /root/.dotnet/corefx/cryptography/x509stores/my/
 ENTRYPOINT ["dotnet", "WebApi.dll"]
