@@ -90,12 +90,12 @@ runs:
       id: node-lint
       shell: bash
       run: |
-        [[ "${{ inputs.package_manager }}" == "npm" ]] && (yarn lint -f compact 1>lint.out 2>&1 || (exit 0)
-        [[ "${{ inputs.package_manager }}" == "yarn" ]] && (npm run lint -- -f compact 1>lint.out 2>&1 || (exit 0)
+        [[ "${{ inputs.package_manager }}" == "npm" ]] && yarn lint -f compact 1>lint.out 2>&1 || (exit 0)
+        [[ "${{ inputs.package_manager }}" == "yarn" ]] && npm run lint -- -f compact 1>lint.out 2>&1 || (exit 0)
         echo -e "\nLint output:\n"
         cat lint.out
 
-        cat lint.out | grep ": line " | sed -e 's|${{ env.TRAILING_AGENT_WORK_PATH }}||') >lint.err
+        cat lint.out | grep ": line " | sed -e 's|${{ env.TRAILING_AGENT_WORK_PATH }}||' >lint.err
         if [ ! -s lint.err ]
         then
           echo "## ✅ No linting issues 🎊" > lint.md
