@@ -111,6 +111,22 @@ jobs:
           comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-build-results"
           comment-content: ${{ steps.dotnet-build.outputs.result }}
 
+      - name: Create Todo Comments
+        uses: gkampitakis/github-action-todo-commenter@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          #ignore-pattern: '.json$|.html$'
+          review-message: "Please take a look :eyes:"
+          # optional, default is "TODO:,FIXME:,BUG:"
+          tags: "TODO:,FIXME:,BUG:"
+
+      # TODO: move?
+      - name: Super-linter
+        uses: super-linter/super-linter@v6.4.1
+        env:
+          # To report GitHub Actions status checks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: WebApi Tests
         run: dotnet test ../../tests/backend/WebApi.Tests --no-restore --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput="../../tests/backend/WebApi.Tests/TestResults/" /p:CoverletOutputFormat=cobertura
 
@@ -167,22 +183,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-CodeCoverageSummary"
           comment-content: ${{ steps.code-coverage-summary.outputs.markdown }}
-
-      - name: Create Todo Comments
-        uses: gkampitakis/github-action-todo-commenter@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          #ignore-pattern: '.json$|.html$'
-          review-message: "Please take a look :eyes:"
-          # optional, default is "TODO:,FIXME:,BUG:"
-          tags: "TODO:,FIXME:,BUG:"
-
-      # TODO: move?
-      - name: Super-linter
-        uses: super-linter/super-linter@v6.4.1
-        env:
-          # To report GitHub Actions status checks
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Inspect code
         uses: muno92/resharper_inspectcode@v1
