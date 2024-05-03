@@ -15,7 +15,9 @@ updates:
       - "hwinther"
 
   - package-ecosystem: "docker"
-    directory: "/"
+    directories:
+      - "/.github/actions/rover-terraform-action"
+      - "/src/backend/WebApi"
     open-pull-requests-limit: 20
     target-branch: "dev"
     schedule:
