@@ -126,6 +126,10 @@ jobs:
         env:
           # To report GitHub Actions status checks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CREATE_LOG_FILE: true
+          LOG_FILE: super-linter.out
+      
+      - run: cat super-linter.out >> $GITHUB_STEP_SUMMARY
 
       - name: WebApi Tests
         run: dotnet test ../../tests/backend/WebApi.Tests --no-restore --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput="../../tests/backend/WebApi.Tests/TestResults/" /p:CoverletOutputFormat=cobertura
