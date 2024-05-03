@@ -89,6 +89,7 @@ runs:
       if: always()
       id: node-lint
       shell: bash
+      working-directory: ${{ inputs.working_directory }}
       run: |
         [[ "${{ inputs.package_manager }}" == "npm" ]] && npm run lint -- -f compact 1>lint.out 2>&1 || (exit 0)
         [[ "${{ inputs.package_manager }}" == "yarn" ]] && yarn lint -f compact 1>lint.out 2>&1 || (exit 0)
