@@ -112,7 +112,7 @@ runs:
           sed -i -e 's/^/- ❌ /' lint.md     # prefix with markdown list item and cross mark emoji
           echo "## ❌ The following linting issues should be fixed:" | cat - lint.md > lint.md.temp && mv lint.md.temp lint.md
         fi
-
+        echo RESULT-SET
         echo "result<<EOF"$'\n'"$(cat lint.md)"$'\n'EOF >> $GITHUB_OUTPUT
         cat lint.md >> $GITHUB_STEP_SUMMARY
 
