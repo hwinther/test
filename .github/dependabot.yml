@@ -14,6 +14,15 @@ updates:
     assignees:
       - "hwinther"
 
+  - package-ecosystem: "docker"
+    directory: "/"
+    open-pull-requests-limit: 20
+    target-branch: "dev"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "hwinther"
+
   - package-ecosystem: "nuget"
     directory: "/src/backend"
     open-pull-requests-limit: 20

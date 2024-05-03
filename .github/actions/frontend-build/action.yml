@@ -140,3 +140,12 @@ runs:
         github-token: ${{ env.GH_TOKEN }}
         comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-results"
         comment-content: ${{ steps.pr-comment-combiner.outputs.result }}
+
+    - name: Create Todo Comments
+      uses: gkampitakis/github-action-todo-commenter@v1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        ignore-pattern: ".js$|.mjs$|.ts$|.tsx$"
+        review-message: "Please take a look :eyes:"
+        # optional, default is "TODO:,FIXME:,BUG:"
+        tags: "TODO:,FIXME:,BUG:"
