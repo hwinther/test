@@ -130,10 +130,7 @@ jobs:
           LOG_FILE: super-linter.out
           DISABLE_ERRORS: true
       
-      - run: |
-          ls -la
-          ls -la ${{ env.WORKFLOW_AGENT_PATH }}
-          cat super-linter.out >> $GITHUB_STEP_SUMMARY
+      - run: cat ${{ env.WORKFLOW_AGENT_PATH }}super-linter.out >> $GITHUB_STEP_SUMMARY
 
       - name: WebApi Tests
         run: dotnet test ../../tests/backend/WebApi.Tests --no-restore --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput="../../tests/backend/WebApi.Tests/TestResults/" /p:CoverletOutputFormat=cobertura
