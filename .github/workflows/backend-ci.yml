@@ -26,6 +26,8 @@ permissions:
   contents: read
   checks: write
   pull-requests: write
+  actions: read # for super-linter
+  statuses: write # for super-linter
 
 # This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
@@ -35,6 +37,7 @@ concurrency:
 env:
   DOTNET_VERSION: "8.0.x"
   BACKEND_SOLUTION_PATH: "src/backend"
+  BACKEND_SOLUTION_FILE: "Backend.sln"
   WORKFLOW_SHORT_NAME: "backend-ci"
   WORKFLOW_AGENT_PATH: "/home/runner/work/test/test/"
 
@@ -63,7 +66,7 @@ jobs:
           key: nuget-${{ hashFiles('**/packages.lock.json') }}
 
       - name: dotnet restore
-        run: dotnet restore --locked-mode
+        run: dotnet restore --locked-mode ${{ env.BACKEND_SOLUTION_FILE }}
 
       - name: dotnet tool restore
         run: dotnet tool restore
@@ -71,7 +74,7 @@ jobs:
       - name: Build
         id: dotnet-build
         run: |
-          dotnet build -c Release --no-restore --nologo -consoleLoggerParameters:NoSummary -verbosity:quiet 1>build.out 2>&1 || (exit 0)
+          dotnet build ${{ env.BACKEND_SOLUTION_FILE }} -c Release --no-restore --nologo -consoleLoggerParameters:NoSummary -verbosity:quiet 1>build.out 2>&1 || (exit 0)
           grep "): error " build.out > build.err || (exit 0)
 
           if [ ! -s build.err ]
@@ -109,6 +112,27 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-build-results"
           comment-content: ${{ steps.dotnet-build.outputs.result }}
+
+      - name: Create Todo Comments
+        uses: gkampitakis/github-action-todo-commenter@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          review-message: "Please take a look :eyes:"
+          tags: "TODO:,FIXME:,BUG:"
+
+      # # TODO: move?
+      # - name: Super-linter
+      #   uses: super-linter/super-linter@v6.4.1
+      #   env:
+      #     # To report GitHub Actions status checks
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     CREATE_LOG_FILE: true
+      #     LOG_FILE: super-linter.out
+      #     DISABLE_ERRORS: true
+      
+      # - run: |
+      #     ls -la ${{ env.WORKFLOW_AGENT_PATH }}
+      #     sudo cat ${{ env.WORKFLOW_AGENT_PATH }}super-linter.out >> $GITHUB_STEP_SUMMARY
 
       - name: WebApi Tests
         run: dotnet test ../../tests/backend/WebApi.Tests --no-restore --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput="../../tests/backend/WebApi.Tests/TestResults/" /p:CoverletOutputFormat=cobertura

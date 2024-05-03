@@ -1,0 +1,149 @@
+name: "Frontend build"
+description: "Frontend (node) build and linting"
+branding:
+  icon: table
+  color: black
+
+inputs:
+  working_directory:
+    required: true
+    description: root folder of the node project, e.g. ./src/frontend/
+  package_manager:
+    required: false
+    description: npm|yarn
+    default: "yarn"
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v4
+      name: Setup node (npm)
+      if: inputs.working_directory == 'npm'
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: "npm"
+        cache-dependency-path: "${{ inputs.working_directory }}/package-lock.json"
+
+    - uses: actions/setup-node@v4
+      name: Setup node (yarn)
+      if: inputs.working_directory == 'yarn'
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: "yarn"
+        cache-dependency-path: "${{ inputs.working_directory }}/yarn.lock"
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        echo "::group::Install dependencies"
+        [[ "${{ inputs.package_manager }}" == "npm" ]] && npm ci || true
+        [[ "${{ inputs.package_manager }}" == "yarn" ]] && yarn install --immutable --immutable-cache --check-cache || true
+        echo "::endgroup::"
+
+    - name: Build
+      id: node-build
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        echo "::group::Build"
+        [[ "${{ inputs.package_manager }}" == "npm" ]] && npm run build 1>build.out 2>&1 || (exit 0)
+        [[ "${{ inputs.package_manager }}" == "yarn" ]] && yarn build 1>build.out 2>&1 || (exit 0)
+        echo -e "\nBuild output:\n"
+        cat build.out
+
+        grep "): error " build.out > build.err || (exit 0)
+        if [ ! -s build.err ]
+        then
+          echo "## ✅ Build successful" > build.md
+        else
+          # Reformat error output as github error annotations
+          error_regex="(.+)\(([0-9]+),[0-9]+\): error (.+)"
+          cat build.err | while read line
+          do
+            if [[ $line =~ $error_regex ]]; then
+              echo "::error file=${BASH_REMATCH[1]},line=${BASH_REMATCH[2]}::${BASH_REMATCH[3]}"
+            fi
+          done
+
+          cp build.err build.md
+          sed -i '/^$/d' build.md             # removes empty lines
+          sed -i -e 's/^/- ❌ /' build.md     # prefix with markdown list item and cross mark emoji
+          echo "## ❌ The following build issues should be fixed:" | cat - build.md > build.md.temp && mv build.md.temp build.md
+        fi
+
+        echo "result<<EOF"$'\n'"$(cat build.md)"$'\n'EOF >> $GITHUB_OUTPUT
+        cat build.md >> $GITHUB_STEP_SUMMARY
+
+        if [ -s build.err ]
+        then
+          exit 1
+        fi
+        echo "::endgroup::"
+
+    - name: Lint
+      if: always()
+      id: node-lint
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        echo "::group::Lint"
+        [[ "${{ inputs.package_manager }}" == "npm" ]] && npm run lint -- -f compact 1>lint.out 2>&1 || (exit 0)
+        [[ "${{ inputs.package_manager }}" == "yarn" ]] && yarn lint -f compact 1>lint.out 2>&1 || (exit 0)
+        echo -e "\nLint output:\n"
+        cat lint.out
+
+        cat lint.out | grep ": line " | sed -e 's|${{ env.TRAILING_AGENT_WORK_PATH }}||' >lint.err || (exit 0)
+        if [ ! -s lint.err ]
+        then
+          echo "## ✅ No linting issues 🎊" > lint.md
+        else
+          # Reformat lint output as github error annotations
+          error_regex="(.+): line ([0-9]+), col [0-9]+, [A-Za-z]+ - (.+)"
+          cat lint.err | while read line
+          do
+            if [[ $line =~ $error_regex ]]; then
+              echo "::error file=${BASH_REMATCH[1]},line=${BASH_REMATCH[2]}::${BASH_REMATCH[3]}"
+            fi
+          done
+
+          cp lint.err lint.md
+          sed -i '/^$/d' lint.md             # removes empty lines
+          sed -i -e 's/^/- ❌ /' lint.md     # prefix with markdown list item and cross mark emoji
+          echo "## ❌ The following linting issues should be fixed:" | cat - lint.md > lint.md.temp && mv lint.md.temp lint.md
+        fi
+
+        echo "result<<EOF"$'\n'"$(cat lint.md)"$'\n'EOF >> $GITHUB_OUTPUT
+        cat lint.md >> $GITHUB_STEP_SUMMARY
+
+        if [ -s lint.err ]
+        then
+          exit 1
+        fi
+        echo "::endgroup::"
+
+    - name: Combine outputs to single PR comment
+      if: always()
+      id: pr-comment-combiner
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        echo "# ${{ env.WORKFLOW_SHORT_NAME }}" > combined.md
+        cat build.md >> combined.md
+        cat lint.md >> combined.md
+        echo "result<<EOF"$'\n'"$(cat combined.md)"$'\n'EOF >> $GITHUB_OUTPUT
+
+    - name: "Create or Update PR Comment"
+      uses: im-open/update-pr-comment@v1.2.2
+      if: always() && github.event_name == 'pull_request'
+      with:
+        github-token: ${{ env.GH_TOKEN }}
+        comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-results"
+        comment-content: ${{ steps.pr-comment-combiner.outputs.result }}
+
+    - name: Create Todo Comments
+      uses: gkampitakis/github-action-todo-commenter@v1
+      with:
+        github-token: ${{ env.GH_TOKEN }}
+        review-message: "Please take a look :eyes:"
+        tags: "TODO:,FIXME:,BUG:"

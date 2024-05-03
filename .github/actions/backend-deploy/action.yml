@@ -1,42 +1,37 @@
 name: "Backend deploy"
+description: "Deploys backend component"
+branding:
+  icon: server
+  color: black
 
 inputs:
   deploy_target:
     required: true
-    type: string
     description: prod|qa|test|dev
   repo_name:
     required: true
-    type: string
     description: main|qa|test|dev (repo name defined separate because main maps to prod)
   labels:
     required: true
-    type: string
     description: labels from conditions in trigger workflow
   base_name:
     required: true
-    type: string
     description: basil|gsi|login|ext
   project_type:
     required: true
-    type: string
     description: function|app
   dockerfile_path:
     required: true
-    type: string
     description: path to dockerfile
   docker_image_name:
     required: true
-    type: string
     description: docker image name
   azure_resource_name:
     required: true
-    type: string
     description: azure resource name
   skip_setup:
     required: false
-    default: false
-    type: bool
+    default: "false"
     description: if true skips setting up .net and nuget package restore
 
 runs:
