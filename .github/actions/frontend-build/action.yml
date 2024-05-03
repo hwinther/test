@@ -79,7 +79,7 @@ runs:
       uses: im-open/update-pr-comment@v1.2.2
       if: ${{ always() && github.event_name == 'pull_request' }}
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ env.GH_TOKEN }}
         comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-build-results"
         comment-content: ${{ steps.node-build.outputs.result }}
 
@@ -122,6 +122,6 @@ runs:
       uses: im-open/update-pr-comment@v1.2.2
       if: ${{ always() && github.event_name == 'pull_request' }}
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ env.GH_TOKEN }}
         comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-lint-results"
         comment-content: ${{ steps.node-lint.outputs.result }}
