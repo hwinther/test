@@ -54,3 +54,27 @@ updates:
           - "@typescript-eslint/*"
           - "*/eslint-plugin"
           - "*/eslint-plugin-*"
+
+  - package-ecosystem: "npm"
+    directory: "/tests/playwright"
+    open-pull-requests-limit: 20
+    target-branch: "dev"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    assignees:
+      - "hwinther"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
+    groups:
+      types:
+        patterns:
+          - "@types/*"
+      eslint:
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@typescript-eslint/*"
+          - "*/eslint-plugin"
+          - "*/eslint-plugin-*"
