@@ -172,7 +172,7 @@ jobs:
         uses: gkampitakis/github-action-todo-commenter@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          ignore-pattern: '.cs$'
+          #ignore-pattern: '.json$|.html$'
           review-message: "Please take a look :eyes:"
           # optional, default is "TODO:,FIXME:,BUG:"
           tags: "TODO:,FIXME:,BUG:"
