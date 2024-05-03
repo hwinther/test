@@ -1,8 +1,0 @@
-{
-  "editor.formatOnType": false,
-  "editor.formatOnPaste": true,
-  "editor.formatOnSave": true,
-  "editor.formatOnSaveMode": "file",
-  "files.autoSave": "onFocusChange", // optional but recommended
-  "explorer.fileNesting.enabled": true
-}
