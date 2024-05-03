@@ -33,8 +33,9 @@ concurrency:
 env:
   NODE_VERSION: "20"
   WORKFLOW_SHORT_NAME: "frontend"
-  PLAYWRIGHT_PATH: "tests/playwright"
+  FRONTEND_PATH: "src/frontend"
   TRAILING_AGENT_WORK_PATH: "/home/runner/work/test/test/"
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build:
@@ -42,12 +43,12 @@ jobs:
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     defaults:
       run:
-        working-directory: ${{ env.PLAYWRIGHT_PATH }}
+        working-directory: ${{ env.FRONTEND_PATH }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - uses: ./.github/actions/frontend-build
         with:
-          working_directory: ${{ env.PLAYWRIGHT_PATH }}
+          working_directory: ${{ env.FRONTEND_PATH }}
           comment_name: ${{ env.WORKFLOW_SHORT_NAME }}

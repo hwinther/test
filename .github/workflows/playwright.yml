@@ -35,6 +35,7 @@ env:
   WORKFLOW_SHORT_NAME: "test-e2e"
   PLAYWRIGHT_PATH: "tests/playwright"
   TRAILING_AGENT_WORK_PATH: "/home/runner/work/test/test/"
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build:
