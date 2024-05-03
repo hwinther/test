@@ -92,6 +92,7 @@ runs:
         [[ "${{ inputs.package_manager }}" == "yarn" ]] && yarn lint -f compact 1>lint.out 2>&1 || (exit 0)
         echo -e "\nLint output:\n"
         cat lint.out
+        ls -la
 
         cat lint.out | grep ": line " | sed -e 's|${{ env.TRAILING_AGENT_WORK_PATH }}||' >lint.err
         if [ ! -s lint.err ]
