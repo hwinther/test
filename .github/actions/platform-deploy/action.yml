@@ -1,21 +1,21 @@
-name: "Backend deploy"
+name: "Platform deploy"
+description: "Deploys platform component"
+branding:
+  icon: layers
+  color: black
 
 inputs:
   deploy_target:
     required: true
-    type: string
     description: prod|qa|test|dev
   working_directory:
     required: true
-    type: string
     description: root folder where the main terraform plan resides, e.g. ./templates/terraform/
   config_path:
     required: true
-    type: string
     description: .conf file relative to working_directory
   var_path:
     required: true
-    type: string
     description: .var file path relative to working_directory
 
 runs:

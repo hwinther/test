@@ -1,5 +1,8 @@
 name: "Frontend build"
 description: "Frontend (node) build and linting"
+branding:
+  icon: table
+  color: black
 
 inputs:
   working_directory:
