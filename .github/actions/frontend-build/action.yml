@@ -52,7 +52,7 @@ runs:
         grep "): error " build.out > build.err || (exit 0)
         if [ ! -s build.err ]
         then
-          echo "## ✅ ${{ env.WORKFLOW_SHORT_NAME }}: Build successful" > build.md
+          echo "## ✅ Build successful" > build.md
         else
           # Reformat error output as github error annotations
           error_regex="(.+)\(([0-9]+),[0-9]+\): error (.+)"
@@ -93,7 +93,7 @@ runs:
         cat lint.out | grep ": line " | sed -e 's|${{ env.TRAILING_AGENT_WORK_PATH }}||' >lint.err || (exit 0)
         if [ ! -s lint.err ]
         then
-          echo "## ✅ ${{ env.WORKFLOW_SHORT_NAME }}: No linting issues 🎊" > lint.md
+          echo "## ✅ No linting issues 🎊" > lint.md
         else
           # Reformat lint output as github error annotations
           error_regex="(.+): line ([0-9]+), col [0-9]+, [A-Za-z]+ - (.+)"
@@ -125,7 +125,8 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       run: |
-        cat build.md > combined.md
+        echo "# ${{ env.WORKFLOW_SHORT_NAME }}" > combined.md
+        cat build.md >> combined.md
         cat lint.md >> combined.md
         echo "result<<EOF"$'\n'"$(cat combined.md)"$'\n'EOF >> $GITHUB_OUTPUT
 
