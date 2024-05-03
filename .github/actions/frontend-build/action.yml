@@ -9,9 +9,9 @@ inputs:
     required: false
     description: npm|yarn
     default: "yarn"
-  comment_name:
+  component_name:
     required: true
-    description: unique name for PR comments
+    description: unique name of this component, used in PR comments
 
 runs:
   using: "composite"
@@ -52,7 +52,7 @@ runs:
         grep "): error " build.out > build.err || (exit 0)
         if [ ! -s build.err ]
         then
-          echo "## ✅ Build successful" > build.md
+          echo "## ✅ ${{ inputs.component_name }}: Build successful" > build.md
         else
           # Reformat error output as github error annotations
           error_regex="(.+)\(([0-9]+),[0-9]+\): error (.+)"
@@ -99,7 +99,7 @@ runs:
         cat lint.out | grep ": line " | sed -e 's|${{ env.TRAILING_AGENT_WORK_PATH }}||' >lint.err
         if [ ! -s lint.err ]
         then
-          echo "## ✅ No linting issues 🎊" > lint.md
+          echo "## ✅ ${{ inputs.component_name }}: No linting issues 🎊" > lint.md
         else
           # Reformat lint output as github error annotations
           error_regex="(.+): line ([0-9]+), col [0-9]+, [A-Za-z]+ - (.+)"

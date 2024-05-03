@@ -51,7 +51,7 @@ jobs:
       - uses: ./.github/actions/frontend-build
         with:
           working_directory: ${{ env.PLAYWRIGHT_PATH }}
-          comment_name: ${{ env.WORKFLOW_SHORT_NAME }}
+          component_name: ${{ env.WORKFLOW_SHORT_NAME }}
 
   run-e2e-tests:
     runs-on: ubuntu-latest
