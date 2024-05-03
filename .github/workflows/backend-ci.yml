@@ -26,6 +26,8 @@ permissions:
   contents: read
   checks: write
   pull-requests: write
+  actions: read # for super-linter
+  statuses: write # for super-linter
 
 # This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
@@ -115,9 +117,7 @@ jobs:
         uses: gkampitakis/github-action-todo-commenter@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          #ignore-pattern: '.json$|.html$'
           review-message: "Please take a look :eyes:"
-          # optional, default is "TODO:,FIXME:,BUG:"
           tags: "TODO:,FIXME:,BUG:"
 
       # TODO: move?
