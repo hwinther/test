@@ -15,5 +15,9 @@
     </None>
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
+    <None Include="grafana-datasources.yml" />
+    <None Include="otel-config.yaml" />
+    <None Include="otel-dotnet.env" />
+    <None Include="prometheus.yml" />
   </ItemGroup>
 </Project>

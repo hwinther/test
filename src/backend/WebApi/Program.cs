@@ -1,7 +1,30 @@
 using System.Reflection;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
+
+const string serviceName = "Test.WebApi";
+builder.Logging.AddOpenTelemetry(static options =>
+{
+    options
+        .SetResourceBuilder(
+            ResourceBuilder.CreateDefault()
+                           .AddService(serviceName))
+        .AddConsoleExporter();
+});
+
+builder.Services.AddOpenTelemetry()
+       .ConfigureResource(static resource => resource.AddService(serviceName))
+       .WithTracing(static tracing => tracing
+                                      .AddAspNetCoreInstrumentation()
+                                      .AddConsoleExporter())
+       .WithMetrics(static metrics => metrics
+                                      .AddAspNetCoreInstrumentation()
+                                      .AddConsoleExporter());
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

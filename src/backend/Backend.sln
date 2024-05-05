@@ -25,6 +25,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F9FCA971-68B
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{69BC9238-50AC-4F4C-B884-717F1E75493F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "log", "log", "{0BD80B55-00B4-4F55-A947-BF76CC059741}"
+	ProjectSection(SolutionItems) = preProject
+		log\placeholder.md = log\placeholder.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +55,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{B9B9AD30-0723-4C38-868E-5E9D9CB458CE} = {9EBA80A2-4F3D-4EBC-AC53-3D4DE1719443}
 		{F9FCA971-68B4-4828-A6EC-1A16DDF1E983} = {9EBA80A2-4F3D-4EBC-AC53-3D4DE1719443}
+		{0BD80B55-00B4-4F55-A947-BF76CC059741} = {F9FCA971-68B4-4828-A6EC-1A16DDF1E983}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A57A04D2-2D56-4C4F-A03F-BC3E671898F8}
