@@ -12,23 +12,41 @@ services:
     env_file:
       - otel-dotnet.env # enable OpenTelemetry .NET Automatic Instrumentation
     environment:
-      # DB_CONNECTION: "Server=sqlserver,1433;User=sa;Password=yourStrong(!)Password;TrustServerCertificate=True;"
+      DB_CONNECTION: "Server=sqlserver,1433;User=sa;Password=yourStrong(!)Password;TrustServerCertificate=True;"
       # OpenTelemetry environmental variables:
       OTEL_SERVICE_NAME: "service"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
       OTEL_DOTNET_AUTO_TRACES_ADDITIONAL_SOURCES: "Examples.Service"
       OTEL_DOTNET_AUTO_METRICS_ADDITIONAL_SOURCES: "Examples.Service"
     depends_on:
-      # - sqlserver
       - otel-collector
+      - sqlserver
+      - rabbitmq
 
-  # sqlserver:
-  #   image: mcr.microsoft.com/mssql/server:2019-CU17-ubuntu-20.04
-  #   environment:
-  #     - ACCEPT_EULA=Y
-  #     - SA_PASSWORD=yourStrong(!)Password
-  #   ports:
-  #     - "1433:1433"
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=yourStrong(!)Password
+    ports:
+      - "1433:1433"
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    privileged: false
+    command: ["bash", "-c", "chmod 600 /var/lib/rabbitmq/.erlang.cookie; rabbitmq-server"]
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - ./rabbitmq/data/:/var/lib/rabbitmq/mnesia
+        - ./rabbitmq/log/:/var/log/rabbitmq
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "rabbitcookie"
+      RABBITMQ_DEFAULT_USER: "admin"
+      RABBITMQ_DEFAULT_PASS: "password"
+    # networks:
+    #     - rabbitmq_go_net
 
   # OpenTelemetry Collector
   otel-collector:

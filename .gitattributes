@@ -1,1 +1,3 @@
 .githooks/* eol=lf
+Makefile eol=lf
+*.sh eol=lf
