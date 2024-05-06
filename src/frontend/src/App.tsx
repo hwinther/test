@@ -1,10 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
+import { useGetWeatherForecast } from './api/endpoints/weather-forecast/weather-forecast';
+import { useAuthDispatch } from './auth.context';
+import { WeatherForecast } from './api/models';
 
 function App() {
   const [count, setCount] = useState(0);
+  const dispatch = useAuthDispatch();
+  const { data: weatherForecasts, refetch } = useGetWeatherForecast();
+
+  useEffect(() => {
+    dispatch('token');
+    setTimeout(() => {
+      refetch();
+    }, 2000);
+  }, [refetch, dispatch]);
 
   return (
     <>
@@ -28,6 +40,12 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+
+      {weatherForecasts?.map((wf: WeatherForecast) => (
+        <p key={wf.date}>
+          {wf.date}: {wf.summary} - {wf.temperatureC}
+        </p>
+      ))}
     </>
   );
 }
