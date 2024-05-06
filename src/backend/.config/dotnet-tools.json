@@ -13,6 +13,12 @@
       "commands": [
         "reportgenerator"
       ]
+    },
+    "swashbuckle.aspnetcore.cli": {
+      "version": "6.5.0",
+      "commands": [
+        "swagger"
+      ]
     }
   }
 }
