@@ -28,6 +28,15 @@ builder.Services.AddOpenTelemetry()
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+var corsPolicyName = "corsPolicy";
+builder.Services.AddCors(options => options
+                             .AddPolicy(corsPolicyName,
+                                        static policyBuilder => policyBuilder
+                                                                .WithOrigins("https://localhost:5173")
+                                                                .AllowCredentials()
+                                                                .AllowAnyHeader()
+                                                                .AllowAnyMethod()));
+
 builder.Services.AddSwaggerGen(static options =>
 {
     options.SwaggerDoc("v1",
@@ -62,6 +71,7 @@ if (app.Environment.IsDevelopment())
     app.UseReDoc();
 }
 
+app.UseCors(corsPolicyName);
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
