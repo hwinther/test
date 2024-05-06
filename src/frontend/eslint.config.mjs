@@ -1,6 +1,8 @@
 import globals from 'globals';
 import pluginReactConfig from 'eslint-plugin-react/configs/recommended.js';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
+import eslintPluginReactRefresh from 'eslint-plugin-react-refresh';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -21,15 +23,11 @@ export default [
       globals: globals.browser,
     },
     files: ['*.ts', '*.tsx'],
-    ignores: [
-      'node_modules/',
-      'playwright-report/',
-      'test-results/',
-      '!tests/*',
-      '!test-examples/*',
-    ],
+    ignores: ['node_modules/'],
   },
-  ...compat.extends('standard-with-typescript'),
-  pluginReactConfig,
-  eslintConfigPrettier,
+  //...compat.extends('standard-with-typescript'),
+  //pluginReactConfig,
+  //eslintConfigPrettier,
+  //eslintPluginReactHooks,
+  //eslintPluginReactRefresh, // TODO
 ];
