@@ -8,6 +8,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { FlatCompat } from '@eslint/eslintrc';
 import pluginJs from '@eslint/js';
+import tseslint from 'typescript-eslint';
 
 // mimic CommonJS variables -- not needed if using CommonJS
 const compatFilename = fileURLToPath(import.meta.url);
@@ -17,17 +18,20 @@ const compat = new FlatCompat({
   recommendedConfig: pluginJs.configs.recommended,
 });
 
+/** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
   {
     languageOptions: {
       globals: globals.browser,
     },
-    files: ['*.ts', '*.tsx'],
-    ignores: ['node_modules/'],
+    files: ['**/*.ts', '**/*.tsx'],
+    ignores: ['node_modules/*', 'dist/*'],
   },
-  //...compat.extends('standard-with-typescript'),
-  //pluginReactConfig,
-  //eslintConfigPrettier,
+  //pluginJs.configs.recommended,
+  ...tseslint.configs.recommended,
+  ...compat.extends('standard-with-typescript'),
+  pluginReactConfig,
+  eslintConfigPrettier,
   //eslintPluginReactHooks,
-  //eslintPluginReactRefresh, // TODO
+  //eslintPluginReactRefresh,
 ];
