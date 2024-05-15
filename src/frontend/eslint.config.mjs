@@ -2,7 +2,7 @@ import globals from 'globals';
 import pluginReactConfig from 'eslint-plugin-react/configs/recommended.js';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
-import eslintPluginReactRefresh from 'eslint-plugin-react-refresh';
+//import eslintPluginReactRefresh from 'eslint-plugin-react-refresh';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -18,6 +18,11 @@ const compat = new FlatCompat({
   recommendedConfig: pluginJs.configs.recommended,
 });
 
+const eslintPluginReactHooksCompat = new FlatCompat({
+  baseDirectory: compatDirname,
+  recommendedConfig: eslintPluginReactHooks.configs.recommended,
+});
+
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
   {
@@ -31,7 +36,7 @@ export default [
   ...tseslint.configs.recommended,
   ...compat.extends('standard-with-typescript'),
   pluginReactConfig,
-  eslintConfigPrettier,
-  //eslintPluginReactHooks,
+  ...eslintPluginReactHooksCompat.extends('standard-with-typescript'),
   //eslintPluginReactRefresh,
+  eslintConfigPrettier,
 ];
