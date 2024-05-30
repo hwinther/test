@@ -6,6 +6,7 @@ on:
 
 env:
   SOLUTION_PATH: "src/backend"
+  SOLUTION_NAME: "Backend.sln"
 
 jobs:
   update-lockfiles:
@@ -24,9 +25,9 @@ jobs:
           git config user.email "${{ github.actor }}@users.noreply.github.com"
 
       - name: Update lockfiles
+        working-directory: ${{ env.SOLUTION_PATH }}
         run: |
-          cd ${{ env.SOLUTION_PATH }}
-          dotnet restore
+          dotnet restore ${{ env.SOLUTION_NAME }}
           git status
           if output=$(git status --porcelain) && [ -z "$output" ]; then
             # Working directory clean - do nothing
