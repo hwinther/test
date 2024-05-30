@@ -37,10 +37,20 @@ updates:
       microsoft:
         patterns:
           - "Microsoft.*"
+      swashbuckle:
+        patterns:
+          - "Swashbuckle.*"
       xunit:
         patterns:
           - "xunit"
           - "xunit.*"
+      nunit:
+        patterns:
+          - "nunit"
+          - "nunit.*"
+      coverlet:
+        patterns:
+          - "coverlet.*"
 
   - package-ecosystem: "npm"
     directory: "/src/frontend"
