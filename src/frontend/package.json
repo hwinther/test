@@ -11,7 +11,7 @@
     "orval": "orval --config ./orval.config.cjs"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.35.1",
+    "@tanstack/react-query": "^5.40.0",
     "@tanstack/react-query-devtools": "^5.35.1",
     "axios": "^1.6.8",
     "react": "^18.2.0",
