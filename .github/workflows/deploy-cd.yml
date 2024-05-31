@@ -118,7 +118,7 @@ jobs:
       # - name: Update database via entity framework
       #   working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
       #   env:
-      #     TestConnectionString: ${{ secrets.SQL_BASIL_CONNECTION_STRING }}
+      #     TestConnectionString: ${{ secrets.SQL_CONNECTION_STRING }}
       #   run: |
       #     dotnet ef database update --project Test.Common --context TestDbContext
 
