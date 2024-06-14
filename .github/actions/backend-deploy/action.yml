@@ -107,6 +107,6 @@ runs:
       shell: bash
       run: 'echo "🚀 Deployed with URL: ${{ steps.fa.outputs.app-url }}${{ steps.webapps-deploy.outputs.webapp-url }} from CR: ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:${{ env.INFORMATIONAL_VERSION }}" >> $GITHUB_STEP_SUMMARY'
 
-    - name: Azure logout
-      shell: bash
-      run: az logout
+    # - name: Azure logout
+    #   shell: bash
+    #   run: az logout
