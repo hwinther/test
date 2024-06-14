@@ -25,8 +25,8 @@ public class WeatherForecastControllerTests
         var result = await _controller.Get();
 
         // Assert
-        Assert.IsInstanceOf<ActionResult<IEnumerable<WeatherForecast>>>(result);
-        Assert.IsInstanceOf<OkObjectResult>(result.Result);
+        Assert.That(result, Is.InstanceOf<ActionResult<IEnumerable<WeatherForecast>>>());
+        Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
     }
 
     [Test]
@@ -36,11 +36,11 @@ public class WeatherForecastControllerTests
         var result = await _controller.Get();
 
         // Assert
-        Assert.NotNull(result.Result);
-        Assert.IsAssignableFrom<OkObjectResult>(result.Result);
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result, Is.AssignableFrom<OkObjectResult>());
         var okResult = (OkObjectResult) result.Result;
-        Assert.NotNull(okResult.Value);
-        Assert.IsAssignableFrom<WeatherForecast[]>(okResult.Value);
+        Assert.That(okResult.Value, Is.Not.Null);
+        Assert.That(okResult.Value, Is.AssignableFrom<WeatherForecast[]>());
         Assert.That(((WeatherForecast[]) okResult.Value).Count(), Is.EqualTo(5));
     }
 
@@ -51,16 +51,16 @@ public class WeatherForecastControllerTests
         var result = await _controller.Get();
 
         // Assert
-        Assert.NotNull(result.Result);
-        Assert.IsAssignableFrom<OkObjectResult>(result.Result);
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result, Is.AssignableFrom<OkObjectResult>());
         var okResult = (OkObjectResult) result.Result;
-        Assert.NotNull(okResult.Value);
-        Assert.IsAssignableFrom<WeatherForecast[]>(okResult.Value);
+        Assert.That(okResult.Value, Is.Not.Null);
+        Assert.That(okResult.Value, Is.AssignableFrom<WeatherForecast[]>());
         foreach (var weatherForecast in (WeatherForecast[]) okResult.Value)
         {
-            Assert.IsInstanceOf<DateOnly>(weatherForecast.Date);
-            Assert.IsInstanceOf<int>(weatherForecast.TemperatureC);
-            Assert.IsInstanceOf<string>(weatherForecast.Summary);
+            Assert.That(weatherForecast.Date, Is.InstanceOf<DateOnly>());
+            Assert.That(weatherForecast.TemperatureC, Is.InstanceOf<int>());
+            Assert.That(weatherForecast.Summary, Is.InstanceOf<string>());
         }
     }
 
