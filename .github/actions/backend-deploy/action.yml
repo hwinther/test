@@ -16,7 +16,7 @@ inputs:
     description: labels from conditions in trigger workflow
   base_name:
     required: true
-    description: basil|gsi|login|ext
+    description: api|integration
   project_type:
     required: true
     description: function|app
@@ -66,7 +66,7 @@ runs:
       if: ${{ !inputs.skip_setup }}
       shell: bash
       working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
-      run: dotnet restore --locked-mode ${{ env.BACKEND_SOLUTION_FILE }}
+      run: dotnet restore --locked-mode ${{ env.BACKEND_SOLUTION_FILENAME }}
 
     - name: "Compose Customized Docker Image"
       shell: bash

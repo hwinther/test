@@ -100,11 +100,9 @@ jobs:
 
       - name: Run Playwright tests
         env:
-          BASIL_URL: https://${{ inputs.url_prefix }}basil-gsi-login.udir.no
-          BASIL_API_URL: https://${{ inputs.url_prefix }}basil-gsi-api.udir.no
+          API_URL: https://${{ inputs.url_prefix }}web-api.test.no
         run: |
-          echo "Using BASIL_URL: $BASIL_URL"
-          echo "Using BASIL_API_URL: $BASIL_API_URL"
+          echo "Using API_URL: $API_URL"
           yarn playwright test
           # npx playwright test
 
