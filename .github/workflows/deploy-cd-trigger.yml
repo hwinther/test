@@ -28,6 +28,8 @@ permissions:
   contents: read
   checks: write
   pull-requests: write
+  # for ghcr.io (docker registry):
+  packages: write
 
 # This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
