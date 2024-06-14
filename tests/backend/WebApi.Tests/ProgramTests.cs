@@ -29,9 +29,9 @@ public class ProgramTests
         var response = await _client.GetAsync("/swagger/index.html");
 
         // Assert
-        Assert.NotNull(response);
+        Assert.That(response, Is.Not.Null);
         response.EnsureSuccessStatusCode();
-        Assert.NotNull(response.Content.Headers.ContentType);
+        Assert.That(response.Content.Headers.ContentType, Is.Not.Null);
         Assert.That(response.Content.Headers.ContentType.ToString(), Is.EqualTo("text/html; charset=utf-8"));
     }
 }
