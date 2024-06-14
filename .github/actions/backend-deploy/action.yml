@@ -66,7 +66,7 @@ runs:
       if: ${{ !inputs.skip_setup }}
       shell: bash
       working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
-      run: dotnet restore --locked-mode
+      run: dotnet restore --locked-mode ${{ env.BACKEND_SOLUTION_FILE }}
 
     - name: "Compose Customized Docker Image"
       shell: bash

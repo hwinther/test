@@ -35,6 +35,7 @@ env:
   TRAILING_AGENT_WORK_PATH: "/home/runner/work/test/test/"
   DOTNET_VERSION: "8.0.x"
   BACKEND_SOLUTION_PATH: "src/backend"
+  BACKEND_SOLUTION_FILE: "Backend.sln"
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
   #DOCKER_REGISTRY_SERVER: "crtest${{ inputs.deploy_target }}ne.azurecr.io"
   #DOCKER_REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
@@ -115,7 +116,7 @@ jobs:
         shell: bash
         working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
         run: |
-          dotnet restore --locked-mode
+          dotnet restore --locked-mode ${{ env.BACKEND_SOLUTION_FILE }}
           dotnet tool restore
 
       # - name: Update database via entity framework
