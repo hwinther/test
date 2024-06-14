@@ -36,17 +36,20 @@ env:
   DOTNET_VERSION: "8.0.x"
   BACKEND_SOLUTION_PATH: "src/backend"
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-  DOCKER_REGISTRY_SERVER: "crtest${{ inputs.deploy_target }}ne.azurecr.io"
-  DOCKER_REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-  DOCKER_REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+  #DOCKER_REGISTRY_SERVER: "crtest${{ inputs.deploy_target }}ne.azurecr.io"
+  #DOCKER_REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+  #DOCKER_REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+  DOCKER_REGISTRY_SERVER: "ghcr.io"
+  DOCKER_REGISTRY_USERNAME: ${{ github.actor }}
+  DOCKER_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
   # ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
   # ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
   # ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   # ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-  POWERAPPS_ENVIRONMENTURL: ${{ secrets.POWERAPPS_ENVIRONMENTURL }}
-  POWERAPPS_APPID: ${{ secrets.POWERAPPS_APPID }}
-  POWERAPPS_TENANTID: ${{ secrets.POWERAPPS_TENANTID }}
-  POWERAPPS_SECRET: ${{ secrets.POWERAPPS_SECRET }}
+  # POWERAPPS_ENVIRONMENTURL: ${{ secrets.POWERAPPS_ENVIRONMENTURL }}
+  # POWERAPPS_APPID: ${{ secrets.POWERAPPS_APPID }}
+  # POWERAPPS_TENANTID: ${{ secrets.POWERAPPS_TENANTID }}
+  # POWERAPPS_SECRET: ${{ secrets.POWERAPPS_SECRET }}
 
 jobs:
   deploy:
@@ -141,8 +144,8 @@ jobs:
           deploy_target: ${{ inputs.deploy_target }}
           repo_name: ${{ inputs.repo_name }}
           labels: ${{ inputs.labels }}
-          base_name: login
-          project_type: app
+          base_name: "login"
+          project_type: "todo"
           dockerfile_path: "WebApi/Dockerfile"
           docker_image_name: "api"
           azure_resource_name: "app-api-${{ inputs.deploy_target }}-ne"
