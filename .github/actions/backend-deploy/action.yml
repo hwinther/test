@@ -72,6 +72,7 @@ runs:
       shell: bash
       working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
       run: |
+        echo "Image path: ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:${{ env.INFORMATIONAL_VERSION }}"
         docker build . -f ${{ inputs.dockerfile_path }} -t ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:${{ env.INFORMATIONAL_VERSION }} -t ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:latest --build-arg VERSION=${{ env.VERSION }} --build-arg INFORMATIONAL_VERSION=${{ env.INFORMATIONAL_VERSION }}
         docker push ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:${{ env.INFORMATIONAL_VERSION }}
         docker push ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:latest

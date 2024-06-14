@@ -148,7 +148,7 @@ jobs:
           base_name: "login"
           project_type: "todo"
           dockerfile_path: "WebApi/Dockerfile"
-          docker_image_name: "api"
+          docker_image_name: "hwinther/test-api"
           azure_resource_name: "app-api-${{ inputs.deploy_target }}-ne"
           skip_setup: true
 
