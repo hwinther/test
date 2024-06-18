@@ -428,3 +428,6 @@ CoverageReport/
 
 # Rider SonarLint plugin
 **/.idea/sonarlint/
+
+# Docker container volumes
+**/docker-volumes/

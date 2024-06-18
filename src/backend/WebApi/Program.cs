@@ -1,4 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -7,12 +9,20 @@ using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddDbContext<BloggingContext>(options =>
+                                                   options.UseSqlServer(Environment.GetEnvironmentVariable("DB_CONNECTION"),
+                                                                        static sqlOptions =>
+                                                                        {
+                                                                            sqlOptions.CommandTimeout(30);
+                                                                            sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                                                                        })
+                                                          .EnableDetailedErrors(builder.Environment.IsDevelopment())
+                                                          .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
+
 const string serviceName = "Test.WebApi";
 builder.Logging.AddOpenTelemetry(static options =>
 {
-    options
-        .SetResourceBuilder(
-            ResourceBuilder.CreateDefault()
+    options.SetResourceBuilder(ResourceBuilder.CreateDefault()
                            .AddService(serviceName))
         .AddConsoleExporter();
 });
@@ -21,9 +31,18 @@ builder.Services.AddOpenTelemetry()
        .ConfigureResource(static resource => resource.AddService(serviceName))
        .WithTracing(static tracing => tracing
                                       .AddAspNetCoreInstrumentation()
+                                      .AddHttpClientInstrumentation()
+                                      .AddSource(nameof(MessageSender))
+                                      .AddZipkinExporter(static options =>
+                                      {
+                                          var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
+                                          options.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
+                                      })
                                       .AddConsoleExporter())
        .WithMetrics(static metrics => metrics
                                       .AddAspNetCoreInstrumentation()
+                                      .AddHttpClientInstrumentation()
+                                      .AddRuntimeInstrumentation()
                                       .AddConsoleExporter());
 
 builder.Services.AddControllers();
@@ -63,6 +82,16 @@ builder.Services.AddSwaggerGen(static options =>
 });
 
 var app = builder.Build();
+
+try
+{
+    app.Services.GetRequiredService<BloggingContext>()
+       .Database.Migrate();
+}
+catch (Exception exception)
+{
+    Console.WriteLine($"Migration exception: {exception.Message}");
+}
 
 if (app.Environment.IsDevelopment())
 {
