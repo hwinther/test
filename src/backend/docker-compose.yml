@@ -28,6 +28,14 @@ services:
       - rabbitmq
       - zipkin
 
+  frontend:
+    image: ${DOCKER_REGISTRY-}frontend
+    build:
+      context: ../frontend
+      dockerfile: ../frontend/Dockerfile
+    depends_on:
+      - webapi
+
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
