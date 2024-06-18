@@ -1,11 +1,11 @@
 .PHONY: run
 run:
-	mkdir -p log
-	chmod 777 log
-	mkdir -p rabbitmq/data
-	chmod 777 rabbitmq/data
-	mkdir -p rabbitmq/log
-	chmod 777 rabbitmq/log
+	mkdir -p docker-volumes/log && chmod 777 docker-volumes/log
+	mkdir -p docker-volumes/rabbitmq/data && chmod 777 docker-volumes/rabbitmq/data
+	mkdir -p docker-volumes/rabbitmq/log && chmod 777 docker-volumes/rabbitmq/log
+	mkdir -p docker-volumes/mssql/data && chmod 777 docker-volumes/mssql/data
+	mkdir -p docker-volumes/mssql/log && chmod 777 docker-volumes/mssql/log
+	mkdir -p docker-volumes/mssql/secrets && chmod 777 docker-volumes/mssql/secrets
 	docker compose up -d --build
 
 .PHONY: clean
@@ -15,7 +15,7 @@ clean:
 
 .PHONY: wait
 wait:
-	until [ -f "./log/traces.log" ] && [ -f "./log/metrics.log" ] && [ -f "./log/logs.log" ]; do sleep 5; done
+	until [ -f "./docker-volumes/log/traces.log" ] && [ -f "./docker-volumes/log/metrics.log" ] && [ -f "./docker-volumes/log/logs.log" ]; do sleep 5; done
 
 .PHONY: test
 test: run wait clean
