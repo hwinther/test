@@ -12,7 +12,7 @@ services:
     env_file:
       - otel-dotnet.env # enable OpenTelemetry .NET Automatic Instrumentation
     environment:
-      DB_CONNECTION: "Server=sqlserver,1433;User=sa;Password=yourStrong(!)Password;TrustServerCertificate=True;"
+      DB_CONNECTION: "Server=sqlserver,1433;Initial Catalog=api;User=sa;Password=yourStrong(!)Password;TrustServerCertificate=True;"
       # OpenTelemetry environmental variables:
       OTEL_SERVICE_NAME: "service"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"

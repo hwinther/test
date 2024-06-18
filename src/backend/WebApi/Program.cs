@@ -6,6 +6,8 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Utils.Messaging;
+using WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,11 +22,14 @@ builder.Services.AddDbContext<BloggingContext>(options =>
                                                           .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
 
 const string serviceName = "Test.WebApi";
+
+builder.Services.AddSingleton<MessageSender>();
+
 builder.Logging.AddOpenTelemetry(static options =>
 {
     options.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                           .AddService(serviceName))
-        .AddConsoleExporter();
+                                              .AddService(serviceName))
+           .AddConsoleExporter();
 });
 
 builder.Services.AddOpenTelemetry()
@@ -33,17 +38,17 @@ builder.Services.AddOpenTelemetry()
                                       .AddAspNetCoreInstrumentation()
                                       .AddHttpClientInstrumentation()
                                       .AddSource(nameof(MessageSender))
+                                      //.AddConsoleExporter()
                                       .AddZipkinExporter(static options =>
                                       {
                                           var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
                                           options.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
-                                      })
-                                      .AddConsoleExporter())
+                                      }))
        .WithMetrics(static metrics => metrics
                                       .AddAspNetCoreInstrumentation()
                                       .AddHttpClientInstrumentation()
-                                      .AddRuntimeInstrumentation()
-                                      .AddConsoleExporter());
+                                      //.AddConsoleExporter()
+                                      .AddRuntimeInstrumentation());
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -85,8 +90,9 @@ var app = builder.Build();
 
 try
 {
-    app.Services.GetRequiredService<BloggingContext>()
-       .Database.Migrate();
+    using var serviceScope = app.Services.CreateScope();
+    var bloggingContext = serviceScope.ServiceProvider.GetRequiredService<BloggingContext>();
+    bloggingContext.Database.Migrate();
 }
 catch (Exception exception)
 {
@@ -110,6 +116,7 @@ app.Run();
 /// <summary>
 ///     Test visibility class
 /// </summary>
+[ExcludeFromCodeCoverage]
 public partial class Program
 {
     // For test visibility
