@@ -12,16 +12,31 @@ services:
     env_file:
       - otel-dotnet.env # enable OpenTelemetry .NET Automatic Instrumentation
     environment:
-      DB_CONNECTION: "Server=sqlserver,1433;User=sa;Password=yourStrong(!)Password;TrustServerCertificate=True;"
+      DB_CONNECTION: "Server=sqlserver,1433;Initial Catalog=api;User=sa;Password=yourStrong(!)Password;TrustServerCertificate=True;"
       # OpenTelemetry environmental variables:
       OTEL_SERVICE_NAME: "service"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
       OTEL_DOTNET_AUTO_TRACES_ADDITIONAL_SOURCES: "Examples.Service"
       OTEL_DOTNET_AUTO_METRICS_ADDITIONAL_SOURCES: "Examples.Service"
+      RABBITMQ_HOSTNAME: rabbitmq
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+      ZIPKIN_HOSTNAME: zipkin
     depends_on:
       - otel-collector
       - sqlserver
       - rabbitmq
+      - zipkin
+
+  frontend:
+    image: ${DOCKER_REGISTRY-}frontend
+    build:
+      context: ../frontend
+      dockerfile: ../frontend/Dockerfile
+    ports:
+     - "8080:80"
+    depends_on:
+      - webapi
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -30,6 +45,10 @@ services:
       - SA_PASSWORD=yourStrong(!)Password
     ports:
       - "1433:1433"
+    volumes:
+        - ./docker-volumes/mssql/data/:/var/opt/mssql/data
+        - ./docker-volumes/mssql/log/:/var/opt/mssql/log
+        - ./docker-volumes/mssql/secrets/:/var/opt/mssql/secrets
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -39,21 +58,19 @@ services:
         - 5672:5672
         - 15672:15672
     volumes:
-        - ./rabbitmq/data/:/var/lib/rabbitmq/mnesia
-        - ./rabbitmq/log/:/var/log/rabbitmq
+        - ./docker-volumes/rabbitmq/data/:/var/lib/rabbitmq/mnesia
+        - ./docker-volumes/rabbitmq/log/:/var/log/rabbitmq
     environment:
       RABBITMQ_ERLANG_COOKIE: "rabbitcookie"
-      RABBITMQ_DEFAULT_USER: "admin"
-      RABBITMQ_DEFAULT_PASS: "password"
-    # networks:
-    #     - rabbitmq_go_net
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
 
   # OpenTelemetry Collector
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.88.0
     volumes:
       - ./otel-config.yaml:/etc/otel/config.yaml
-      - ./log:/log/otel
+      - ./docker-volumes/log:/log/otel
     command: --config /etc/otel/config.yaml
     environment:
       JAEGER_ENDPOINT: "jaeger:4317"
@@ -66,6 +83,7 @@ services:
       - jaeger
       - prometheus
       - loki
+      - zipkin
 
   jaeger:
     image: jaegertracing/all-in-one:1.50.0
@@ -91,5 +109,12 @@ services:
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_AUTH_DISABLE_LOGIN_FORM: true
+      GF_FEATURE_TOGGLES_ENABLE: traceqlEditor
     ports:
       - "3000:3000"
+
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - 9411:9411
