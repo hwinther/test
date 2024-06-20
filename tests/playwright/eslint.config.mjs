@@ -1,35 +1,22 @@
-import globals from 'globals';
-import pluginReactConfig from 'eslint-plugin-react/configs/recommended.js';
-import eslintConfigPrettier from 'eslint-config-prettier';
+import eslintConfigLove from 'eslint-config-love'
+import perfectionistNatural from 'eslint-plugin-perfectionist/configs/recommended-natural'
+import eslintConfigPrettier from 'eslint-config-prettier'
+import cspellESLintPluginRecommended from '@cspell/eslint-plugin/recommended'
+import eslintPluginSonarJs from 'eslint-plugin-sonarjs'
 
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { FlatCompat } from '@eslint/eslintrc';
-import pluginJs from '@eslint/js';
-
-// mimic CommonJS variables -- not needed if using CommonJS
-const compatFilename = fileURLToPath(import.meta.url);
-const compatDirname = path.dirname(compatFilename);
-const compat = new FlatCompat({
-  baseDirectory: compatDirname,
-  recommendedConfig: pluginJs.configs.recommended,
-});
-
+/** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
   {
-    languageOptions: {
-      globals: globals.browser,
-    },
-    files: ['*.ts', '*.tsx'],
-    ignores: [
-      'node_modules/',
-      'playwright-report/',
-      'test-results/',
-      '!tests/*',
-      '!test-examples/*',
-    ],
+    ...eslintConfigLove,
+    files: ['**/*.js', '**/*.ts', '**/*.tsx'],
   },
-  ...compat.extends('standard-with-typescript'),
-  pluginReactConfig,
+  perfectionistNatural,
+  cspellESLintPluginRecommended,
+  eslintPluginSonarJs.configs.recommended,
+  {
+    plugins: {
+      eslintPluginSonarJs,
+    },
+  },
   eslintConfigPrettier,
-];
+]

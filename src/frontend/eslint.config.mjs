@@ -1,42 +1,25 @@
-import globals from 'globals';
-import pluginReactConfig from 'eslint-plugin-react/configs/recommended.js';
-import eslintConfigPrettier from 'eslint-config-prettier';
-import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
-//import eslintPluginReactRefresh from 'eslint-plugin-react-refresh';
-
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { FlatCompat } from '@eslint/eslintrc';
-import pluginJs from '@eslint/js';
-import tseslint from 'typescript-eslint';
-
-// mimic CommonJS variables -- not needed if using CommonJS
-const compatFilename = fileURLToPath(import.meta.url);
-const compatDirname = path.dirname(compatFilename);
-const compat = new FlatCompat({
-  baseDirectory: compatDirname,
-  recommendedConfig: pluginJs.configs.recommended,
-});
-
-const eslintPluginReactHooksCompat = new FlatCompat({
-  baseDirectory: compatDirname,
-  recommendedConfig: eslintPluginReactHooks.configs.recommended,
-});
+import cspellESLintPluginRecommended from '@cspell/eslint-plugin/recommended'
+import eslintConfigLove from 'eslint-config-love'
+import eslintConfigPrettier from 'eslint-config-prettier'
+import perfectionistNatural from 'eslint-plugin-perfectionist/configs/recommended-natural'
+import eslintPluginSonarJs from 'eslint-plugin-sonarjs'
+import jsDoc from 'eslint-plugin-jsdoc'
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
   {
-    languageOptions: {
-      globals: globals.browser,
-    },
-    files: ['**/*.ts', '**/*.tsx'],
-    ignores: ['node_modules/*', 'dist/*'],
+    ...eslintConfigLove,
+    files: ['**/*.js', '**/*.ts', '**/*.tsx'],
   },
-  //pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
-  ...compat.extends('standard-with-typescript'),
-  pluginReactConfig,
-  ...eslintPluginReactHooksCompat.extends('standard-with-typescript'),
-  //eslintPluginReactRefresh,
+  perfectionistNatural,
+  cspellESLintPluginRecommended,
+  eslintPluginSonarJs.configs.recommended,
+  jsDoc.configs['flat/recommended'],
+  {
+    plugins: {
+      eslintPluginSonarJs,
+      jsDoc,
+    },
+  },
   eslintConfigPrettier,
-];
+]

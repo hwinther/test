@@ -1,5 +1,5 @@
 /** @type {import('orval').Options} */
-module.exports = {
+export default {
   api: {
     output: {
       mode: 'tags-split',
@@ -32,4 +32,4 @@ module.exports = {
       // },
     },
   },
-};
+}
