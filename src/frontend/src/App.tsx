@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+
 import './App.css'
 import { useGetWeatherForecast } from './api/endpoints/weather-forecast/weather-forecast'
+import { type WeatherForecast } from './api/models'
+import reactLogo from './assets/react.svg'
 import { useAuthDispatch } from './auth.context'
-import { WeatherForecast } from './api/models'
 
+// eslint-disable-next-line import/no-absolute-path
+import viteLogo from '/vite.svg'
+
+/**
+ *
+ */
 function App() {
   const [count, setCount] = useState(0)
   const dispatch = useAuthDispatch()
@@ -22,15 +28,21 @@ function App() {
     <>
       <div>
         <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
+          <img alt="Vite logo" className="logo" src={viteLogo} />
         </a>
         <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
+          <img alt="React logo" className="logo react" src={reactLogo} />
         </a>
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
+        <button
+          onClick={() => {
+            setCount((count) => count + 1)
+          }}
+        >
+          count is {count}
+        </button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>

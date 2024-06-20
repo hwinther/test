@@ -1,9 +1,9 @@
-import { createContext, ReactNode, useContext, useState } from 'react'
+import { type ReactNode, createContext, useContext, useState } from 'react'
 type Dispatch = (Auth: string) => void
 
-type AuthProviderProps = { children: ReactNode; initialState?: string | null }
+interface AuthProviderProps { children: ReactNode; initialState?: null | string }
 
-const AuthContext = createContext<string | null>(null)
+const AuthContext = createContext<null | string>(null)
 const AuthDispatchContext = createContext<Dispatch | null>(null)
 
 const AuthProvider = ({ children, initialState = null }: AuthProviderProps) => {
@@ -17,8 +17,8 @@ const AuthProvider = ({ children, initialState = null }: AuthProviderProps) => {
   )
 }
 
-const useAuth = (): string | null => {
-  return useContext<string | null>(AuthContext)
+const useAuth = (): null | string => {
+  return useContext<null | string>(AuthContext)
 }
 
 const useAuthDispatch = (): Dispatch => {

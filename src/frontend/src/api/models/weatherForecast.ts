@@ -8,7 +8,7 @@ export interface WeatherForecast {
    * Summary text
    * @nullable
    */
-  summary?: string | null
+  summary?: null | string
   /** Temperature in celsius */
   temperatureC?: number
 }
