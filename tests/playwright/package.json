@@ -9,7 +9,9 @@
   "author": "hwinther",
   "scripts": {
     "build": "tsc --noEmit",
-    "lint": "eslint . --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
+    "format/check": "prettier . --check",
+    "format/fix": "prettier . --write"
   },
   "devDependencies": {
     "@cspell/eslint-plugin": "^8.9.1",
