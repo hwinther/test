@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { type JSX, useEffect, useState } from 'react'
 
 import './App.css'
 import { useGetWeatherForecast } from './api/endpoints/weather-forecast/weather-forecast'
@@ -6,13 +6,13 @@ import { type WeatherForecast } from './api/models'
 import reactLogo from './assets/react.svg'
 import { useAuthDispatch } from './auth.context'
 
-// eslint-disable-next-line import/no-absolute-path
 import viteLogo from '/vite.svg'
 
 /**
- *
+ * This is the main component of the application.
+ * @returns {JSX.Element} The rendered App component.
  */
-function App() {
+function App(): JSX.Element {
   const [count, setCount] = useState(0)
   const dispatch = useAuthDispatch()
   const { data: weatherForecasts, refetch } = useGetWeatherForecast()
@@ -20,6 +20,7 @@ function App() {
   useEffect(() => {
     dispatch('token')
     setTimeout(() => {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       refetch()
     }, 2000)
   }, [refetch, dispatch])

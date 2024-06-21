@@ -15,7 +15,7 @@ const isLocalhost = Boolean(
     // [::1] is the IPv6 localhost address.
     window.location.hostname === '[::1]' ||
     // 127.0.0.0/8 are considered localhost for IPv4.
-    window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/),
+    /^127(?:\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)){3}$/.exec(window.location.hostname),
 )
 
 interface Config {
@@ -24,13 +24,15 @@ interface Config {
 }
 
 /**
- *
- * @param config
+ * Register the service worker after performing some checks.
+ * @param {Config} config - The configuration object.
+ * @param {Function} config.onSuccess - The success callback function.
+ * @param {Function} config.onUpdate - The update callback function.
  */
-export function register(config?: Config) {
+export function register(config?: Config): void {
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
-    const publicUrl = new URL(process.env.PUBLIC_URL!, window.location.href)
+    const publicUrl = new URL(process.env.PUBLIC_URL ?? '', window.location.href)
     if (publicUrl.origin !== window.location.origin) {
       // Our service worker won't work if PUBLIC_URL is on a different origin
       // from what our page is served on. This might happen if a CDN is used to
@@ -47,6 +49,7 @@ export function register(config?: Config) {
 
         // Add some additional logging to localhost, pointing developers to the
         // service worker/PWA documentation.
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         navigator.serviceWorker.ready.then(() => {
           console.log(
             'This web app is being served cache-first by a service ' +
@@ -62,11 +65,11 @@ export function register(config?: Config) {
 }
 
 /**
- *
- * @param swUrl
- * @param config
+ * Register the service worker.
+ * @param {string} swUrl - The URL of the service worker.
+ * @param {Config} config - The configuration object.
  */
-function registerValidSW(swUrl: string, config?: Config) {
+function registerValidSW(swUrl: string, config?: Config): void {
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
@@ -77,7 +80,7 @@ function registerValidSW(swUrl: string, config?: Config) {
         }
         installingWorker.onstatechange = () => {
           if (installingWorker.state === 'installed') {
-            if (navigator.serviceWorker.controller) {
+            if (navigator.serviceWorker.controller != null) {
               // At this point, the updated precached content has been fetched,
               // but the previous service worker will still serve the older
               // content until all client tabs are closed.
@@ -87,7 +90,7 @@ function registerValidSW(swUrl: string, config?: Config) {
               )
 
               // Execute callback
-              if (config?.onUpdate) {
+              if (config?.onUpdate != null) {
                 config.onUpdate(registration)
               }
             } else {
@@ -97,7 +100,7 @@ function registerValidSW(swUrl: string, config?: Config) {
               console.log('Content is cached for offline use.')
 
               // Execute callback
-              if (config?.onSuccess) {
+              if (config?.onSuccess != null) {
                 config.onSuccess(registration)
               }
             }
@@ -111,11 +114,11 @@ function registerValidSW(swUrl: string, config?: Config) {
 }
 
 /**
- *
- * @param swUrl
- * @param config
+ * Check if the service worker is valid.
+ * @param {string} swUrl - The URL of the service worker.
+ * @param {Config} config - The configuration object.
  */
-function checkValidServiceWorker(swUrl: string, config?: Config) {
+function checkValidServiceWorker(swUrl: string, config?: Config): void {
   // Check if the service worker can be found. If it can't reload the page.
   fetch(swUrl, {
     headers: { 'Service-Worker': 'script' },
@@ -125,7 +128,9 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
       const contentType = response.headers.get('content-type')
       if (response.status === 404 || (contentType != null && !contentType.includes('javascript'))) {
         // No service worker found. Probably a different app. Reload the page.
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         navigator.serviceWorker.ready.then((registration) => {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           registration.unregister().then(() => {
             window.location.reload()
           })
@@ -141,12 +146,13 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
 }
 
 /**
- *
+ * Unregister the service worker.
  */
-export function unregister() {
+export function unregister(): void {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready
       .then((registration) => {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         registration.unregister()
       })
       .catch((error) => {

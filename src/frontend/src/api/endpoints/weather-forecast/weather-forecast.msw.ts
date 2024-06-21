@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker'
 import { HttpResponse, delay, http } from 'msw'
+import { WeatherForecast } from '../../models'
 
 export const getGetWeatherForecastResponseMock = (overrideResponse: any = {}): WeatherForecast[] =>
   Array.from({ length: faker.number.int({ max: 10, min: 1 }) }, (_, i) => i + 1).map(() => ({
@@ -12,9 +13,9 @@ export const getGetWeatherForecastResponseMock = (overrideResponse: any = {}): W
 export const getGetWeatherForecastMockHandler = () => {
   return http.get('*/WeatherForecast', async () => {
     await delay(1000)
-    return new HttpResponse(getGetWeatherForecastResponseMock(), {
+    return new HttpResponse(JSON.stringify(getGetWeatherForecastResponseMock()), {
       headers: {
-        'Content-Type': 'text/plain',
+        'Content-Type': 'application/json',
       },
       status: 200,
     })

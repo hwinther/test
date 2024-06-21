@@ -1,13 +1,16 @@
 import { type ReactNode, createContext, useContext, useState } from 'react'
 type Dispatch = (Auth: string) => void
 
-interface AuthProviderProps { children: ReactNode; initialState?: null | string }
+interface AuthProviderProps {
+  children: ReactNode
+  initialState?: null | string
+}
 
 const AuthContext = createContext<null | string>(null)
 const AuthDispatchContext = createContext<Dispatch | null>(null)
 
-const AuthProvider = ({ children, initialState = null }: AuthProviderProps) => {
-  // it's a quick demo with useState but you can also have a more complexe state with a useReducer
+const AuthProvider = ({ children, initialState = null }: AuthProviderProps): JSX.Element => {
+  // it's a quick demo with useState but you can also have a more complex state with a useReducer
   const [token, setToken] = useState(initialState)
 
   return (

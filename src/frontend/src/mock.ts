@@ -4,4 +4,5 @@ import { getWeatherForecastMock } from './api/endpoints/weather-forecast/weather
 
 const worker = setupWorker(...getWeatherForecastMock())
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 worker.start()
