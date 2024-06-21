@@ -6,18 +6,18 @@ import eslintPluginSonarJs from 'eslint-plugin-sonarjs'
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
-  {
-    ...eslintConfigLove,
-    files: ['**/*.js', '**/*.ts', '**/*.tsx'],
-    ignores: ['node_modules/*', 'dist/*', '*.lock'],
-  },
-  perfectionistNatural,
-  cspellESLintPluginRecommended,
-  eslintPluginSonarJs.configs.recommended,
+  { files: ['**/*.js', '**/*.ts', '**/*.tsx'] },
+  { ignores: ['node_modules/*', 'dist/*', '*.lock'] },
   {
     plugins: {
       eslintPluginSonarJs,
     },
   },
+  {
+    ...eslintConfigLove,
+  },
+  perfectionistNatural,
+  cspellESLintPluginRecommended,
+  eslintPluginSonarJs.configs.recommended,
   eslintConfigPrettier,
 ]
