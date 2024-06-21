@@ -118,7 +118,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           review-message: "Please take a look :eyes:"
-          tags: "TODO:,FIXME:,BUG:"
+          tags: "TODO,TODO:,FIXME:,BUG:"
 
       # # TODO: move?
       # - name: Super-linter
@@ -129,7 +129,7 @@ jobs:
       #     CREATE_LOG_FILE: true
       #     LOG_FILE: super-linter.out
       #     DISABLE_ERRORS: true
-      
+
       # - run: |
       #     ls -la ${{ env.WORKFLOW_AGENT_PATH }}
       #     sudo cat ${{ env.WORKFLOW_AGENT_PATH }}super-linter.out >> $GITHUB_STEP_SUMMARY
