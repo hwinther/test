@@ -407,25 +407,32 @@
             },
             "description": "Constants defined in the assembly, if any.",
             "nullable": true,
-            "readOnly": true
+            "readOnly": true,
+            "example": [
+              "DEBUG",
+              "NET8"
+            ]
           },
           "version": {
             "type": "string",
             "description": "The version of the assembly.",
             "nullable": true,
-            "readOnly": true
+            "readOnly": true,
+            "example": "1.0.0"
           },
           "informationalVersion": {
             "type": "string",
             "description": "The informational version of the assembly, which may include additional details.",
             "nullable": true,
-            "readOnly": true
+            "readOnly": true,
+            "example": "1.0.0-dev"
           },
           "environmentName": {
             "type": "string",
             "description": "The name of the environment where the application is running.",
             "nullable": true,
-            "readOnly": true
+            "readOnly": true,
+            "example": "Development"
           }
         },
         "additionalProperties": false,
@@ -437,17 +444,20 @@
           "date": {
             "type": "string",
             "description": "Date of forecast",
-            "format": "date"
+            "format": "date",
+            "example": "2024.06.07"
           },
           "temperatureC": {
             "type": "integer",
             "description": "Temperature in celsius",
-            "format": "int32"
+            "format": "int32",
+            "example": 25
           },
           "summary": {
             "type": "string",
             "description": "Summary text",
-            "nullable": true
+            "nullable": true,
+            "example": "Sunny"
           }
         },
         "additionalProperties": false,
