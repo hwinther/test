@@ -1,0 +1,15 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "githubusercontent",
+    "mkdirp",
+    "precached",
+    "nocheck",
+    "streetsidesoftware",
+    "tsmerge",
+    "visualstudio",
+    "vsmarketplacebadge"
+  ],
+  "ignorePaths": ["node_modules/**", "*.lock"]
+}
