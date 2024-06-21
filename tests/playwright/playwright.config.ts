@@ -54,11 +54,14 @@ export default defineConfig({
   ],
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI
-    ? [['dot'], ['json', { outputFile: 'playwright-report/test-results.json' }]]
+    ? [
+        ['dot'],
+        ['json', { outputFile: './playwright-report/test-results.json' }],
+      ]
     : [
         ['list'],
         ['html'],
-        ['json', { outputFile: 'playwright-report/test-results.json' }],
+        ['json', { outputFile: './playwright-report/test-results.json' }],
       ],
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
