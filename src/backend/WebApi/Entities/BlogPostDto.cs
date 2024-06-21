@@ -3,12 +3,12 @@
 namespace WebApi.Entities;
 
 /// <summary>
-///     TODO
+///     DTO for blog post
 /// </summary>
 public class BlogPostDto : IValidatableObject
 {
     /// <summary>
-    ///     TODO
+    ///     Gets or sets the test property.
     /// </summary>
     public string? Test { get; set; }
 

@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace WebApi.Filters;
 
 /// <summary>
-///     TODO
+///     TODO: document
 /// </summary>
 public class ValidateModelAttribute : ActionFilterAttribute
 {
     /// <inheritdoc />
-    public override void OnActionExecuting(ActionExecutingContext actionExecutingContext)
+    public override void OnActionExecuting(ActionExecutingContext context)
     {
-        if (!actionExecutingContext.ModelState.IsValid)
-            actionExecutingContext.Result = new BadRequestObjectResult(actionExecutingContext.ModelState);
+        if (!context.ModelState.IsValid)
+            context.Result = new BadRequestObjectResult(context.ModelState);
     }
 }
