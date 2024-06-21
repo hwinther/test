@@ -1,6 +1,7 @@
 import { type JSX, useEffect, useState } from 'react'
 
 import './App.css'
+import { useVersion } from './api/endpoints/service/service'
 import { useGetWeatherForecast } from './api/endpoints/weather-forecast/weather-forecast'
 import { type WeatherForecast } from './api/models'
 import reactLogo from './assets/react.svg'
@@ -16,6 +17,7 @@ function App(): JSX.Element {
   const [count, setCount] = useState(0)
   const dispatch = useAuthDispatch()
   const { data: weatherForecasts, refetch } = useGetWeatherForecast()
+  const { data: version } = useVersion()
 
   useEffect(() => {
     dispatch('token')
@@ -55,6 +57,12 @@ function App(): JSX.Element {
           {wf.date}: {wf.summary} - {wf.temperatureC}
         </p>
       ))}
+
+      {version !== null && (
+        <p style={{ fontSize: '0.7em' }}>
+          Version: {version?.informationalVersion} Env: {version?.environmentName} Mode: {import.meta.env.MODE}
+        </p>
+      )}
     </>
   )
 }

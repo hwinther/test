@@ -115,6 +115,7 @@ jobs:
 
       - name: Create Todo Comments
         uses: gkampitakis/github-action-todo-commenter@v1
+        if: ${{ github.event_name == 'pull_request' }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           review-message: "Please take a look :eyes:"

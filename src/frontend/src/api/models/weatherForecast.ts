@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 /**
  * Weather forecast model
  */
@@ -8,7 +10,7 @@ export interface WeatherForecast {
    * Summary text
    * @nullable
    */
-  summary?: null | string
+  summary?: string | null
   /** Temperature in celsius */
   temperatureC?: number
 }
