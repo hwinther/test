@@ -1,35 +1,36 @@
-import { createContext, ReactNode, useContext, useState } from 'react';
-type Dispatch = (Auth: string) => void;
+import { type ReactNode, createContext, useContext, useState } from 'react'
+type Dispatch = (Auth: string) => void
 
-type AuthProviderProps = { children: ReactNode; initialState?: string | null };
+interface AuthProviderProps {
+  children: ReactNode
+  initialState?: null | string
+}
 
-const AuthContext = createContext<string | null>(null);
-const AuthDispatchContext = createContext<Dispatch | null>(null);
+const AuthContext = createContext<null | string>(null)
+const AuthDispatchContext = createContext<Dispatch | null>(null)
 
-const AuthProvider = ({ children, initialState = null }: AuthProviderProps) => {
-  // it's a quick demo with useState but you can also have a more complexe state with a useReducer
-  const [token, setToken] = useState(initialState);
+const AuthProvider = ({ children, initialState = null }: AuthProviderProps): JSX.Element => {
+  // it's a quick demo with useState but you can also have a more complex state with a useReducer
+  const [token, setToken] = useState(initialState)
 
   return (
     <AuthContext.Provider value={token}>
-      <AuthDispatchContext.Provider value={setToken}>
-        {children}
-      </AuthDispatchContext.Provider>
+      <AuthDispatchContext.Provider value={setToken}>{children}</AuthDispatchContext.Provider>
     </AuthContext.Provider>
-  );
-};
+  )
+}
 
-const useAuth = (): string | null => {
-  return useContext<string | null>(AuthContext);
-};
+const useAuth = (): null | string => {
+  return useContext<null | string>(AuthContext)
+}
 
 const useAuthDispatch = (): Dispatch => {
-  const context = useContext<Dispatch | null>(AuthDispatchContext);
+  const context = useContext<Dispatch | null>(AuthDispatchContext)
 
   if (context === null) {
-    throw new Error('useAuthDispatch must be used within a AuthProvider');
+    throw new Error('useAuthDispatch must be used within a AuthProvider')
   }
-  return context;
-};
+  return context
+}
 
-export { AuthProvider, useAuth, useAuthDispatch };
+export { AuthProvider, useAuth, useAuthDispatch }

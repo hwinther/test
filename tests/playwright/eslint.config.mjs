@@ -1,35 +1,36 @@
-import globals from 'globals';
-import pluginReactConfig from 'eslint-plugin-react/configs/recommended.js';
-import eslintConfigPrettier from 'eslint-config-prettier';
+import cspellESLintPluginRecommended from '@cspell/eslint-plugin/recommended'
+import eslintConfigLove from 'eslint-config-love'
+import eslintConfigPrettier from 'eslint-config-prettier'
+import perfectionistNatural from 'eslint-plugin-perfectionist/configs/recommended-natural'
+import eslintPluginSonarJs from 'eslint-plugin-sonarjs'
 
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { FlatCompat } from '@eslint/eslintrc';
-import pluginJs from '@eslint/js';
-
-// mimic CommonJS variables -- not needed if using CommonJS
-const compatFilename = fileURLToPath(import.meta.url);
-const compatDirname = path.dirname(compatFilename);
-const compat = new FlatCompat({
-  baseDirectory: compatDirname,
-  recommendedConfig: pluginJs.configs.recommended,
-});
-
+/** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
+  { files: ['**/*.js', '**/*.ts', '**/*.tsx'] },
+  { ignores: ['node_modules/*', 'dist/*', '*.lock'] },
   {
-    languageOptions: {
-      globals: globals.browser,
+    plugins: {
+      eslintPluginSonarJs,
     },
-    files: ['*.ts', '*.tsx'],
-    ignores: [
-      'node_modules/',
-      'playwright-report/',
-      'test-results/',
-      '!tests/*',
-      '!test-examples/*',
-    ],
   },
-  ...compat.extends('standard-with-typescript'),
-  pluginReactConfig,
+  perfectionistNatural,
+  cspellESLintPluginRecommended,
+  eslintPluginSonarJs.configs.recommended,
+  {
+    ...eslintConfigLove,
+    rules: {
+      ...eslintConfigLove.rules,
+      '@cspell/spellchecker': [
+        'warn',
+        {
+          autoFix: false,
+          checkComments: true,
+          configFile: new URL('./cspell.json', import.meta.url).toString(),
+        },
+      ],
+      '@typescript-eslint/triple-slash-reference': 'off',
+      'import/no-absolute-path': 'off',
+    },
+  },
   eslintConfigPrettier,
-];
+]

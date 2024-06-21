@@ -1,15 +1,14 @@
 {
-  //"editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnType": false,
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
-  "files.autoSave": "onFocusChange", // optional but recommended
-  //"vs-code-prettier-eslint.prettierLast": false, // set as "true" to run 'prettier' last not first
-  "source.fixAll": "explicit",
+  "files.autoSave": "onFocusChange",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
   "explorer.fileNesting.enabled": true,
-  "eslint.experimental.useFlatConfig": true,
   "eslint.lintTask.enable": true,
   "eslint.format.enable": true
 }

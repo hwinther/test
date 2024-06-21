@@ -19,8 +19,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
     "allowJs": true
   },
-  "include": ["src", "eslint.config.mjs", "orval.config.cjs", "vite.config.ts"],
+  "include": ["src", "eslint.config.mjs", "orval.config.cjs"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

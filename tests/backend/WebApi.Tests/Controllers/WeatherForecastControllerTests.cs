@@ -64,13 +64,19 @@ public class WeatherForecastControllerTests
         }
     }
 
-    //[Test]
-    //public async Task Get_LogsInformationMessage()
-    //{
-    //    // Act
-    //    await _controller.Get();
+    [Test]
+    public async Task Get_LogsInformationMessage()
+    {
+        // Act
+        await _controller.Get();
 
-    //    // Assert
-    //    _loggerMock.Verify(static x => x.LogInformation(It.IsAny<string>()), Times.Once);
-    //}
+        // Assert
+        _loggerMock.Verify(static logger => logger.Log(
+                               It.Is<LogLevel>(static logLevel => logLevel == LogLevel.Information),
+                               It.Is<EventId>(static eventId => eventId.Id == 0),
+                               It.Is<It.IsAnyType>(static (@object, type) => @object.ToString() == "GetWeatherForecast was called" && type.Name == "FormattedLogValues"),
+                               It.IsAny<Exception>(),
+                               It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                           Times.Once);
+    }
 }

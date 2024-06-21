@@ -1,6 +1,8 @@
-import { setupWorker } from 'msw/browser';
-import { getWeatherForecastMock } from './api/endpoints/weather-forecast/weather-forecast.msw';
+import { setupWorker } from 'msw/browser'
 
-const worker = setupWorker(...getWeatherForecastMock());
+import { getWeatherForecastMock } from './api/endpoints/weather-forecast/weather-forecast.msw'
 
-worker.start();
+const worker = setupWorker(...getWeatherForecastMock())
+
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
+worker.start()

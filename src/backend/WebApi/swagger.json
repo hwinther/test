@@ -221,6 +221,68 @@
         }
       }
     },
+    "/Service/ping": {
+      "get": {
+        "tags": [
+          "Service"
+        ],
+        "summary": "Returns ok",
+        "operationId": "Ping",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringGenericValue"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringGenericValue"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringGenericValue"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Service/version": {
+      "get": {
+        "tags": [
+          "Service"
+        ],
+        "summary": "Returns version",
+        "operationId": "Version",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionInformation"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionInformation"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionInformation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/WeatherForecast": {
       "get": {
         "tags": [
@@ -269,12 +331,12 @@
         "properties": {
           "blogId": {
             "type": "integer",
-            "description": "TODO",
+            "description": "Gets or sets the unique identifier for the blog.",
             "format": "int32"
           },
           "url": {
             "type": "string",
-            "description": "TODO",
+            "description": "Gets or sets the URL of the blog.",
             "nullable": true
           },
           "posts": {
@@ -282,35 +344,35 @@
             "items": {
               "$ref": "#/components/schemas/Post"
             },
-            "description": "TODO",
+            "description": "Gets the collection of posts associated with the blog.",
             "nullable": true,
             "readOnly": true
           }
         },
         "additionalProperties": false,
-        "description": "TODO"
+        "description": "Represents a blog with a unique ID, URL, and a collection of posts."
       },
       "Post": {
         "type": "object",
         "properties": {
           "postId": {
             "type": "integer",
-            "description": "TODO",
+            "description": "Gets or sets the unique identifier for the post.",
             "format": "int32"
           },
           "title": {
             "type": "string",
-            "description": "TODO",
+            "description": "Gets or sets the title of the post.",
             "nullable": true
           },
           "content": {
             "type": "string",
-            "description": "TODO",
+            "description": "Gets or sets the content of the post.",
             "nullable": true
           },
           "blogId": {
             "type": "integer",
-            "description": "TODO",
+            "description": "Gets or sets the unique identifier of the blog to which the post belongs.",
             "format": "int32"
           },
           "blog": {
@@ -318,7 +380,56 @@
           }
         },
         "additionalProperties": false,
-        "description": "TODO"
+        "description": "Represents a post with a unique ID, title, content, and the associated blog ID."
+      },
+      "StringGenericValue": {
+        "required": [
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "Gets or sets the value stored in the container.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents a generic value container for value types."
+      },
+      "VersionInformation": {
+        "type": "object",
+        "properties": {
+          "constants": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Constants defined in the assembly, if any.",
+            "nullable": true,
+            "readOnly": true
+          },
+          "version": {
+            "type": "string",
+            "description": "The version of the assembly.",
+            "nullable": true,
+            "readOnly": true
+          },
+          "informationalVersion": {
+            "type": "string",
+            "description": "The informational version of the assembly, which may include additional details.",
+            "nullable": true,
+            "readOnly": true
+          },
+          "environmentName": {
+            "type": "string",
+            "description": "The name of the environment where the application is running.",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents version information for an assembly, including constants, environment name, version, and informational\r\nversion."
       },
       "WeatherForecast": {
         "type": "object",

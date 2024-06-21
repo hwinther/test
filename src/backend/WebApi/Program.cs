@@ -8,6 +8,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Utils.Messaging;
 using WebApi;
+using WebApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,7 +51,7 @@ builder.Services.AddOpenTelemetry()
                                       //.AddConsoleExporter()
                                       .AddRuntimeInstrumentation());
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(static options => options.Filters.Add<ValidateModelAttribute>());
 builder.Services.AddEndpointsApiExplorer();
 var corsPolicyName = "corsPolicy";
 builder.Services.AddCors(options => options

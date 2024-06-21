@@ -1,16 +1,14 @@
-//@ts-nocheck
-
 /**
  * Weather forecast model
  */
 export interface WeatherForecast {
   /** Date of forecast */
-  date?: string;
+  date?: string
   /**
    * Summary text
    * @nullable
    */
-  summary?: string | null;
+  summary?: null | string
   /** Temperature in celsius */
-  temperatureC?: number;
+  temperatureC?: number
 }

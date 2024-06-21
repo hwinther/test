@@ -4,6 +4,7 @@
     "paths": {
       "@tests/*": ["tests/*"]
     },
+    "noImplicitAny": true,
     "strictNullChecks": true
   },
   "exclude": ["node_modules", "playwright-report", "test-results"]

@@ -17,9 +17,9 @@
 	</PropertyGroup>
 
   <ItemGroup>
-    <!--AssemblyAttribute Include="Demo.Backend.Common.Attributes.DefineConstantsAttribute">
+    <AssemblyAttribute Include="WebApi.Attributes.DefineConstantsAttribute">
       <_Parameter1>"$(DefineConstants)"</_Parameter1>
-    </AssemblyAttribute-->
+    </AssemblyAttribute>
 	
     <!-- TODO: GitVersion does not match the git tag well enough, in order to fully use it I think we would have to embrace their commit message format -->
     <!--PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
@@ -30,6 +30,6 @@
     <!--PackageReference Include="SonarAnalyzer.CSharp" Version="9.11.0.78383">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </-PackageReference-->
+    </PackageReference-->
   </ItemGroup>
 </Project>
