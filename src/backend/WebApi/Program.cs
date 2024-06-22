@@ -6,9 +6,9 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Utils.Messaging;
 using WebApi;
 using WebApi.Filters;
+using WebApi.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 

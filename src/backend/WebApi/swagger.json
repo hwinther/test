@@ -196,7 +196,7 @@
         "tags": [
           "SendMessage"
         ],
-        "summary": "TODO",
+        "summary": "Sends a message using the MessageSender service.",
         "responses": {
           "200": {
             "description": "OK",
