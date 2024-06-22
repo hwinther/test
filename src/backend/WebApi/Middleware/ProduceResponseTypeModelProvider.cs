@@ -32,18 +32,12 @@ public class ProduceResponseTypeModelProvider : IApplicationModelProvider
                                        ?.GetGenericArguments()
                                        .FirstOrDefault();
 
-                action.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status510NotExtended));
-
                 if (returnType != null)
-                {
                     action.Filters.Add(new ProducesResponseTypeAttribute(returnType, StatusCodes.Status200OK));
-                    action.Filters.Add(new ProducesResponseTypeAttribute(returnType, StatusCodes.Status500InternalServerError));
-                }
                 else
-                {
                     action.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status200OK));
-                    action.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status500InternalServerError));
-                }
+
+                action.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status500InternalServerError));
             }
         }
     }
