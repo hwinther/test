@@ -10,7 +10,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Swashbuckle.AspNetCore.SwaggerUI;
-using WebApi;
+using WebApi.Database;
 using WebApi.Filters;
 using WebApi.Messaging;
 using WebApi.Middleware;

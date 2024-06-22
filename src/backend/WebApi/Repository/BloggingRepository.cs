@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WebApi.Database;
 using WebApi.Entities;
 
 namespace WebApi.Repository;
@@ -104,6 +105,7 @@ public class BloggingRepository(BloggingContext bloggingContext) : IBloggingRepo
 
             // Update
             blogEntity.Url = blog.Url;
+
             await bloggingContext.SaveChangesAsync(cancellationToken);
             return BlogDto.FromEntity(blogEntity);
         }
@@ -114,6 +116,7 @@ public class BloggingRepository(BloggingContext bloggingContext) : IBloggingRepo
             Url = blog.Url
         });
 
+        await bloggingContext.SaveChangesAsync(cancellationToken);
         return BlogDto.FromEntity(createdBlogEntity.Entity);
     }
 
@@ -154,6 +157,7 @@ public class BloggingRepository(BloggingContext bloggingContext) : IBloggingRepo
             // Update existing post
             postEntity.Title = post.Title;
             postEntity.Content = post.Content;
+
             await bloggingContext.SaveChangesAsync(cancellationToken);
             return PostDto.FromEntity(postEntity);
         }
@@ -167,7 +171,6 @@ public class BloggingRepository(BloggingContext bloggingContext) : IBloggingRepo
         });
 
         await bloggingContext.SaveChangesAsync(cancellationToken);
-
         return PostDto.FromEntity(createdPostEntity.Entity);
     }
 }
