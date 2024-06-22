@@ -16,7 +16,7 @@ export const getPingQueryKey = () => {
   return [`/Service/ping`] as const
 }
 
-export const getPingQueryOptions = <TData = Awaited<ReturnType<typeof ping>>, TError = ErrorType<unknown>>(options?: {
+export const getPingQueryOptions = <TData = Awaited<ReturnType<typeof ping>>, TError = ErrorType<void>>(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof ping>>, TError, TData>>
 }) => {
   const { query: queryOptions } = options ?? {}
@@ -31,12 +31,12 @@ export const getPingQueryOptions = <TData = Awaited<ReturnType<typeof ping>>, TE
 }
 
 export type PingQueryResult = NonNullable<Awaited<ReturnType<typeof ping>>>
-export type PingQueryError = ErrorType<unknown>
+export type PingQueryError = ErrorType<void>
 
 /**
  * @summary Returns ok
  */
-export const usePing = <TData = Awaited<ReturnType<typeof ping>>, TError = ErrorType<unknown>>(options?: {
+export const usePing = <TData = Awaited<ReturnType<typeof ping>>, TError = ErrorType<void>>(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof ping>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
   const queryOptions = getPingQueryOptions(options)
@@ -61,7 +61,7 @@ export const getVersionQueryKey = () => {
 
 export const getVersionQueryOptions = <
   TData = Awaited<ReturnType<typeof version>>,
-  TError = ErrorType<unknown>,
+  TError = ErrorType<void>,
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof version>>, TError, TData>>
 }) => {
@@ -79,12 +79,12 @@ export const getVersionQueryOptions = <
 }
 
 export type VersionQueryResult = NonNullable<Awaited<ReturnType<typeof version>>>
-export type VersionQueryError = ErrorType<unknown>
+export type VersionQueryError = ErrorType<void>
 
 /**
  * @summary Returns version
  */
-export const useVersion = <TData = Awaited<ReturnType<typeof version>>, TError = ErrorType<unknown>>(options?: {
+export const useVersion = <TData = Awaited<ReturnType<typeof version>>, TError = ErrorType<void>>(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof version>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
   const queryOptions = getVersionQueryOptions(options)

@@ -18,7 +18,7 @@ export const getGetWeatherForecastQueryKey = () => {
 
 export const getGetWeatherForecastQueryOptions = <
   TData = Awaited<ReturnType<typeof getWeatherForecast>>,
-  TError = ErrorType<unknown>,
+  TError = ErrorType<void>,
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeatherForecast>>, TError, TData>>
 }) => {
@@ -37,14 +37,14 @@ export const getGetWeatherForecastQueryOptions = <
 }
 
 export type GetWeatherForecastQueryResult = NonNullable<Awaited<ReturnType<typeof getWeatherForecast>>>
-export type GetWeatherForecastQueryError = ErrorType<unknown>
+export type GetWeatherForecastQueryError = ErrorType<void>
 
 /**
  * @summary Returns weather forecast
  */
 export const useGetWeatherForecast = <
   TData = Awaited<ReturnType<typeof getWeatherForecast>>,
-  TError = ErrorType<unknown>,
+  TError = ErrorType<void>,
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeatherForecast>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {

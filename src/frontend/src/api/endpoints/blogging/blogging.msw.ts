@@ -1,135 +1,196 @@
 //@ts-nocheck
 import { faker } from '@faker-js/faker'
 import { HttpResponse, delay, http } from 'msw'
+import type { BlogDto, PostDto } from '../../models'
 
-export const getGetBlogsResponseMock = (): Blog[] =>
+export const getGetBlogsResponseMock = (): BlogDto[] =>
   Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
     blogId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-    posts: faker.helpers.arrayElement([
-      Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-        blogId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-        content: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
-        postId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-        title: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
-      })),
-      undefined,
-    ]),
-    url: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
+    url: faker.helpers.arrayElement([faker.word.sample(), null]),
   }))
 
-export const getPostBlogResponseMock = (overrideResponse: Partial<Blog> = {}): Blog => ({
+export const getPostBlogResponseMock = (overrideResponse: Partial<BlogDto> = {}): BlogDto => ({
   blogId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-  posts: faker.helpers.arrayElement([
-    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-      blog: faker.helpers.arrayElement([
-        {
-          blogId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-          posts: faker.helpers.arrayElement([[], undefined]),
-          url: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
-        },
-        undefined,
-      ]),
-      blogId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-      content: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
-      postId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-      title: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
-    })),
-    undefined,
-  ]),
-  url: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
+  url: faker.helpers.arrayElement([faker.word.sample(), null]),
   ...overrideResponse,
 })
 
-export const getGetPostsResponseMock = (): Post[] =>
+export const getGetBlogResponseMock = (overrideResponse: Partial<BlogDto> = {}): BlogDto => ({
+  blogId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
+  url: faker.helpers.arrayElement([faker.word.sample(), null]),
+  ...overrideResponse,
+})
+
+export const getGetPostsResponseMock = (): PostDto[] =>
   Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-    blog: faker.helpers.arrayElement([
-      {
-        blogId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-        posts: faker.helpers.arrayElement([[], undefined]),
-        url: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
-      },
-      undefined,
-    ]),
-    blogId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-    content: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
+    blogId: faker.number.int({ min: undefined, max: undefined }),
+    content: faker.helpers.arrayElement([faker.word.sample(), null]),
     postId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-    title: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
+    title: faker.helpers.arrayElement([faker.word.sample(), null]),
   }))
 
-export const getPostPostResponseMock = (overrideResponse: Partial<Post> = {}): Post => ({
-  blog: faker.helpers.arrayElement([
-    {
-      blogId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-      posts: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          blogId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-          content: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
-          postId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-          title: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
-        })),
-        undefined,
-      ]),
-      url: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
-    },
-    undefined,
-  ]),
-  blogId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-  content: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
+export const getGetPostResponseMock = (overrideResponse: Partial<PostDto> = {}): PostDto => ({
+  blogId: faker.number.int({ min: undefined, max: undefined }),
+  content: faker.helpers.arrayElement([faker.word.sample(), null]),
   postId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
-  title: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.word.sample(), null]), undefined]),
+  title: faker.helpers.arrayElement([faker.word.sample(), null]),
   ...overrideResponse,
 })
 
-export const getGetBlogsMockHandler = () => {
-  return http.get('*/Blogging/Blog', async () => {
+export const getPostPostResponseMock = (overrideResponse: Partial<PostDto> = {}): PostDto => ({
+  blogId: faker.number.int({ min: undefined, max: undefined }),
+  content: faker.helpers.arrayElement([faker.word.sample(), null]),
+  postId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
+  title: faker.helpers.arrayElement([faker.word.sample(), null]),
+  ...overrideResponse,
+})
+
+export const getGetBlogsMockHandler = (
+  overrideResponse?:
+    | BlogDto[]
+    | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<BlogDto[]> | BlogDto[]),
+) => {
+  return http.get('*/Blogging/blog', async (info) => {
     await delay(1000)
-    return new HttpResponse(getGetBlogsResponseMock(), {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/plain',
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetBlogsResponseMock(),
+      ),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    })
+    )
   })
 }
 
-export const getPostBlogMockHandler = () => {
-  return http.post('*/Blogging/Blog', async () => {
+export const getPostBlogMockHandler = (
+  overrideResponse?: BlogDto | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<BlogDto> | BlogDto),
+) => {
+  return http.post('*/Blogging/blog', async (info) => {
     await delay(1000)
-    return new HttpResponse(getPostBlogResponseMock(), {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/plain',
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPostBlogResponseMock(),
+      ),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    })
+    )
   })
 }
 
-export const getGetPostsMockHandler = () => {
-  return http.get('*/Blogging/Post', async () => {
+export const getGetBlogMockHandler = (
+  overrideResponse?: BlogDto | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<BlogDto> | BlogDto),
+) => {
+  return http.get('*/Blogging/blog/:id', async (info) => {
     await delay(1000)
-    return new HttpResponse(getGetPostsResponseMock(), {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/plain',
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetBlogResponseMock(),
+      ),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    })
+    )
   })
 }
 
-export const getPostPostMockHandler = () => {
-  return http.post('*/Blogging/Post', async () => {
+export const getGetPostsMockHandler = (
+  overrideResponse?:
+    | PostDto[]
+    | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<PostDto[]> | PostDto[]),
+) => {
+  return http.get('*/Blogging/blog/:blogId/posts', async (info) => {
     await delay(1000)
-    return new HttpResponse(getPostPostResponseMock(), {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/plain',
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetPostsResponseMock(),
+      ),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    })
+    )
+  })
+}
+
+export const getGetPostMockHandler = (
+  overrideResponse?: PostDto | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<PostDto> | PostDto),
+) => {
+  return http.get('*/Blogging/post/:id', async (info) => {
+    await delay(1000)
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetPostResponseMock(),
+      ),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+  })
+}
+
+export const getPostPostMockHandler = (
+  overrideResponse?: PostDto | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<PostDto> | PostDto),
+) => {
+  return http.post('*/Blogging/post', async (info) => {
+    await delay(1000)
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPostPostResponseMock(),
+      ),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
   })
 }
 export const getBloggingMock = () => [
   getGetBlogsMockHandler(),
   getPostBlogMockHandler(),
+  getGetBlogMockHandler(),
   getGetPostsMockHandler(),
+  getGetPostMockHandler(),
   getPostPostMockHandler(),
 ]
