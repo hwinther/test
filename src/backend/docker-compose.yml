@@ -12,7 +12,7 @@ services:
     env_file:
       - otel-dotnet.env # enable OpenTelemetry .NET Automatic Instrumentation
     environment:
-      DB_CONNECTION: "Server=sqlserver,1433;Initial Catalog=api;User=sa;Password=yourStrong(!)Password;TrustServerCertificate=True;"
+      DB_CONNECTION: "Server=sqlserver,1433;Initial Catalog=api;User=sa;Password=DevelopmentOnlyPassword1;TrustServerCertificate=True;"
       # OpenTelemetry environmental variables:
       OTEL_SERVICE_NAME: "service"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
@@ -42,7 +42,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=yourStrong(!)Password
+      - SA_PASSWORD=DevelopmentOnlyPassword1
     ports:
       - "1433:1433"
     volumes:
