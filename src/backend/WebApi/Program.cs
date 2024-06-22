@@ -14,6 +14,7 @@ using WebApi;
 using WebApi.Filters;
 using WebApi.Messaging;
 using WebApi.Middleware;
+using WebApi.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,8 @@ builder.Services.AddDbContext<BloggingContext>(options =>
                                                                         })
                                                           .EnableDetailedErrors(builder.Environment.IsDevelopment())
                                                           .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
+
+builder.Services.AddScoped<IBloggingRepository, BloggingRepository>();
 
 const string serviceName = "Test.WebApi";
 
@@ -119,6 +122,7 @@ if (app.Environment.IsDevelopment())
     app.UseReDoc();
 }
 
+// app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseCors(corsPolicyName);
 app.UseHttpsRedirection();
 app.UseAuthorization();

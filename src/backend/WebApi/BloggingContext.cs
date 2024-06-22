@@ -49,7 +49,7 @@ public class Blog : IBlog
     public List<Post> Posts { get; } = [];
 
     /// <inheritdoc />
-    public required int BlogId { get; set; }
+    public int BlogId { get; set; }
 
     /// <inheritdoc />
     public required string Url { get; set; }
@@ -87,6 +87,11 @@ public interface IPost
     ///     Gets or sets the content of the post.
     /// </summary>
     public string Content { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the unique identifier of the blog to which the post belongs.
+    /// </summary>
+    public int BlogId { get; set; }
 }
 
 /// <inheritdoc />
@@ -94,16 +99,14 @@ public interface IPost
 public class Post : IPost
 {
     /// <summary>
-    ///     Gets or sets the unique identifier of the blog to which the post belongs.
-    /// </summary>
-    public required int BlogId { get; set; }
-
-    /// <summary>
     ///     Gets or sets the blog to which the post belongs.
     /// </summary>
     public Blog? Blog { get; set; }
     /// <inheritdoc />
-    public required int PostId { get; set; }
+    public required int BlogId { get; set; }
+
+    /// <inheritdoc />
+    public int PostId { get; set; }
 
     /// <inheritdoc />
     public required string Title { get; set; }

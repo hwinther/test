@@ -119,6 +119,12 @@
           "System.Threading.Channels": "7.0.0"
         }
       },
+      "SauceControl.InheritDoc": {
+        "type": "Direct",
+        "requested": "[2.0.1, )",
+        "resolved": "2.0.1",
+        "contentHash": "qKTPOFisGzEfoAN6DeOzYhNN3d9+BMP8uOfpKMs9Zxhe0PB351uf1k9/10hAAtK2J2eq+9Q9l2VZ621SPM/Olg=="
+      },
       "Swashbuckle.AspNetCore": {
         "type": "Direct",
         "requested": "[6.6.2, )",
