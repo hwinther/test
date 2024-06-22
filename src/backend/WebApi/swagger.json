@@ -26,23 +26,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Blog"
-                  }
-                }
-              },
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Blog"
-                  }
-                }
-              },
-              "text/json": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -83,17 +67,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Blog"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Blog"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Blog"
                 }
@@ -114,23 +88,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Post"
-                  }
-                }
-              },
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Post"
-                  }
-                }
-              },
-              "text/json": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -171,17 +129,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Post"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Post"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Post"
                 }
@@ -201,17 +149,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "type": "string"
                 }
@@ -232,17 +170,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringGenericValue"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringGenericValue"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StringGenericValue"
                 }
@@ -263,17 +191,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/VersionInformation"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VersionInformation"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/VersionInformation"
                 }
@@ -294,23 +212,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WeatherForecast"
-                  }
-                }
-              },
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WeatherForecast"
-                  }
-                }
-              },
-              "text/json": {
                 "schema": {
                   "type": "array",
                   "items": {
