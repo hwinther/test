@@ -20,7 +20,7 @@
         "tags": [
           "Blogging"
         ],
-        "summary": "Get blogs",
+        "summary": "Gets a list of all blogs.",
         "operationId": "GetBlogs",
         "responses": {
           "200": {
@@ -45,9 +45,10 @@
         "tags": [
           "Blogging"
         ],
-        "summary": "Create or update blog",
+        "summary": "Creates a new blog or updates an existing one.",
         "operationId": "PostBlog",
         "requestBody": {
+          "description": "The blog data transfer object",
           "content": {
             "application/json": {
               "schema": {
@@ -88,17 +89,19 @@
         "tags": [
           "Blogging"
         ],
-        "summary": "Get specific blog",
+        "summary": "Gets a specific blog by ID.",
         "operationId": "GetBlog",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "description": "The ID of the blog.",
             "required": true,
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
+            },
+            "example": 1
           }
         ],
         "responses": {
@@ -123,17 +126,19 @@
         "tags": [
           "Blogging"
         ],
-        "summary": "Get posts related to a blog",
+        "summary": "Gets a list of posts related to a specific blog.",
         "operationId": "GetPosts",
         "parameters": [
           {
             "name": "blogId",
             "in": "path",
+            "description": "The ID of the blog",
             "required": true,
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
+            },
+            "example": 1
           }
         ],
         "responses": {
@@ -161,17 +166,19 @@
         "tags": [
           "Blogging"
         ],
-        "summary": "Get specific post by id",
+        "summary": "Gets a specific post by ID.",
         "operationId": "GetPost",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "description": "The ID of the post",
             "required": true,
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
+            },
+            "example": 1
           }
         ],
         "responses": {
@@ -196,9 +203,10 @@
         "tags": [
           "Blogging"
         ],
-        "summary": "Create or update post",
+        "summary": "Creates a new post.",
         "operationId": "PostPost",
         "requestBody": {
+          "description": "The post data transfer object",
           "content": {
             "application/json": {
               "schema": {
@@ -344,12 +352,14 @@
           "blogId": {
             "type": "integer",
             "description": "Gets or sets the unique identifier for the blog.",
-            "format": "int32"
+            "format": "int32",
+            "example": 1
           },
           "url": {
             "type": "string",
             "description": "Gets or sets the URL of the blog.",
-            "nullable": true
+            "nullable": true,
+            "example": "https://localhost/a-test-blog"
           }
         },
         "additionalProperties": false,
@@ -366,22 +376,26 @@
           "postId": {
             "type": "integer",
             "description": "Gets or sets the unique identifier for the post.",
-            "format": "int32"
+            "format": "int32",
+            "example": 1
           },
           "title": {
             "type": "string",
             "description": "Gets or sets the title of the post.",
-            "nullable": true
+            "nullable": true,
+            "example": "Bob Loblaw's Law Blog"
           },
           "content": {
             "type": "string",
             "description": "Gets or sets the content of the post.",
-            "nullable": true
+            "nullable": true,
+            "example": "Example blog post content"
           },
           "blogId": {
             "type": "integer",
             "description": "Gets or sets the unique identifier of the blog to which the post belongs.",
-            "format": "int32"
+            "format": "int32",
+            "example": 1
           }
         },
         "additionalProperties": false,
