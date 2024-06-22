@@ -200,5 +200,8 @@ jobs:
           solutionPath: Backend.sln
           dotnetVersion: ${{ env.DOTNET_VERSION }}
           failOnIssue: false
+          solutionWideAnalysis: true
           include: |
             **.cs
+          ignoreIssueType:
+            PropertyCanBeMadeInitOnly.Global
