@@ -7,42 +7,47 @@ using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
 using RabbitMQ.Client;
 
-namespace Utils.Messaging;
+namespace WebApi.Messaging;
 
 /// <summary>
-///     TODO
+///     Provides functionality to send messages to a RabbitMQ queue, including support for propagating OpenTelemetry trace
+///     context.
+///     Implements IDisposable to ensure that resources are released properly when the object is no longer needed.
 /// </summary>
-public class MessageSender : IDisposable
+public sealed class MessageSender : IDisposable
 {
     private static readonly ActivitySource ActivitySource = new(nameof(MessageSender));
     private static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
 
-    private readonly ILogger<MessageSender> logger;
-    private readonly IConnection connection;
-    private readonly IModel channel;
+    private readonly ILogger<MessageSender> _logger;
+    private readonly IConnection _connection;
+    private readonly IModel _channel;
 
     /// <summary>
-    ///     TODO
+    ///     Initializes a new instance of the <see cref="MessageSender" /> class, establishing a connection and channel to
+    ///     RabbitMQ.
     /// </summary>
+    /// <param name="logger">The logger used for logging information and errors.</param>
     public MessageSender(ILogger<MessageSender> logger)
     {
-        this.logger = logger;
-        connection = RabbitMqHelper.CreateConnection();
-        channel = RabbitMqHelper.CreateModelAndDeclareTestQueue(connection);
+        _logger = logger;
+        _connection = RabbitMqHelper.CreateConnection();
+        _channel = RabbitMqHelper.CreateModelAndDeclareTestQueue(_connection);
     }
 
     /// <summary>
-    ///     TODO
+    ///     Releases all resources used by the <see cref="MessageSender" />.
     /// </summary>
     public void Dispose()
     {
-        channel.Dispose();
-        connection.Dispose();
+        _channel.Dispose();
+        _connection.Dispose();
     }
 
     /// <summary>
-    ///     TODO
+    ///     Sends a message to a RabbitMQ queue, including propagating the OpenTelemetry trace context.
     /// </summary>
+    /// <returns>A string representing the message that was sent.</returns>
     public string SendMessage()
     {
         try
@@ -52,7 +57,7 @@ public class MessageSender : IDisposable
             var activityName = $"{RabbitMqHelper.TestQueueName} send";
 
             using var activity = ActivitySource.StartActivity(activityName, ActivityKind.Producer);
-            var props = channel.CreateBasicProperties();
+            var props = _channel.CreateBasicProperties();
 
             // Depending on Sampling (and whether a listener is registered or not), the
             // activity above may not be created.
@@ -74,23 +79,29 @@ public class MessageSender : IDisposable
 
             var body = $"Published message: DateTime.Now = {DateTime.Now}.";
 
-            channel.BasicPublish(
+            _channel.BasicPublish(
                 RabbitMqHelper.DefaultExchangeName,
                 RabbitMqHelper.TestQueueName,
                 props,
                 Encoding.UTF8.GetBytes(body));
 
-            logger.LogInformation($"Message sent: [{body}]");
+            _logger.LogInformation($"Message sent: [{body}]");
 
             return body;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Message publishing failed.");
+            _logger.LogError(ex, "Message publishing failed.");
             throw;
         }
     }
 
+    /// <summary>
+    ///     Injects the trace context into the basic properties of a RabbitMQ message.
+    /// </summary>
+    /// <param name="props">The basic properties of the message where the context is to be injected.</param>
+    /// <param name="key">The key for the trace context to be injected.</param>
+    /// <param name="value">The value of the trace context to be injected.</param>
     private void InjectTraceContextIntoBasicProperties(IBasicProperties props, string key, string value)
     {
         try
@@ -102,7 +113,7 @@ public class MessageSender : IDisposable
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to inject trace context.");
+            _logger.LogError(ex, "Failed to inject trace context.");
         }
     }
 }

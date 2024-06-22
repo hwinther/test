@@ -2,35 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using Microsoft.AspNetCore.Mvc;
-using Utils.Messaging;
+using WebApi.Messaging;
 
 namespace WebApi.Controllers;
 
 /// <summary>
-///     TODO
+///     Controller for sending messages. It uses the MessageSender service to send messages.
 /// </summary>
+/// <remarks>
+///     Initializes a new instance of the <see cref="SendMessageController" /> class.
+/// </remarks>
+/// <param name="messageSender">The service used for sending messages.</param>
 [ApiController]
 [Route("[controller]")]
-public class SendMessageController : ControllerBase
+public class SendMessageController(MessageSender messageSender) : ControllerBase
 {
-    private readonly ILogger<SendMessageController> logger;
-    private readonly MessageSender messageSender;
-
     /// <summary>
-    ///     TODO
+    ///     Sends a message using the MessageSender service.
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="messageSender"></param>
-    public SendMessageController(ILogger<SendMessageController> logger, MessageSender messageSender)
-    {
-        this.logger = logger;
-        this.messageSender = messageSender;
-    }
-
-    /// <summary>
-    ///     TODO
-    /// </summary>
-    /// <returns></returns>
+    /// <returns>A string indicating the result of the message sending operation.</returns>
     [HttpGet]
     public string Get() => messageSender.SendMessage();
 }

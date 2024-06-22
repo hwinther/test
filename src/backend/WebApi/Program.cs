@@ -1,14 +1,20 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Utils.Messaging;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using WebApi;
 using WebApi.Filters;
+using WebApi.Messaging;
+using WebApi.Middleware;
+using WebApi.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +27,8 @@ builder.Services.AddDbContext<BloggingContext>(options =>
                                                                         })
                                                           .EnableDetailedErrors(builder.Environment.IsDevelopment())
                                                           .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
+
+builder.Services.AddScoped<IBloggingRepository, BloggingRepository>();
 
 const string serviceName = "Test.WebApi";
 
@@ -51,10 +59,17 @@ builder.Services.AddOpenTelemetry()
                                       //.AddConsoleExporter()
                                       .AddRuntimeInstrumentation());
 
-builder.Services.AddControllers(static options => options.Filters.Add<ValidateModelAttribute>());
-builder.Services.AddEndpointsApiExplorer();
-var corsPolicyName = "corsPolicy";
-builder.Services.AddCors(options => options
+builder.Services.AddControllers(static options =>
+{
+    options.Filters.Add<ValidateModelAttribute>();
+    options.OutputFormatters.RemoveType<StringOutputFormatter>();
+    (options.OutputFormatters.First(static formatter => formatter is SystemTextJsonOutputFormatter) as SystemTextJsonOutputFormatter)?.SupportedMediaTypes.Remove("text/json");
+});
+
+builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, ProduceResponseTypeModelProvider>());
+
+const string corsPolicyName = "corsPolicy";
+builder.Services.AddCors(static options => options
                              .AddPolicy(corsPolicyName,
                                         static policyBuilder => policyBuilder
                                                                 .WithOrigins("https://localhost:5173")
@@ -103,10 +118,11 @@ catch (Exception exception)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(static options => options.DocExpansion(DocExpansion.None));
     app.UseReDoc();
 }
 
+// app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseCors(corsPolicyName);
 app.UseHttpsRedirection();
 app.UseAuthorization();

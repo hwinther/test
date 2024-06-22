@@ -12,3 +12,33 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+
+  frontend:
+    deploy:
+      replicas: 0
+
+  # keep sqlserver and rabbitmq
+
+  otel-collector:
+    deploy:
+      replicas: 0
+
+  jaeger:
+    deploy:
+      replicas: 0
+
+  prometheus:
+    deploy:
+      replicas: 0
+
+  loki:
+    deploy:
+      replicas: 0
+
+  grafana:
+    deploy:
+      replicas: 0
+
+  zipkin:
+    deploy:
+      replicas: 0

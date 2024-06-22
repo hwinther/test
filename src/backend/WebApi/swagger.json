@@ -15,7 +15,7 @@
     "version": "v1"
   },
   "paths": {
-    "/Blogging/Blog": {
+    "/Blogging/blog": {
       "get": {
         "tags": [
           "Blogging"
@@ -26,31 +26,18 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Blog"
-                  }
-                }
-              },
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Blog"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Blog"
+                    "$ref": "#/components/schemas/BlogDto"
                   }
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       },
@@ -58,23 +45,23 @@
         "tags": [
           "Blogging"
         ],
-        "summary": "Create blog",
+        "summary": "Create or update blog",
         "operationId": "PostBlog",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Blog"
+                "$ref": "#/components/schemas/BlogDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Blog"
+                "$ref": "#/components/schemas/BlogDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Blog"
+                "$ref": "#/components/schemas/BlogDto"
               }
             }
           }
@@ -83,86 +70,149 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Blog"
-                }
-              },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Blog"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Blog"
+                  "$ref": "#/components/schemas/BlogDto"
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
     },
-    "/Blogging/Post": {
+    "/Blogging/blog/{id}": {
       "get": {
         "tags": [
           "Blogging"
         ],
-        "summary": "Get posts",
-        "operationId": "GetPosts",
+        "summary": "Get specific blog",
+        "operationId": "GetBlog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Post"
-                  }
+                  "$ref": "#/components/schemas/BlogDto"
                 }
-              },
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/Blogging/blog/{blogId}/posts": {
+      "get": {
+        "tags": [
+          "Blogging"
+        ],
+        "summary": "Get posts related to a blog",
+        "operationId": "GetPosts",
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Post"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Post"
+                    "$ref": "#/components/schemas/PostDto"
                   }
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
-      },
+      }
+    },
+    "/Blogging/post/{id}": {
+      "get": {
+        "tags": [
+          "Blogging"
+        ],
+        "summary": "Get specific post by id",
+        "operationId": "GetPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/Blogging/post": {
       "post": {
         "tags": [
           "Blogging"
         ],
-        "summary": "Create post",
+        "summary": "Create or update post",
         "operationId": "PostPost",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Post"
+                "$ref": "#/components/schemas/PostDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Post"
+                "$ref": "#/components/schemas/PostDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Post"
+                "$ref": "#/components/schemas/PostDto"
               }
             }
           }
@@ -171,22 +221,15 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Post"
-                }
-              },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Post"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Post"
+                  "$ref": "#/components/schemas/PostDto"
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -196,27 +239,20 @@
         "tags": [
           "SendMessage"
         ],
-        "summary": "TODO",
+        "summary": "Sends a message using the MessageSender service.",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "type": "string"
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -232,22 +268,15 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringGenericValue"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringGenericValue"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StringGenericValue"
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -263,22 +292,15 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/VersionInformation"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VersionInformation"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/VersionInformation"
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -294,23 +316,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WeatherForecast"
-                  }
-                }
-              },
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WeatherForecast"
-                  }
-                }
-              },
-              "text/json": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -319,6 +325,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -326,7 +335,10 @@
   },
   "components": {
     "schemas": {
-      "Blog": {
+      "BlogDto": {
+        "required": [
+          "url"
+        ],
         "type": "object",
         "properties": {
           "blogId": {
@@ -338,21 +350,17 @@
             "type": "string",
             "description": "Gets or sets the URL of the blog.",
             "nullable": true
-          },
-          "posts": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Post"
-            },
-            "description": "Gets the collection of posts associated with the blog.",
-            "nullable": true,
-            "readOnly": true
           }
         },
         "additionalProperties": false,
-        "description": "Represents a blog with a unique ID, URL, and a collection of posts."
+        "description": "Blog DTO"
       },
-      "Post": {
+      "PostDto": {
+        "required": [
+          "blogId",
+          "content",
+          "title"
+        ],
         "type": "object",
         "properties": {
           "postId": {
@@ -374,13 +382,10 @@
             "type": "integer",
             "description": "Gets or sets the unique identifier of the blog to which the post belongs.",
             "format": "int32"
-          },
-          "blog": {
-            "$ref": "#/components/schemas/Blog"
           }
         },
         "additionalProperties": false,
-        "description": "Represents a post with a unique ID, title, content, and the associated blog ID."
+        "description": "Post DTO"
       },
       "StringGenericValue": {
         "required": [

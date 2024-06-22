@@ -8,50 +8,57 @@ using OpenTelemetry.Context.Propagation;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace Utils.Messaging;
+namespace WebApi.Messaging;
 
 /// <summary>
-///     TODO
+///     Represents a message receiver that listens for messages from a RabbitMQ queue and processes them.
+///     This class is responsible for establishing a connection to RabbitMQ, declaring a queue, and starting a consumer
+///     that listens for messages on that queue. It uses OpenTelemetry to propagate trace context for distributed tracing.
 /// </summary>
-public class MessageReceiver : IDisposable
+public sealed class MessageReceiver : IDisposable
 {
     private static readonly ActivitySource ActivitySource = new(nameof(MessageReceiver));
     private static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
 
-    private readonly ILogger<MessageReceiver> logger;
-    private readonly IConnection connection;
-    private readonly IModel channel;
+    private readonly ILogger<MessageReceiver> _logger;
+    private readonly IConnection _connection;
+    private readonly IModel _channel;
 
     /// <summary>
-    ///     TODO
+    ///     Initializes a new instance of the <see cref="MessageReceiver" /> class, creating a connection to RabbitMQ
+    ///     and declaring a queue for message consumption.
     /// </summary>
+    /// <param name="logger">The logger used for logging information and errors.</param>
     public MessageReceiver(ILogger<MessageReceiver> logger)
     {
-        this.logger = logger;
-        connection = RabbitMqHelper.CreateConnection();
-        channel = RabbitMqHelper.CreateModelAndDeclareTestQueue(connection);
+        _logger = logger;
+        _connection = RabbitMqHelper.CreateConnection();
+        _channel = RabbitMqHelper.CreateModelAndDeclareTestQueue(_connection);
     }
 
     /// <summary>
-    ///     TODO
+    ///     Releases all resources used by the <see cref="MessageReceiver" />.
     /// </summary>
     public void Dispose()
     {
-        channel.Dispose();
-        connection.Dispose();
+        _channel.Dispose();
+        _connection.Dispose();
     }
 
     /// <summary>
-    ///     TODO
+    ///     Starts the message consumer which listens for messages on the declared queue and processes them.
     /// </summary>
     public void StartConsumer()
     {
-        RabbitMqHelper.StartConsumer(channel, ReceiveMessage);
+        RabbitMqHelper.StartConsumer(_channel, ReceiveMessage);
     }
 
     /// <summary>
-    ///     TODO
+    ///     Processes received messages from the RabbitMQ queue. It extracts and propagates the trace context for
+    ///     distributed tracing and logs the message content. It also simulates message processing by sleeping for a short
+    ///     duration.
     /// </summary>
+    /// <param name="ea">The event arguments containing the message and metadata.</param>
     public void ReceiveMessage(BasicDeliverEventArgs ea)
     {
         // Extract the PropagationContext of the upstream parent from the message headers.
@@ -67,7 +74,7 @@ public class MessageReceiver : IDisposable
         {
             var message = Encoding.UTF8.GetString(ea.Body.Span.ToArray());
 
-            logger.LogInformation($"Message received: [{message}]");
+            _logger.LogInformation($"Message received: [{message}]");
 
             activity?.SetTag("message", message);
 
@@ -80,7 +87,7 @@ public class MessageReceiver : IDisposable
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Message processing failed.");
+            _logger.LogError(ex, "Message processing failed.");
         }
     }
 
@@ -96,7 +103,7 @@ public class MessageReceiver : IDisposable
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to extract trace context.");
+            _logger.LogError(ex, "Failed to extract trace context.");
         }
 
         return [];
