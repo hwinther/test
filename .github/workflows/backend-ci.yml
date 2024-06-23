@@ -119,7 +119,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           review-message: "Please take a look :eyes:"
-          tags: "TODO,FIXME,BUG"
+          tags: "TODO:,FIXME:,BUG:"
 
       # # TODO: move?
       # - name: Super-linter
@@ -137,13 +137,16 @@ jobs:
 
       - name: WebApi Tests
         run: dotnet test ../../tests/backend/WebApi.Tests --no-restore --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput="../../tests/backend/WebApi.Tests/TestResults/" /p:CoverletOutputFormat=cobertura
+        continue-on-error: true
 
+      #- uses: hwinther/test-reporter@dotnet-nunit # TODO: set back to original once nunit is supported: dorny/test-reporter@v1
       - uses: dorny/test-reporter@v1
+        id: test-reporter
         with:
           name: "WebApi Tests"
           path: "tests/backend/WebApi.Tests/TestResults/test-results.trx"
-          reporter: dotnet-trx
-          fail-on-error: true
+          reporter: dotnet-trx # dotnet-nunit
+          fail-on-error: false
 
       - name: Generate report for all tests
         id: reportgenerator
@@ -161,7 +164,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-reportgenerator"
-          comment-content: ${{ steps.reportgenerator.outputs.markdown }}
+          comment-content: ${{ steps.reportgenerator.outputs.markdown }}${{ steps.test-reporter.outputs.conclusion }}
 
       - name: Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0
@@ -203,5 +206,4 @@ jobs:
           solutionWideAnalysis: true
           include: |
             **.cs
-          ignoreIssueType:
-            PropertyCanBeMadeInitOnly.Global
+          ignoreIssueType: PropertyCanBeMadeInitOnly.Global

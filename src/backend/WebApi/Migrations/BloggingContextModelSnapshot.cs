@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WebApi;
+using WebApi.Database;
 
 #nullable disable
 
@@ -21,13 +21,18 @@ namespace WebApi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("WebApi.Blog", b =>
+            modelBuilder.Entity("WebApi.Database.Blog", b =>
                 {
                     b.Property<int>("BlogId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BlogId"));
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -39,7 +44,7 @@ namespace WebApi.Migrations
                     b.ToTable("Blogs");
                 });
 
-            modelBuilder.Entity("WebApi.Post", b =>
+            modelBuilder.Entity("WebApi.Database.Post", b =>
                 {
                     b.Property<int>("PostId")
                         .ValueGeneratedOnAdd()
@@ -67,9 +72,9 @@ namespace WebApi.Migrations
                     b.ToTable("Posts");
                 });
 
-            modelBuilder.Entity("WebApi.Post", b =>
+            modelBuilder.Entity("WebApi.Database.Post", b =>
                 {
-                    b.HasOne("WebApi.Blog", "Blog")
+                    b.HasOne("WebApi.Database.Blog", "Blog")
                         .WithMany("Posts")
                         .HasForeignKey("BlogId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -78,7 +83,7 @@ namespace WebApi.Migrations
                     b.Navigation("Blog");
                 });
 
-            modelBuilder.Entity("WebApi.Blog", b =>
+            modelBuilder.Entity("WebApi.Database.Blog", b =>
                 {
                     b.Navigation("Posts");
                 });

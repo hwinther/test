@@ -9,41 +9,24 @@ import type {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query'
-import type { Blog, Post } from '../../models'
+import type { BlogDto, PostDto } from '../../models'
 import { customInstance } from '../../mutators/custom-instance'
 import type { ErrorType } from '../../mutators/custom-instance'
 
-// https://stackoverflow.com/questions/49579094/typescript-conditional-types-filter-out-readonly-properties-pick-only-requir/49579497#49579497
-type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B
-
-type WritableKeys<T> = {
-  [P in keyof T]-?: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, P>
-}[keyof T]
-
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never
-type DistributeReadOnlyOverUnions<T> = T extends any ? NonReadonly<T> : never
-
-type Writable<T> = Pick<T, WritableKeys<T>>
-type NonReadonly<T> = [T] extends [UnionToIntersection<T>]
-  ? {
-      [P in keyof Writable<T>]: T[P] extends object ? NonReadonly<NonNullable<T[P]>> : T[P]
-    }
-  : DistributeReadOnlyOverUnions<T>
-
 /**
- * @summary Get blogs
+ * @summary Gets a list of all blogs.
  */
 export const getBlogs = (signal?: AbortSignal) => {
-  return customInstance<Blog[]>({ url: `/Blogging/Blog`, method: 'GET', signal })
+  return customInstance<BlogDto[]>({ url: `/Blogging/blog`, method: 'GET', signal })
 }
 
 export const getGetBlogsQueryKey = () => {
-  return [`/Blogging/Blog`] as const
+  return [`/Blogging/blog`] as const
 }
 
 export const getGetBlogsQueryOptions = <
   TData = Awaited<ReturnType<typeof getBlogs>>,
-  TError = ErrorType<unknown>,
+  TError = ErrorType<void>,
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getBlogs>>, TError, TData>>
 }) => {
@@ -61,12 +44,12 @@ export const getGetBlogsQueryOptions = <
 }
 
 export type GetBlogsQueryResult = NonNullable<Awaited<ReturnType<typeof getBlogs>>>
-export type GetBlogsQueryError = ErrorType<unknown>
+export type GetBlogsQueryError = ErrorType<void>
 
 /**
- * @summary Get blogs
+ * @summary Gets a list of all blogs.
  */
-export const useGetBlogs = <TData = Awaited<ReturnType<typeof getBlogs>>, TError = ErrorType<unknown>>(options?: {
+export const useGetBlogs = <TData = Awaited<ReturnType<typeof getBlogs>>, TError = ErrorType<void>>(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getBlogs>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
   const queryOptions = getGetBlogsQueryOptions(options)
@@ -79,23 +62,23 @@ export const useGetBlogs = <TData = Awaited<ReturnType<typeof getBlogs>>, TError
 }
 
 /**
- * @summary Create blog
+ * @summary Creates a new blog or updates an existing one.
  */
-export const postBlog = (blog: NonReadonly<Blog>) => {
-  return customInstance<Blog>({
-    url: `/Blogging/Blog`,
+export const postBlog = (blogDto: BlogDto) => {
+  return customInstance<BlogDto>({
+    url: `/Blogging/blog`,
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    data: blog,
+    data: blogDto,
   })
 }
 
-export const getPostBlogMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<Awaited<ReturnType<typeof postBlog>>, TError, { data: NonReadonly<Blog> }, TContext>
-}): UseMutationOptions<Awaited<ReturnType<typeof postBlog>>, TError, { data: NonReadonly<Blog> }, TContext> => {
+export const getPostBlogMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof postBlog>>, TError, { data: BlogDto }, TContext>
+}): UseMutationOptions<Awaited<ReturnType<typeof postBlog>>, TError, { data: BlogDto }, TContext> => {
   const { mutation: mutationOptions } = options ?? {}
 
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof postBlog>>, { data: NonReadonly<Blog> }> = (props) => {
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof postBlog>>, { data: BlogDto }> = (props) => {
     const { data } = props ?? {}
 
     return postBlog(data)
@@ -105,59 +88,58 @@ export const getPostBlogMutationOptions = <TError = ErrorType<unknown>, TContext
 }
 
 export type PostBlogMutationResult = NonNullable<Awaited<ReturnType<typeof postBlog>>>
-export type PostBlogMutationBody = NonReadonly<Blog>
-export type PostBlogMutationError = ErrorType<unknown>
+export type PostBlogMutationBody = BlogDto
+export type PostBlogMutationError = ErrorType<void>
 
 /**
- * @summary Create blog
+ * @summary Creates a new blog or updates an existing one.
  */
-export const usePostBlog = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<Awaited<ReturnType<typeof postBlog>>, TError, { data: NonReadonly<Blog> }, TContext>
-}): UseMutationResult<Awaited<ReturnType<typeof postBlog>>, TError, { data: NonReadonly<Blog> }, TContext> => {
+export const usePostBlog = <TError = ErrorType<void>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof postBlog>>, TError, { data: BlogDto }, TContext>
+}): UseMutationResult<Awaited<ReturnType<typeof postBlog>>, TError, { data: BlogDto }, TContext> => {
   const mutationOptions = getPostBlogMutationOptions(options)
 
   return useMutation(mutationOptions)
 }
 /**
- * @summary Get posts
+ * @summary Gets a specific blog by ID.
  */
-export const getPosts = (signal?: AbortSignal) => {
-  return customInstance<Post[]>({ url: `/Blogging/Post`, method: 'GET', signal })
+export const getBlog = (id: number, signal?: AbortSignal) => {
+  return customInstance<BlogDto>({ url: `/Blogging/blog/${id}`, method: 'GET', signal })
 }
 
-export const getGetPostsQueryKey = () => {
-  return [`/Blogging/Post`] as const
+export const getGetBlogQueryKey = (id: number) => {
+  return [`/Blogging/blog/${id}`] as const
 }
 
-export const getGetPostsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getPosts>>,
-  TError = ErrorType<unknown>,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPosts>>, TError, TData>>
-}) => {
+export const getGetBlogQueryOptions = <TData = Awaited<ReturnType<typeof getBlog>>, TError = ErrorType<void>>(
+  id: number,
+  options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getBlog>>, TError, TData>> },
+) => {
   const { query: queryOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? getGetPostsQueryKey()
+  const queryKey = queryOptions?.queryKey ?? getGetBlogQueryKey(id)
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getPosts>>> = ({ signal }) => getPosts(signal)
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getBlog>>> = ({ signal }) => getBlog(id, signal)
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getPosts>>,
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getBlog>>,
     TError,
     TData
   > & { queryKey: QueryKey }
 }
 
-export type GetPostsQueryResult = NonNullable<Awaited<ReturnType<typeof getPosts>>>
-export type GetPostsQueryError = ErrorType<unknown>
+export type GetBlogQueryResult = NonNullable<Awaited<ReturnType<typeof getBlog>>>
+export type GetBlogQueryError = ErrorType<void>
 
 /**
- * @summary Get posts
+ * @summary Gets a specific blog by ID.
  */
-export const useGetPosts = <TData = Awaited<ReturnType<typeof getPosts>>, TError = ErrorType<unknown>>(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPosts>>, TError, TData>>
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
-  const queryOptions = getGetPostsQueryOptions(options)
+export const useGetBlog = <TData = Awaited<ReturnType<typeof getBlog>>, TError = ErrorType<void>>(
+  id: number,
+  options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getBlog>>, TError, TData>> },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = getGetBlogQueryOptions(id, options)
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey }
 
@@ -167,23 +149,117 @@ export const useGetPosts = <TData = Awaited<ReturnType<typeof getPosts>>, TError
 }
 
 /**
- * @summary Create post
+ * @summary Gets a list of posts related to a specific blog.
  */
-export const postPost = (post: Post) => {
-  return customInstance<Post>({
-    url: `/Blogging/Post`,
+export const getPosts = (blogId: number, signal?: AbortSignal) => {
+  return customInstance<PostDto[]>({ url: `/Blogging/blog/${blogId}/posts`, method: 'GET', signal })
+}
+
+export const getGetPostsQueryKey = (blogId: number) => {
+  return [`/Blogging/blog/${blogId}/posts`] as const
+}
+
+export const getGetPostsQueryOptions = <TData = Awaited<ReturnType<typeof getPosts>>, TError = ErrorType<void>>(
+  blogId: number,
+  options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPosts>>, TError, TData>> },
+) => {
+  const { query: queryOptions } = options ?? {}
+
+  const queryKey = queryOptions?.queryKey ?? getGetPostsQueryKey(blogId)
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getPosts>>> = ({ signal }) => getPosts(blogId, signal)
+
+  return { queryKey, queryFn, enabled: !!blogId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getPosts>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey }
+}
+
+export type GetPostsQueryResult = NonNullable<Awaited<ReturnType<typeof getPosts>>>
+export type GetPostsQueryError = ErrorType<void>
+
+/**
+ * @summary Gets a list of posts related to a specific blog.
+ */
+export const useGetPosts = <TData = Awaited<ReturnType<typeof getPosts>>, TError = ErrorType<void>>(
+  blogId: number,
+  options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPosts>>, TError, TData>> },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = getGetPostsQueryOptions(blogId, options)
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey }
+
+  query.queryKey = queryOptions.queryKey
+
+  return query
+}
+
+/**
+ * @summary Gets a specific post by ID.
+ */
+export const getPost = (id: number, signal?: AbortSignal) => {
+  return customInstance<PostDto>({ url: `/Blogging/post/${id}`, method: 'GET', signal })
+}
+
+export const getGetPostQueryKey = (id: number) => {
+  return [`/Blogging/post/${id}`] as const
+}
+
+export const getGetPostQueryOptions = <TData = Awaited<ReturnType<typeof getPost>>, TError = ErrorType<void>>(
+  id: number,
+  options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPost>>, TError, TData>> },
+) => {
+  const { query: queryOptions } = options ?? {}
+
+  const queryKey = queryOptions?.queryKey ?? getGetPostQueryKey(id)
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getPost>>> = ({ signal }) => getPost(id, signal)
+
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getPost>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey }
+}
+
+export type GetPostQueryResult = NonNullable<Awaited<ReturnType<typeof getPost>>>
+export type GetPostQueryError = ErrorType<void>
+
+/**
+ * @summary Gets a specific post by ID.
+ */
+export const useGetPost = <TData = Awaited<ReturnType<typeof getPost>>, TError = ErrorType<void>>(
+  id: number,
+  options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPost>>, TError, TData>> },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = getGetPostQueryOptions(id, options)
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey }
+
+  query.queryKey = queryOptions.queryKey
+
+  return query
+}
+
+/**
+ * @summary Creates a new post.
+ */
+export const postPost = (postDto: PostDto) => {
+  return customInstance<PostDto>({
+    url: `/Blogging/post`,
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    data: post,
+    data: postDto,
   })
 }
 
-export const getPostPostMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<Awaited<ReturnType<typeof postPost>>, TError, { data: Post }, TContext>
-}): UseMutationOptions<Awaited<ReturnType<typeof postPost>>, TError, { data: Post }, TContext> => {
+export const getPostPostMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof postPost>>, TError, { data: PostDto }, TContext>
+}): UseMutationOptions<Awaited<ReturnType<typeof postPost>>, TError, { data: PostDto }, TContext> => {
   const { mutation: mutationOptions } = options ?? {}
 
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof postPost>>, { data: Post }> = (props) => {
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof postPost>>, { data: PostDto }> = (props) => {
     const { data } = props ?? {}
 
     return postPost(data)
@@ -193,15 +269,15 @@ export const getPostPostMutationOptions = <TError = ErrorType<unknown>, TContext
 }
 
 export type PostPostMutationResult = NonNullable<Awaited<ReturnType<typeof postPost>>>
-export type PostPostMutationBody = Post
-export type PostPostMutationError = ErrorType<unknown>
+export type PostPostMutationBody = PostDto
+export type PostPostMutationError = ErrorType<void>
 
 /**
- * @summary Create post
+ * @summary Creates a new post.
  */
-export const usePostPost = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<Awaited<ReturnType<typeof postPost>>, TError, { data: Post }, TContext>
-}): UseMutationResult<Awaited<ReturnType<typeof postPost>>, TError, { data: Post }, TContext> => {
+export const usePostPost = <TError = ErrorType<void>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof postPost>>, TError, { data: PostDto }, TContext>
+}): UseMutationResult<Awaited<ReturnType<typeof postPost>>, TError, { data: PostDto }, TContext> => {
   const mutationOptions = getPostPostMutationOptions(options)
 
   return useMutation(mutationOptions)

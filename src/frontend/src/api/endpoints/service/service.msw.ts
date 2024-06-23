@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { faker } from '@faker-js/faker'
 import { HttpResponse, delay, http } from 'msw'
+import type { StringGenericValue, VersionInformation } from '../../models'
 
 export const getPingResponseMock = (overrideResponse: Partial<StringGenericValue> = {}): StringGenericValue => ({
   value: faker.helpers.arrayElement([faker.word.sample(), null]),
@@ -21,27 +22,53 @@ export const getVersionResponseMock = (overrideResponse: Partial<VersionInformat
   ...overrideResponse,
 })
 
-export const getPingMockHandler = () => {
-  return http.get('*/Service/ping', async () => {
+export const getPingMockHandler = (
+  overrideResponse?:
+    | StringGenericValue
+    | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<StringGenericValue> | StringGenericValue),
+) => {
+  return http.get('*/Service/ping', async (info) => {
     await delay(1000)
-    return new HttpResponse(getPingResponseMock(), {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/plain',
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPingResponseMock(),
+      ),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    })
+    )
   })
 }
 
-export const getVersionMockHandler = () => {
-  return http.get('*/Service/version', async () => {
+export const getVersionMockHandler = (
+  overrideResponse?:
+    | VersionInformation
+    | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<VersionInformation> | VersionInformation),
+) => {
+  return http.get('*/Service/version', async (info) => {
     await delay(1000)
-    return new HttpResponse(getVersionResponseMock(), {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/plain',
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getVersionResponseMock(),
+      ),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    })
+    )
   })
 }
 export const getServiceMock = () => [getPingMockHandler(), getVersionMockHandler()]

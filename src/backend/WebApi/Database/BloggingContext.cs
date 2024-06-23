@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace WebApi;
+namespace WebApi.Database;
 
 /// <summary>
 ///     Represents the database context for blogging, configuring entities and their relationships.
@@ -31,11 +31,19 @@ public interface IBlog
     /// <summary>
     ///     Gets or sets the unique identifier for the blog.
     /// </summary>
+    /// <example>1</example>
     public int BlogId { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the title of the blog.
+    /// </summary>
+    /// <example>My blog title</example>
+    public string Title { get; set; }
 
     /// <summary>
     ///     Gets or sets the URL of the blog.
     /// </summary>
+    /// <example>https://localhost/a-test-blog</example>
     public string Url { get; set; }
 }
 
@@ -52,6 +60,9 @@ public class Blog : IBlog
     public int BlogId { get; set; }
 
     /// <inheritdoc />
+    public required string Title { get; set; }
+
+    /// <inheritdoc />
     public required string Url { get; set; }
 }
 
@@ -63,6 +74,9 @@ public class BlogConfiguration : IEntityTypeConfiguration<Blog>
     /// <inheritdoc />
     public void Configure(EntityTypeBuilder<Blog> builder)
     {
+        builder.Property(static post => post.Title)
+               .HasMaxLength(500);
+
         builder.Property(static post => post.Url)
                .HasMaxLength(1000);
     }
@@ -76,21 +90,25 @@ public interface IPost
     /// <summary>
     ///     Gets or sets the unique identifier for the post.
     /// </summary>
+    /// <example>1</example>
     public int PostId { get; set; }
 
     /// <summary>
     ///     Gets or sets the title of the post.
     /// </summary>
+    /// <example>Bob Loblaw's Law Blog</example>
     public string Title { get; set; }
 
     /// <summary>
     ///     Gets or sets the content of the post.
     /// </summary>
+    /// <example>Example blog post content</example>
     public string Content { get; set; }
 
     /// <summary>
     ///     Gets or sets the unique identifier of the blog to which the post belongs.
     /// </summary>
+    /// <example>1</example>
     public int BlogId { get; set; }
 }
 
@@ -102,6 +120,7 @@ public class Post : IPost
     ///     Gets or sets the blog to which the post belongs.
     /// </summary>
     public Blog? Blog { get; set; }
+
     /// <inheritdoc />
     public required int BlogId { get; set; }
 

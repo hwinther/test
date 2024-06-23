@@ -5,7 +5,7 @@ import { customInstance } from '../../mutators/custom-instance'
 import type { ErrorType } from '../../mutators/custom-instance'
 
 /**
- * @summary TODO
+ * @summary Sends a message using the MessageSender service.
  */
 export const getSendMessage = (signal?: AbortSignal) => {
   return customInstance<string>({ url: `/SendMessage`, method: 'GET', signal })
@@ -17,7 +17,7 @@ export const getGetSendMessageQueryKey = () => {
 
 export const getGetSendMessageQueryOptions = <
   TData = Awaited<ReturnType<typeof getSendMessage>>,
-  TError = ErrorType<unknown>,
+  TError = ErrorType<void>,
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSendMessage>>, TError, TData>>
 }) => {
@@ -35,14 +35,14 @@ export const getGetSendMessageQueryOptions = <
 }
 
 export type GetSendMessageQueryResult = NonNullable<Awaited<ReturnType<typeof getSendMessage>>>
-export type GetSendMessageQueryError = ErrorType<unknown>
+export type GetSendMessageQueryError = ErrorType<void>
 
 /**
- * @summary TODO
+ * @summary Sends a message using the MessageSender service.
  */
 export const useGetSendMessage = <
   TData = Awaited<ReturnType<typeof getSendMessage>>,
-  TError = ErrorType<unknown>,
+  TError = ErrorType<void>,
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSendMessage>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {

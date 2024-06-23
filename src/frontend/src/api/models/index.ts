@@ -1,7 +1,7 @@
 //@ts-nocheck
 
-export * from './blog'
-export * from './post'
+export * from './blogDto'
+export * from './postDto'
 export * from './stringGenericValue'
 export * from './versionInformation'
 export * from './weatherForecast'
