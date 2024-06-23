@@ -139,11 +139,12 @@ jobs:
         run: dotnet test ../../tests/backend/WebApi.Tests --no-restore --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput="../../tests/backend/WebApi.Tests/TestResults/" /p:CoverletOutputFormat=cobertura
         continue-on-error: true
 
-      - uses: dorny/test-reporter@v1
+      - uses: hwinther/test-reporter@dotnet-nunit # dorny/test-reporter@v1
+        id: test-reporter
         with:
           name: "WebApi Tests"
           path: "tests/backend/WebApi.Tests/TestResults/test-results.trx"
-          reporter: dotnet-trx
+          reporter: dotnet-trx # TODO: nunit is not supported
           fail-on-error: false
 
       - name: Generate report for all tests
@@ -162,7 +163,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-reportgenerator"
-          comment-content: ${{ steps.reportgenerator.outputs.markdown }}
+          comment-content: ${{ steps.reportgenerator.outputs.markdown }}${{ steps.test-reporter.outputs.conclusion }}
 
       - name: Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0
