@@ -147,4 +147,4 @@ runs:
       with:
         github-token: ${{ env.GH_TOKEN }}
         review-message: "Please take a look :eyes:"
-        tags: "TODO,FIXME,BUG"
+        tags: "TODO:,FIXME:,BUG:"

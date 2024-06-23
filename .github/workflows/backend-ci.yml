@@ -119,7 +119,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           review-message: "Please take a look :eyes:"
-          tags: "TODO,FIXME,BUG"
+          tags: "TODO:,FIXME:,BUG:"
 
       # # TODO: move?
       # - name: Super-linter
