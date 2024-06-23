@@ -113,7 +113,8 @@ public class BloggingRepository(BloggingContext bloggingContext) : IBloggingRepo
         // Add
         var createdBlogEntity = bloggingContext.Blogs.Add(new Blog
         {
-            Url = blog.Url
+            Url = blog.Url,
+            Title = blog.Title
         });
 
         await bloggingContext.SaveChangesAsync(cancellationToken);

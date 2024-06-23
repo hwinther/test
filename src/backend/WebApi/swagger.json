@@ -345,6 +345,7 @@
     "schemas": {
       "BlogDto": {
         "required": [
+          "title",
           "url"
         ],
         "type": "object",
@@ -354,6 +355,12 @@
             "description": "Gets or sets the unique identifier for the blog.",
             "format": "int32",
             "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Gets or sets the title of the blog.",
+            "nullable": true,
+            "example": "My blog title"
           },
           "url": {
             "type": "string",

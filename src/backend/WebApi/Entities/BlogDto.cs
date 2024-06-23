@@ -12,11 +12,20 @@ public record BlogDto : IBlog, IValidatableObject
     public int BlogId { get; set; }
 
     /// <inheritdoc />
+    public required string Title { get; set; }
+
+    /// <inheritdoc />
     public required string Url { get; set; }
 
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
+        if (string.IsNullOrEmpty(Title))
+            yield return new ValidationResult($"{nameof(Title)} must be set");
+
+        if (Title.Length > 1000)
+            yield return new ValidationResult($"{nameof(Title)} is longer than the maximum amount of characters (500)");
+
         if (string.IsNullOrEmpty(Url))
             yield return new ValidationResult($"{nameof(Url)} must be set");
 
@@ -40,6 +49,7 @@ public record BlogDto : IBlog, IValidatableObject
         new()
         {
             BlogId = blog.BlogId,
+            Title = blog.Title,
             Url = blog.Url
         };
 }

@@ -35,6 +35,12 @@ public interface IBlog
     public int BlogId { get; set; }
 
     /// <summary>
+    ///     Gets or sets the title of the blog.
+    /// </summary>
+    /// <example>My blog title</example>
+    public string Title { get; set; }
+
+    /// <summary>
     ///     Gets or sets the URL of the blog.
     /// </summary>
     /// <example>https://localhost/a-test-blog</example>
@@ -54,6 +60,9 @@ public class Blog : IBlog
     public int BlogId { get; set; }
 
     /// <inheritdoc />
+    public required string Title { get; set; }
+
+    /// <inheritdoc />
     public required string Url { get; set; }
 }
 
@@ -65,6 +74,9 @@ public class BlogConfiguration : IEntityTypeConfiguration<Blog>
     /// <inheritdoc />
     public void Configure(EntityTypeBuilder<Blog> builder)
     {
+        builder.Property(static post => post.Title)
+               .HasMaxLength(500);
+
         builder.Property(static post => post.Url)
                .HasMaxLength(1000);
     }
