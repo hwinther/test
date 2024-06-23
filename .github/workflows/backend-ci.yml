@@ -137,6 +137,7 @@ jobs:
 
       - name: WebApi Tests
         run: dotnet test ../../tests/backend/WebApi.Tests --no-restore --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput="../../tests/backend/WebApi.Tests/TestResults/" /p:CoverletOutputFormat=cobertura
+        continue-on-error: true
 
       - uses: dorny/test-reporter@v1
         with:
@@ -203,5 +204,4 @@ jobs:
           solutionWideAnalysis: true
           include: |
             **.cs
-          ignoreIssueType:
-            PropertyCanBeMadeInitOnly.Global
+          ignoreIssueType: PropertyCanBeMadeInitOnly.Global
