@@ -144,7 +144,6 @@ jobs:
           name: "WebApi Tests"
           path: "tests/backend/WebApi.Tests/TestResults/test-results.trx"
           reporter: dotnet-trx
-          fail-on-error: true
 
       - name: Generate report for all tests
         id: reportgenerator
