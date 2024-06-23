@@ -73,9 +73,7 @@ public class BloggingControllerTests
 
         // Assert
         Assert.That(result, Is.InstanceOf<ActionResult<BlogDto>>());
-        var okResult = result.Result as OkObjectResult;
-        Assert.That(okResult, Is.Not.Null);
-        var returnedBlog = okResult.Value as BlogDto;
+        var returnedBlog = result.Value;
         Assert.That(returnedBlog, Is.Not.Null);
         Assert.Multiple(() =>
         {
