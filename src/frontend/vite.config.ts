@@ -9,4 +9,10 @@ export default defineConfig({
     port: 5173,
   },
   plugins: [react(), vike({ prerender: true }), mkcert()],
+  resolve: {
+    alias: {
+      '~': '/src',
+      '~components': '/src/components',
+    },
+  },
 })

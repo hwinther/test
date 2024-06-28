@@ -5,8 +5,9 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { type PageContext } from 'vike/types'
 
-import { AuthProvider } from '../auth.context'
-import * as serviceWorker from '../serviceWorker'
+import { AuthProvider } from '~/auth.context'
+import * as serviceWorker from '~/serviceWorker'
+
 import { PageLayout } from './PageLayout'
 
 const queryClient = new QueryClient()

@@ -1,10 +1,11 @@
 import { type JSX, useEffect, useState } from 'react'
 
-import { useVersion } from '../../api/endpoints/service/service'
-import { useGetWeatherForecast } from '../../api/endpoints/weather-forecast/weather-forecast'
-import { type WeatherForecast } from '../../api/models'
-import reactLogo from '../../assets/react.svg'
-import { useAuthDispatch } from '../../auth.context'
+import { useVersion } from '~/api/endpoints/service/service'
+import { useGetWeatherForecast } from '~/api/endpoints/weather-forecast/weather-forecast'
+import { type WeatherForecast } from '~/api/models'
+import reactLogo from '~/assets/react.svg'
+import { useAuthDispatch } from '~/auth.context'
+
 import './Page.css'
 
 import viteLogo from '/vite.svg'

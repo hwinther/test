@@ -1,6 +1,7 @@
 import React from 'react'
 
-import { useGetBlogs } from '../../api/endpoints/blogging/blogging'
+import { useGetBlogs } from '~/api/endpoints/blogging/blogging'
+import { Link } from '~/renderer/Link'
 
 const BlogListView: React.FC = () => {
   const { data: blogs, error, isLoading } = useGetBlogs()
@@ -14,8 +15,11 @@ const BlogListView: React.FC = () => {
       <ul>
         {blogs?.map((blog) => (
           <li key={blog.blogId}>
-            {/*<h3>{blog.title}</h3>*/}
-            <p>{blog.url}</p>
+            <p>
+              <Link className="is-active" href={`/blogs/${blog.blogId}`}>
+                {blog.title} - ({blog.url})
+              </Link>
+            </p>
           </li>
         ))}
       </ul>
