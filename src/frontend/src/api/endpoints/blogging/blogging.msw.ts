@@ -6,17 +6,20 @@ import type { BlogDto, PostDto } from '../../models'
 export const getGetBlogsResponseMock = (): BlogDto[] =>
   Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
     blogId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
+    title: faker.helpers.arrayElement([faker.word.sample(), null]),
     url: faker.helpers.arrayElement([faker.word.sample(), null]),
   }))
 
 export const getPostBlogResponseMock = (overrideResponse: Partial<BlogDto> = {}): BlogDto => ({
   blogId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
+  title: faker.helpers.arrayElement([faker.word.sample(), null]),
   url: faker.helpers.arrayElement([faker.word.sample(), null]),
   ...overrideResponse,
 })
 
 export const getGetBlogResponseMock = (overrideResponse: Partial<BlogDto> = {}): BlogDto => ({
   blogId: faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), undefined]),
+  title: faker.helpers.arrayElement([faker.word.sample(), null]),
   url: faker.helpers.arrayElement([faker.word.sample(), null]),
   ...overrideResponse,
 })
