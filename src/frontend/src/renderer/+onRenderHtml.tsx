@@ -1,3 +1,12 @@
+// https://vike.dev/onRenderHtml
+import { escapeInject } from 'vike/server'
+
+/**
+ * Renders the HTML template.
+ * @returns {Promise<any>} The wrapped template.
+ */
+async function onRenderHtml(): Promise<any> {
+  return escapeInject`
 <!doctype html>
 <html lang="en">
   <head>
@@ -8,6 +17,9 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+`
+}
+
+export { onRenderHtml }

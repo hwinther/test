@@ -3,9 +3,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import App from './App.tsx'
 import { AuthProvider } from './auth.context'
 import './index.css'
+import Page from './pages/index/+Page'
 import * as serviceWorker from './serviceWorker'
 
 const queryClient = new QueryClient()
@@ -20,7 +20,7 @@ if (rootElement != null) {
     <React.StrictMode>
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
-          <App />
+          <Page />
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </AuthProvider>
