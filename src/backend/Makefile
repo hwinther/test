@@ -1,17 +1,20 @@
-.PHONY: run
-run:
+.PHONY: mkdirs
+mkdirs:
 	mkdir -p docker-volumes/log && chmod 777 docker-volumes/log
 	mkdir -p docker-volumes/rabbitmq/data && chmod 777 docker-volumes/rabbitmq/data
 	mkdir -p docker-volumes/rabbitmq/log && chmod 777 docker-volumes/rabbitmq/log
 	mkdir -p docker-volumes/mssql/data && chmod 777 docker-volumes/mssql/data
 	mkdir -p docker-volumes/mssql/log && chmod 777 docker-volumes/mssql/log
 	mkdir -p docker-volumes/mssql/secrets && chmod 777 docker-volumes/mssql/secrets
+
+.PHONY: run
+run: mkdirs
 	docker compose up -d --build
 
 .PHONY: clean
 clean:
 	docker compose down --remove-orphans
-	rm -rf log rabbitmq
+	rm -rf docker-volumes
 
 .PHONY: wait
 wait:
