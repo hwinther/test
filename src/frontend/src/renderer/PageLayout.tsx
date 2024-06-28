@@ -6,9 +6,9 @@ import './PageLayout.css'
  * PageLayout component.
  * @param {object} props - The component props.
  * @param {React.ReactNode} props.children - The children nodes.
- * @returns {JSX.Element} The rendered component.
+ * @returns {React.JSX.Element} The rendered component.
  */
-function PageLayout({ children }: Readonly<{ children: React.ReactNode }>): JSX.Element {
+function PageLayout({ children }: Readonly<{ children: React.ReactNode }>): React.JSX.Element {
   return (
     <React.StrictMode>
       <Navigation>
@@ -25,9 +25,9 @@ function PageLayout({ children }: Readonly<{ children: React.ReactNode }>): JSX.
  * Navigation component.
  * @param {object} props - The component props.
  * @param {React.ReactNode} props.children - The children nodes.
- * @returns {JSX.Element} The rendered component.
+ * @returns {React.JSX.Element} The rendered component.
  */
-function Navigation({ children }: Readonly<{ children: React.ReactNode }>): JSX.Element {
+function Navigation({ children }: Readonly<{ children: React.ReactNode }>): React.JSX.Element {
   return (
     <div
       style={{
@@ -48,9 +48,9 @@ function Navigation({ children }: Readonly<{ children: React.ReactNode }>): JSX.
  * Content component.
  * @param {object} props - The component props.
  * @param {React.ReactNode} props.children - The children nodes.
- * @returns {JSX.Element} The rendered component.
+ * @returns {React.JSX.Element} The rendered component.
  */
-function Content({ children }: Readonly<{ children: React.ReactNode }>): JSX.Element {
+function Content({ children }: Readonly<{ children: React.ReactNode }>): React.JSX.Element {
   return <div>{children}</div>
 }
 

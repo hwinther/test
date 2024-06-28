@@ -1,5 +1,5 @@
-.PHONY: mkdirs
-mkdirs:
+.PHONY: dirs
+dirs:
 	mkdir -p docker-volumes/log && chmod 777 docker-volumes/log
 	mkdir -p docker-volumes/rabbitmq/data && chmod 777 docker-volumes/rabbitmq/data
 	mkdir -p docker-volumes/rabbitmq/log && chmod 777 docker-volumes/rabbitmq/log
@@ -8,7 +8,7 @@ mkdirs:
 	mkdir -p docker-volumes/mssql/secrets && chmod 777 docker-volumes/mssql/secrets
 
 .PHONY: run
-run: mkdirs
+run: dirs
 	docker compose up -d --build
 
 .PHONY: clean

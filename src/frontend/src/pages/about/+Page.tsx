@@ -1,8 +1,10 @@
+import React from 'react'
+
 /**
  * Renders the About page.
- * @returns {JSX.Element} The rendered About page.
+ * @returns {React.JSX.Element} The rendered About page.
  */
-export function Page(): JSX.Element {
+export function Page(): React.JSX.Element {
   return (
     <>
       <h1>About</h1>
