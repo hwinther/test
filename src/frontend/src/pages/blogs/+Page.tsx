@@ -6,7 +6,7 @@ import { Link } from '~/renderer/Link'
 const BlogListView: React.FC = () => {
   const { data: blogs, error, isLoading } = useGetBlogs()
 
-  if (isLoading === true) return <div>Loading...</div>
+  if (isLoading) return <div>Loading...</div>
   if (error != null) return <div>Error loading blogs</div>
 
   return (

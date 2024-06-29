@@ -10,7 +10,7 @@ const BlogListView: React.FC = () => {
   const { data: blog, error: blogError, isLoading: blogIsLoading } = useGetBlog(parseInt(id ?? '0'))
   const { data: posts, error: postsError, isLoading: postsIsLoading } = useGetPosts(parseInt(id ?? '0'))
 
-  if (blogIsLoading === true || postsIsLoading === true) return <div>Loading...</div>
+  if (blogIsLoading || postsIsLoading) return <div>Loading...</div>
   if (blogError != null || blog === null || postsError != null || posts === null) return <div>Error loading blog</div>
 
   return (
