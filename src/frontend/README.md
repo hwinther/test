@@ -28,3 +28,18 @@ export default {
 - Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
 - Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
 - Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+
+## Local container build and launch
+
+```bash
+# Make localhost certificate if it's missing
+# cd ssl && make && cd ..
+
+# Build container
+podman build -f Dockerfile . -t frontend-test
+
+# Run container
+docker run --rm -p 5173:8443 -it frontend-test
+
+# Navigate to https://localhost:5173/ in browser
+```
