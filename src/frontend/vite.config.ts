@@ -25,7 +25,10 @@ export default defineConfig({
     setupFiles: './src/test/setupTests.ts',
     mockReset: true,
     coverage: { provider: 'istanbul' },
-    reporters: ['verbose', 'github-actions', 'junit'],
-    outputFile: './coverage/coverage.xml',
+    reporters: ['verbose', 'github-actions', 'junit', 'json'],
+    outputFile: {
+      junit: './coverage/junit-report.xml',
+      json: './coverage/json-report.json',
+    },
   },
 })
