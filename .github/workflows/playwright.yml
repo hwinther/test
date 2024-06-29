@@ -115,7 +115,7 @@ jobs:
         if: ${{ (github.event_name == 'pull_request' || github.event_name == 'pull_request_target' || github.event_name == 'push') && always() }}
         id: playwright-report-summary
         with:
-          report-file: "${{ env.PLAYWRIGHT_PATH }}/playwright-report/results.json"
+          report-file: "${{ env.PLAYWRIGHT_PATH }}/playwright-report/test-results.json"
           comment-title: "Playwright results"
           job-summary: true
           icon-style: "emojis"
