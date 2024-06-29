@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react-swc'
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import vike from 'vike/plugin'
 import mkcert from 'vite-plugin-mkcert'
 
@@ -14,5 +14,18 @@ export default defineConfig({
       '~': '/src',
       '~components': '/src/components',
     },
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setupTests.ts',
+    mockReset: true,
+    coverage: { provider: 'istanbul' },
+    reporters: ['verbose', 'github-actions', 'junit'],
+    outputFile: './coverage/coverage.xml',
   },
 })
