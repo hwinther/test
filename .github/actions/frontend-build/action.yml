@@ -158,6 +158,6 @@ runs:
       id: test-reporter
       with:
         name: "Frontend Tests"
-        path: "src/frontend/test-results/results.xml"
+        path: "src/frontend/coverage/coverage.xml"
         reporter: jest-junit
         fail-on-error: false
