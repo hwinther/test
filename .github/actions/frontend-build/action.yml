@@ -175,3 +175,21 @@ runs:
         indicators: true
         output: both
         thresholds: "60 80"
+
+    - name: Create output variable
+      id: code-coverage-summary
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        cat ../../code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+        echo "markdown<<EOF" >> $GITHUB_OUTPUT
+        cat ../../code-coverage-results.md >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: "Create or Update PR Comment"
+      uses: im-open/update-pr-comment@v1.2.2
+      if: ${{ always() && github.event_name == 'pull_request' }}
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-CodeCoverageSummary"
+        comment-content: ${{ steps.code-coverage-summary.outputs.markdown }}
