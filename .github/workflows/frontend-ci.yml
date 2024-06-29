@@ -51,3 +51,4 @@ jobs:
       - uses: ./.github/actions/frontend-build
         with:
           working_directory: ${{ env.FRONTEND_PATH }}
+          run_tests: "true"

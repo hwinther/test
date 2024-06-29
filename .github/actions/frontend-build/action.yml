@@ -12,6 +12,10 @@ inputs:
     required: false
     description: npm|yarn
     default: "yarn"
+  run_tests:
+    required: false
+    description: true|false
+    default: "false"
 
 runs:
   using: "composite"
@@ -150,12 +154,15 @@ runs:
         tags: "TODO:,FIXME:,BUG:"
 
     - name: vitest
+      if: ${{ env.run_tests == 'true' }}
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       run: yarn coverage
 
-    - uses: dorny/test-reporter@v1
+    - name: Test reporter
+      uses: dorny/test-reporter@v1
       id: test-reporter
+      if: ${{ env.run_tests == 'true' }}
       with:
         name: "Frontend Tests"
         working-directory: ${{ inputs.working_directory }}
@@ -165,6 +172,7 @@ runs:
 
     - name: Code Coverage Report
       uses: irongut/CodeCoverageSummary@v1.3.0
+      if: ${{ env.run_tests == 'true' }}
       with:
         filename: "src/frontend/coverage/cobertura-coverage.xml"
         badge: true
@@ -180,6 +188,7 @@ runs:
       id: code-coverage-summary
       shell: bash
       working-directory: ${{ inputs.working_directory }}
+      if: ${{ env.run_tests == 'true' }}
       run: |
         cat ../../code-coverage-results.md >> $GITHUB_STEP_SUMMARY
         echo "markdown<<EOF" >> $GITHUB_OUTPUT
@@ -188,7 +197,7 @@ runs:
 
     - name: "Create or Update PR Comment"
       uses: im-open/update-pr-comment@v1.2.2
-      if: ${{ always() && github.event_name == 'pull_request' }}
+      if: ${{ env.run_tests == 'true' && always() && github.event_name == 'pull_request' }}
       with:
         github-token: ${{ env.GH_TOKEN }}
         comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-CodeCoverageSummary"
