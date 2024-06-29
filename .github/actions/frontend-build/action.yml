@@ -162,5 +162,5 @@ runs:
         # path: "src/frontend/coverage/junit-report.xml"
         # reporter: jest-junit
         path: "coverage/json-report.json"
-        reporter: jest-junit
+        reporter: mocha-json
         fail-on-error: false
