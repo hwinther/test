@@ -190,6 +190,6 @@ runs:
       uses: im-open/update-pr-comment@v1.2.2
       if: ${{ always() && github.event_name == 'pull_request' }}
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ env.GH_TOKEN }}
         comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-CodeCoverageSummary"
         comment-content: ${{ steps.code-coverage-summary.outputs.markdown }}
