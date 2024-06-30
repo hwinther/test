@@ -18,6 +18,7 @@ updates:
     directories:
       - "/.github/actions/rover-terraform-action"
       - "/src/backend/WebApi"
+      - "/src/frontend"
     open-pull-requests-limit: 20
     target-branch: "dev"
     schedule:
