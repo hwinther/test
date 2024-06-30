@@ -11,7 +11,7 @@ inputs:
   package_manager:
     required: false
     description: npm|yarn
-    default: "yarn"
+    default: "npm"
   run_tests:
     required: false
     description: true|false
