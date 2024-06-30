@@ -51,6 +51,8 @@ jobs:
       - uses: ./.github/actions/frontend-build
         with:
           working_directory: ${{ env.PLAYWRIGHT_PATH }}
+          package_manager: "npm"
+          run_tests: "false"
 
   run-e2e-tests:
     runs-on: ubuntu-latest
@@ -66,11 +68,13 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
-        name: Setup node (yarn)
+        name: Setup node (npm)
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "yarn"
-          cache-dependency-path: "${{ env.PLAYWRIGHT_PATH }}/yarn.lock"
+          cache: "npm"
+          cache-dependency-path: "${{ env.PLAYWRIGHT_PATH }}/package-lock.json"
+          # cache: "yarn"
+          # cache-dependency-path: "${{ env.PLAYWRIGHT_PATH }}/yarn.lock"
 
       - name: Get API token and set environment variables
         run: |
@@ -79,28 +83,28 @@ jobs:
           echo "API_TOKEN=$(echo ${TOKEN})" >> $GITHUB_ENV
 
       - name: Install dependencies
-        run: yarn install --immutable --immutable-cache --check-cache
+        run: npm ci # yarn install --immutable --immutable-cache --check-cache
 
       - name: Get installed Playwright version
         id: playwright-version
         run: |
           # NPM:
-          # echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")" >> $GITHUB_ENV
-          # echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")" >> $GITHUB_OUTPUT
-          # echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")"
+          echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")" >> $GITHUB_ENV
+          echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")" >> $GITHUB_OUTPUT
+          echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")"
           # YARN:
-          echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package.json').devDependencies['@playwright/test'].version)")" >> $GITHUB_ENV
-          echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package.json').devDependencies['@playwright/test'].version)")" >> $GITHUB_OUTPUT
-          echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package.json').devDependencies['@playwright/test'].version)")"
+          # echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package.json').devDependencies['@playwright/test'].version)")" >> $GITHUB_ENV
+          # echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package.json').devDependencies['@playwright/test'].version)")" >> $GITHUB_OUTPUT
+          # echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package.json').devDependencies['@playwright/test'].version)")"
       - name: Cache playwright binaries
         uses: actions/cache@v4
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.PLAYWRIGHT_VERSION }}
-      - run: yarn playwright install --with-deps # npx playwright install --with-deps
+      - run: npm run playwright install --with-deps # npx playwright install --with-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-      - run: yarn playwright install-deps # npx playwright install-deps
+      - run: npm run playwright install-deps # npx playwright install-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
 
       - name: Run Playwright tests
@@ -108,8 +112,7 @@ jobs:
           API_URL: https://${{ inputs.url_prefix }}web-api.test.no
         run: |
           echo "Using API_URL: $API_URL"
-          yarn playwright test
-          # npx playwright test
+          npm run playwright test
 
       - uses: daun/playwright-report-summary@v3
         if: ${{ (github.event_name == 'pull_request' || github.event_name == 'pull_request_target' || github.event_name == 'push') && always() }}
