@@ -12,7 +12,9 @@
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "lint/fix": "eslint . --fix",
     "format/check": "prettier . --check",
-    "format/fix": "prettier . --write"
+    "format/fix": "prettier . --write",
+    "test": "playwright test",
+    "playwright": "playwright"
   },
   "devDependencies": {
     "@cspell/eslint-plugin": "^8.9.1",
