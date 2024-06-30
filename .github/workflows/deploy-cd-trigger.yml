@@ -13,15 +13,15 @@ on:
       - "templates/terraform/**"
     tags:
       - "v*"
-  pull_request:
-    branches:
-      - dev
-    paths:
-      - "src/**"
-      - "templates/terraform/**"
-      - ".github/workflows/deploy-*.yml"
-      - ".github/actions/backend-deploy/action.yml"
-    types: [opened, reopened, labeled, synchronize, ready_for_review]
+  # pull_request:
+  #   branches:
+  #     - dev
+  #   paths:
+  #     - "src/**"
+  #     - "templates/terraform/**"
+  #     - ".github/workflows/deploy-*.yml"
+  #     - ".github/actions/backend-deploy/action.yml"
+  #   types: [opened, reopened, labeled, synchronize, ready_for_review]
 
 # Sets permissions of the GITHUB_TOKEN to allow creating checks and updating PR
 permissions:
