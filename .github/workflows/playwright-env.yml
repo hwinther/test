@@ -56,7 +56,7 @@ jobs:
     secrets: inherit
   call-workflow-dev:
     if: ${{ github.ref == 'refs/heads/dev' || (github.event_name == 'pull_request' && github.base_ref == 'dev' && github.event.pull_request.draft == false) }}
-    uses: hwinther/test/.github/workflows/playwright.yml@feature/TEST-0005-playwright-yarn-to-npm
+    uses: hwinther/test/.github/workflows/playwright.yml@dev
     with:
       deploy_target: dev
       repo_name: dev
