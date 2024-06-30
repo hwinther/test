@@ -642,8 +642,8 @@
       },
       "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
         "type": "Transitive",
-        "resolved": "1.20.1",
-        "contentHash": "H4bIRdEOuyWBotgdPA5oCjJmUekWrtU5lOKnMAVaSNduZXHnqFZECsYbkm4vIOE4aeIO8TEYqfsZaJus1KknLQ=="
+        "resolved": "1.21.0",
+        "contentHash": "8NudeHOE56YsY59HYY89akRMup8Ho+7Y3cADTGjajjWroXVU9RQai2nA6PfteB8AuzmRHZ5NZQB2BnWhQEul5g=="
       },
       "Microsoft.Win32.SystemEvents": {
         "type": "Transitive",
@@ -977,7 +977,7 @@
         "dependencies": {
           "Microsoft.AspNetCore.OpenApi": "[8.0.6, )",
           "Microsoft.EntityFrameworkCore.SqlServer": "[8.0.6, )",
-          "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": "[1.20.1, )",
+          "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": "[1.21.0, )",
           "OpenTelemetry.Exporter.Console": "[1.9.0, )",
           "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.9.0, )",
           "OpenTelemetry.Exporter.Zipkin": "[1.9.0, )",
