@@ -36,6 +36,7 @@ env:
   DOTNET_VERSION: "8.0.x"
   BACKEND_SOLUTION_PATH: "src/backend"
   BACKEND_SOLUTION_FILENAME: "Backend.sln"
+  FRONTEND_PATH: "src/frontend"
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
   #DOCKER_REGISTRY_SERVER: "crtest${{ inputs.deploy_target }}ne.azurecr.io"
   #DOCKER_REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
@@ -151,6 +152,12 @@ jobs:
           docker_image_name: "hwinther/test/api-${{ inputs.deploy_target }}"
           azure_resource_name: "app-api-${{ inputs.deploy_target }}-ne"
           skip_setup: true
+
+      - name: Deploy TEST frontend
+        uses: ./.github/actions/frontend-deploy
+        with:
+          dockerfile_path: "Dockerfile"
+          docker_image_name: "hwinther/test/frontend-${{ inputs.deploy_target }}"
 
       # - name: Send deploy success message to slack
       #   if: ${{ success() }}
