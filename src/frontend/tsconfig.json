@@ -7,10 +7,12 @@
     "skipLibCheck": true,
 
     /* Paths */
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "~/*": ["*"],
-      "~components/*": ["components/*"]
+      "~/*": ["src/*"],
+      //"~components/*": ["src/components/*"],
+      //"~pages/*": ["src/pages/*"],
+      "~test/*": ["test/*"]
     },
 
     /* Bundler mode */
@@ -30,6 +32,6 @@
     "strictNullChecks": true,
     "allowJs": true
   },
-  "include": ["src", "eslint.config.mjs", "orval.config.cjs"],
+  "include": ["src", "test", "eslint.config.mjs", "orval.config.cjs"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

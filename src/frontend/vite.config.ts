@@ -12,7 +12,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '~': '/src',
-      '~components': '/src/components',
+      //'~components': '/src/components',
+      //'~pages': '/src/pages',
+      '~test': '/test',
     },
   },
   build: {
@@ -22,7 +24,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './src/test/setupTests.ts',
+    setupFiles: './test/setupTests.ts',
     mockReset: true,
     coverage: { enabled: true, provider: 'istanbul', reporter: ['cobertura', 'lcov', 'html'] },
     reporters: ['verbose', 'github-actions', 'junit'],
