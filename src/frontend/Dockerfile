@@ -1,12 +1,12 @@
-FROM node:20-alpine AS yarn
+FROM node:20-alpine AS npm
 WORKDIR /app
-COPY package.json yarn.lock /app/
-RUN yarn install --frozen-lockfile
+COPY package.json package-lock.json /app/
+RUN npm ci
 
-FROM yarn AS build
+FROM npm AS build
 COPY . /app/
-COPY --from=yarn /app/node_modules /app/node_modules
-RUN yarn build
+COPY --from=npm /app/node_modules /app/node_modules
+RUN npm run build
 
 FROM nginx:alpine-otel AS final
 RUN apk update && apk upgrade
