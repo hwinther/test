@@ -6,19 +6,29 @@
       "version": "8.0.4",
       "commands": [
         "dotnet-ef"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-reportgenerator-globaltool": {
       "version": "5.3.7",
       "commands": [
         "reportgenerator"
-      ]
+      ],
+      "rollForward": false
     },
     "swashbuckle.aspnetcore.cli": {
       "version": "6.6.2",
       "commands": [
         "swagger"
-      ]
+      ],
+      "rollForward": false
+    },
+    "dotnet-stryker": {
+      "version": "4.0.6",
+      "commands": [
+        "dotnet-stryker"
+      ],
+      "rollForward": false
     }
   }
 }
