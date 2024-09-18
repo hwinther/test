@@ -1,5 +1,5 @@
 using System.Reflection;
-using Moq;
+using System.Reflection.Emit;
 using WebApi.Attributes;
 using WebApi.Entities;
 
@@ -8,12 +8,24 @@ namespace WebApi.Tests.Entities;
 [TestFixture]
 public class VersionInformationTests
 {
-    [SetUp]
-    public void SetUp()
+    private static Assembly CreateFakeAssembly<T>(params object[] constructorArgs)
+        where T : Attribute
     {
-        _assemblyMock = new Mock<Assembly>();
+        var type = typeof(T);
+        var constructor = type.GetConstructor([typeof(string)]) ?? throw new InvalidOperationException($"Could not get constructor for {type.Name}");
+
+        var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName($"{type.Name}.FakeAssembly"),
+                                                                    AssemblyBuilderAccess.RunAndCollect,
+                                                                    [
+                                                                        new CustomAttributeBuilder(constructor,
+                                                                                                   constructorArgs)
+                                                                    ]) ?? throw new InvalidOperationException($"Failed to build assembly for {type.Name}");
+
+        var assemblyFake = assemblyBuilder.Modules.First()
+                                          .Assembly;
+
+        return assemblyFake;
     }
-    private Mock<Assembly> _assemblyMock;
 
     [Test]
     public void ConstantsProperty_ExtractsConstantsCorrectly()
@@ -24,11 +36,10 @@ public class VersionInformationTests
             "DEBUG", "NET8"
         };
 
-        _assemblyMock.Setup(static a => a.GetCustomAttribute<DefineConstantsAttribute>())
-                     .Returns(new DefineConstantsAttribute("\"DEBUG;NET8\""));
+        var assemblyFake = CreateFakeAssembly<DefineConstantsAttribute>("\"DEBUG;NET8\"");
 
         // Act
-        var versionInformation = new VersionInformation(_assemblyMock.Object);
+        var versionInformation = new VersionInformation(assemblyFake);
 
         // Assert
         Assert.That(versionInformation.Constants, Is.EqualTo(expectedConstants));
@@ -38,12 +49,11 @@ public class VersionInformationTests
     public void VersionProperty_ExtractsVersionCorrectly()
     {
         // Arrange
-        var expectedVersion = "1.0.0";
-        _assemblyMock.Setup(static a => a.GetCustomAttribute<AssemblyVersionAttribute>())
-                     .Returns(new AssemblyVersionAttribute(expectedVersion));
+        const string expectedVersion = "1.0.0";
+        var assemblyFake = CreateFakeAssembly<AssemblyVersionAttribute>(expectedVersion);
 
         // Act
-        var versionInformation = new VersionInformation(_assemblyMock.Object);
+        var versionInformation = new VersionInformation(assemblyFake);
 
         // Assert
         Assert.That(versionInformation.Version, Is.EqualTo(expectedVersion));
@@ -53,12 +63,11 @@ public class VersionInformationTests
     public void InformationalVersionProperty_ExtractsInformationalVersionCorrectly()
     {
         // Arrange
-        var expectedInformationalVersion = "1.0.0-dev";
-        _assemblyMock.Setup(static a => a.GetCustomAttribute<AssemblyInformationalVersionAttribute>())
-                     .Returns(new AssemblyInformationalVersionAttribute(expectedInformationalVersion));
+        const string expectedInformationalVersion = "1.0.0-dev";
+        var assemblyFake = CreateFakeAssembly<AssemblyInformationalVersionAttribute>(expectedInformationalVersion);
 
         // Act
-        var versionInformation = new VersionInformation(_assemblyMock.Object);
+        var versionInformation = new VersionInformation(assemblyFake);
 
         // Assert
         Assert.That(versionInformation.InformationalVersion, Is.EqualTo(expectedInformationalVersion));
@@ -72,7 +81,7 @@ public class VersionInformationTests
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", null);
 
         // Act
-        var versionInformation = new VersionInformation(_assemblyMock.Object);
+        var versionInformation = new VersionInformation(typeof(VersionInformationTests).Assembly);
 
         // Assert
         Assert.That(versionInformation.EnvironmentName, Is.EqualTo("Unknown"));
