@@ -37,7 +37,7 @@ public interface IBloggingRepository
     /// <param name="blog">The blog to add.</param>
     /// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the added <see cref="BlogDto" />.</returns>
-    Task<BlogDto?> AddBlogAsync(BlogDto blog, CancellationToken cancellationToken);
+    Task<BlogDto?> AddOrUpdateBlogAsync(BlogDto blog, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Lists all posts asynchronously.
@@ -67,7 +67,7 @@ public interface IBloggingRepository
     /// <param name="post">The post to add.</param>
     /// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the added <see cref="PostDto" />.</returns>
-    Task<PostDto?> AddPostAsync(PostDto post, CancellationToken cancellationToken);
+    Task<PostDto?> AddOrUpdatePostAsync(PostDto post, CancellationToken cancellationToken);
 }
 
 /// <summary>
@@ -91,7 +91,7 @@ public class BloggingRepository(BloggingContext bloggingContext) : IBloggingRepo
     }
 
     /// <inheritdoc />
-    public async Task<BlogDto?> AddBlogAsync(BlogDto blog, CancellationToken cancellationToken)
+    public async Task<BlogDto?> AddOrUpdateBlogAsync(BlogDto blog, CancellationToken cancellationToken)
     {
         if (blog.BlogId != 0)
         {
@@ -143,7 +143,7 @@ public class BloggingRepository(BloggingContext bloggingContext) : IBloggingRepo
     }
 
     /// <inheritdoc />
-    public async Task<PostDto?> AddPostAsync(PostDto post, CancellationToken cancellationToken)
+    public async Task<PostDto?> AddOrUpdatePostAsync(PostDto post, CancellationToken cancellationToken)
     {
         if (post.PostId != 0)
         {

@@ -9,7 +9,7 @@ public class DefineConstantsAttributeTests
     public void AttributeInstantiation_WithConstantsString_IsNotNull()
     {
         // Arrange
-        var constantsString = "\"CONST1;CONST2;CONST3\"";
+        const string constantsString = "\"CONST1;CONST2;CONST3\"";
 
         // Act
         var attribute = new DefineConstantsAttribute(constantsString);
@@ -22,7 +22,7 @@ public class DefineConstantsAttributeTests
     public void ConstantsProperty_WithValidConstantsString_ParsesCorrectly()
     {
         // Arrange
-        var constantsString = "\"CONST1;CONST2;CONST3\"";
+        const string constantsString = "\"CONST1;CONST2;CONST3\"";
         var expectedConstants = new[]
         {
             "CONST1", "CONST2", "CONST3"
