@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 using Moq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -11,12 +12,22 @@ namespace WebApi.Tests.Messaging;
 public class RabbitMqTests
 {
     [OneTimeSetUp]
-    public async Task InitializeAsync() => await _rabbitMqContainer.StartAsync();
+    public async Task InitializeAsync()
+    {
+        await _rabbitMqContainer.StartAsync();
+        _unitTestActivity = new Activity(nameof(RabbitMqTests));
+    }
 
     [OneTimeTearDown]
-    public async Task DisposeAsync() => await _rabbitMqContainer.DisposeAsync();
+    public async Task DisposeAsync()
+    {
+        await _rabbitMqContainer.DisposeAsync();
+        _unitTestActivity.Stop();
+        _unitTestActivity.Dispose();
+    }
 
     private readonly RabbitMqContainer _rabbitMqContainer = new RabbitMqBuilder().Build();
+    private Activity _unitTestActivity;
 
     [Test]
     [Order(1)]
@@ -50,9 +61,9 @@ public class RabbitMqTests
         Environment.SetEnvironmentVariable("RABBITMQ_DEFAULT_USER", connectionFactory.UserName);
         Environment.SetEnvironmentVariable("RABBITMQ_DEFAULT_PASS", connectionFactory.Password);
         var messageSenderLogger = new Mock<ILogger<MessageSender>>();
-        var messageSender = new MessageSender(messageSenderLogger.Object);
+        using var messageSender = new MessageSender(messageSenderLogger.Object);
         var messageReceiverLogger = new Mock<ILogger<MessageReceiver>>();
-        var messageReceiver = new MessageReceiver(messageReceiverLogger.Object);
+        using var messageReceiver = new MessageReceiver(messageReceiverLogger.Object);
 
         // When
         messageSender.SendMessage();
