@@ -44,7 +44,7 @@
 
   <Target Name="CreateSwaggerJson" AfterTargets="Build" Condition="$(Configuration)=='Debug'">
     <Message Text="Updating swagger schema file" Importance="High" />
-    <Exec Command="dotnet swagger tofile --output swagger.json $(OutputPath)$(AssemblyName).dll v1" WorkingDirectory="$(ProjectDir)" />
+    <Exec EnvironmentVariables="DOTNET_ENVIRONMENT=Swagger;ASPNETCORE_ENVIRONMENT=Swagger" Command="dotnet swagger tofile --output swagger.json $(OutputPath)$(AssemblyName).dll v1" WorkingDirectory="$(ProjectDir)" />
   </Target>
 
 </Project>

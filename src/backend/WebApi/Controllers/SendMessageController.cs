@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Entities;
 using WebApi.Messaging;
 
 namespace WebApi.Controllers;
@@ -15,12 +16,16 @@ namespace WebApi.Controllers;
 /// <param name="messageSender">The service used for sending messages.</param>
 [ApiController]
 [Route("[controller]")]
-public class SendMessageController(MessageSender messageSender) : ControllerBase
+public class SendMessageController(IMessageSender messageSender) : ControllerBase
 {
     /// <summary>
     ///     Sends a message using the MessageSender service.
     /// </summary>
     /// <returns>A string indicating the result of the message sending operation.</returns>
     [HttpGet]
-    public string Get() => messageSender.SendMessage();
+    public Task<ActionResult<GenericValue<string>>> Get() =>
+        Task.FromResult<ActionResult<GenericValue<string>>>(Ok(new GenericValue<string>
+        {
+            Value = messageSender.SendMessage()
+        }));
 }

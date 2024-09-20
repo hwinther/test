@@ -32,7 +32,7 @@ builder.Services.AddScoped<IBloggingRepository, BloggingRepository>();
 
 const string serviceName = "Test.WebApi";
 
-builder.Services.AddSingleton<MessageSender>();
+builder.Services.AddSingleton<IMessageSender, MessageSender>();
 
 builder.Logging.AddOpenTelemetry(static options =>
 {
@@ -104,16 +104,17 @@ builder.Services.AddSwaggerGen(static options =>
 
 var app = builder.Build();
 
-try
-{
-    using var serviceScope = app.Services.CreateScope();
-    var bloggingContext = serviceScope.ServiceProvider.GetRequiredService<BloggingContext>();
-    bloggingContext.Database.Migrate();
-}
-catch (Exception exception)
-{
-    Console.WriteLine($"Migration exception: {exception.Message}");
-}
+if (!app.Environment.IsEnvironment("Swagger") && !EF.IsDesignTime)
+    try
+    {
+        using var serviceScope = app.Services.CreateScope();
+        var bloggingContext = serviceScope.ServiceProvider.GetRequiredService<BloggingContext>();
+        bloggingContext.Database.Migrate();
+    }
+    catch (Exception exception)
+    {
+        Console.WriteLine($"Migration exception: {exception.Message}");
+    }
 
 if (app.Environment.IsDevelopment())
 {
