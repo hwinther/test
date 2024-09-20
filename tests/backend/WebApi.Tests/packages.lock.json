@@ -65,6 +65,15 @@
           "Testcontainers": "3.10.0"
         }
       },
+      "Testcontainers.RabbitMq": {
+        "type": "Direct",
+        "requested": "[3.10.0, )",
+        "resolved": "3.10.0",
+        "contentHash": "ih6Pbx68k4Q4qxJQWB5pRIidiXLHhY970N/CDXe1vKYUn9gkz1ZzJe4cTeqHdHKEYmrsNtWlB0u52sawMlKeBw==",
+        "dependencies": {
+          "Testcontainers": "3.10.0"
+        }
+      },
       "Azure.Core": {
         "type": "Transitive",
         "resolved": "1.35.0",
