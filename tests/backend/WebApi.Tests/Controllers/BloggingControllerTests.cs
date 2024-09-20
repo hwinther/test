@@ -21,41 +21,14 @@ public class BloggingControllerTests
     private Mock<IBloggingRepository> _bloggingRepositoryMock;
     private BloggingController _controller;
 
-    private readonly BlogDto _mockBlog = new()
-    {
-        BlogId = 1,
-        Title = "Test Blog",
-        Url = "test://url"
-    };
-    private BlogDto _mockBlogFactory(int id) =>
-        _mockBlog with
-        {
-            BlogId = id,
-            Title = $"Blog entry {id}"
-        };
-
-    private readonly PostDto _mockPost = new()
-    {
-        BlogId = 1,
-        PostId = 1,
-        Title = "Test Blog",
-        Content = "Test content"
-    };
-    private PostDto _mockPostFactory(int id) =>
-        _mockPost with
-        {
-            PostId = id,
-            Title = $"Post entry {id}"
-        };
-
     [Test]
     public async Task GetBlogs_ReturnsListOfBlogs()
     {
         // Arrange
         var blogs = new List<BlogDto>
         {
-            _mockBlog,
-            _mockBlogFactory(2)
+            MockBlog,
+            MockBlogFactory(2)
         };
 
         _bloggingRepositoryMock.Setup(static repo => repo.ListBlogsAsync(It.IsAny<CancellationToken>()))
@@ -78,7 +51,7 @@ public class BloggingControllerTests
     {
         // Arrange
         _bloggingRepositoryMock.Setup(static repo => repo.GetBlogAsync(1, It.IsAny<CancellationToken>()))
-                               .ReturnsAsync(_mockBlog);
+                               .ReturnsAsync(MockBlog);
 
         // Act
         var result = await _controller.GetBlog(1, CancellationToken.None);
@@ -89,9 +62,9 @@ public class BloggingControllerTests
         Assert.That(returnedBlog, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(returnedBlog.BlogId, Is.EqualTo(_mockBlog.BlogId));
-            Assert.That(returnedBlog.Title, Is.EqualTo(_mockBlog.Title));
-            Assert.That(returnedBlog.Url, Is.EqualTo(_mockBlog.Url));
+            Assert.That(returnedBlog.BlogId, Is.EqualTo(MockBlog.BlogId));
+            Assert.That(returnedBlog.Title, Is.EqualTo(MockBlog.Title));
+            Assert.That(returnedBlog.Url, Is.EqualTo(MockBlog.Url));
         });
     }
 
@@ -113,7 +86,7 @@ public class BloggingControllerTests
     public async Task PostBlog_NoId_StoresBlog()
     {
         // Arrange
-        var blog = _mockBlog with
+        var blog = MockBlog with
         {
             BlogId = 0
         };
@@ -121,7 +94,7 @@ public class BloggingControllerTests
         var blogId = 1;
 
         _bloggingRepositoryMock.Setup(static repo => repo.AddOrUpdateBlogAsync(It.IsAny<BlogDto>(), It.IsAny<CancellationToken>()))
-                               .ReturnsAsync(_mockBlog with
+                               .ReturnsAsync(MockBlog with
                                {
                                    BlogId = blogId
                                });
@@ -137,8 +110,8 @@ public class BloggingControllerTests
         Assert.Multiple(() =>
         {
             Assert.That(returnedBlog.BlogId, Is.EqualTo(blogId));
-            Assert.That(returnedBlog.Title, Is.EqualTo(_mockBlog.Title));
-            Assert.That(returnedBlog.Url, Is.EqualTo(_mockBlog.Url));
+            Assert.That(returnedBlog.Title, Is.EqualTo(MockBlog.Title));
+            Assert.That(returnedBlog.Url, Is.EqualTo(MockBlog.Url));
         });
     }
 
@@ -150,7 +123,7 @@ public class BloggingControllerTests
                                .ReturnsAsync((BlogDto?) null);
 
         // Act
-        var result = await _controller.PostBlog(_mockBlog, CancellationToken.None);
+        var result = await _controller.PostBlog(MockBlog, CancellationToken.None);
 
         // Assert
         Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
@@ -162,8 +135,8 @@ public class BloggingControllerTests
         // Arrange
         var posts = new List<PostDto>
         {
-            _mockPost,
-            _mockPostFactory(2)
+            MockPost,
+            MockPostFactory(2)
         };
 
         _bloggingRepositoryMock.Setup(static repo => repo.ListPostsAsync(1, It.IsAny<CancellationToken>()))
@@ -186,7 +159,7 @@ public class BloggingControllerTests
     {
         // Arrange
         _bloggingRepositoryMock.Setup(static repo => repo.GetPostAsync(1, It.IsAny<CancellationToken>()))
-                               .ReturnsAsync(_mockPost);
+                               .ReturnsAsync(MockPost);
 
         // Act
         var result = await _controller.GetPost(1, CancellationToken.None);
@@ -197,10 +170,10 @@ public class BloggingControllerTests
         Assert.That(returnedPost, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(returnedPost.PostId, Is.EqualTo(_mockPost.PostId));
-            Assert.That(returnedPost.Title, Is.EqualTo(_mockPost.Title));
-            Assert.That(returnedPost.BlogId, Is.EqualTo(_mockPost.BlogId));
-            Assert.That(returnedPost.Content, Is.EqualTo(_mockPost.Content));
+            Assert.That(returnedPost.PostId, Is.EqualTo(MockPost.PostId));
+            Assert.That(returnedPost.Title, Is.EqualTo(MockPost.Title));
+            Assert.That(returnedPost.BlogId, Is.EqualTo(MockPost.BlogId));
+            Assert.That(returnedPost.Content, Is.EqualTo(MockPost.Content));
         });
     }
 
@@ -222,7 +195,7 @@ public class BloggingControllerTests
     public async Task PostPost_NoId_StoresPost()
     {
         // Arrange
-        var post = _mockPost with
+        var post = MockPost with
         {
             PostId = 0
         };
@@ -230,7 +203,7 @@ public class BloggingControllerTests
         var postId = 1;
 
         _bloggingRepositoryMock.Setup(static repo => repo.AddOrUpdatePostAsync(It.IsAny<PostDto>(), It.IsAny<CancellationToken>()))
-                               .ReturnsAsync(_mockPost with
+                               .ReturnsAsync(MockPost with
                                {
                                    PostId = postId
                                });
@@ -246,9 +219,9 @@ public class BloggingControllerTests
         Assert.Multiple(() =>
         {
             Assert.That(returnedPost.PostId, Is.EqualTo(postId));
-            Assert.That(returnedPost.Title, Is.EqualTo(_mockPost.Title));
-            Assert.That(returnedPost.BlogId, Is.EqualTo(_mockPost.BlogId));
-            Assert.That(returnedPost.Content, Is.EqualTo(_mockPost.Content));
+            Assert.That(returnedPost.Title, Is.EqualTo(MockPost.Title));
+            Assert.That(returnedPost.BlogId, Is.EqualTo(MockPost.BlogId));
+            Assert.That(returnedPost.Content, Is.EqualTo(MockPost.Content));
         });
     }
 
@@ -260,7 +233,7 @@ public class BloggingControllerTests
                                .ReturnsAsync((PostDto?) null);
 
         // Act
-        var result = await _controller.PostPost(_mockPost, CancellationToken.None);
+        var result = await _controller.PostPost(MockPost, CancellationToken.None);
 
         // Assert
         Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());

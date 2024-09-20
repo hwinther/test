@@ -104,6 +104,7 @@ public class BloggingRepository(BloggingContext bloggingContext) : IBloggingRepo
                 return null;
 
             // Update
+            blogEntity.Title = blog.Title;
             blogEntity.Url = blog.Url;
 
             await bloggingContext.SaveChangesAsync(cancellationToken);
@@ -122,14 +123,10 @@ public class BloggingRepository(BloggingContext bloggingContext) : IBloggingRepo
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<PostDto>> ListPostsAsync(int blogId, CancellationToken cancellationToken)
-    {
-        var posts = await bloggingContext.Posts
-                                         .Where(p => p.BlogId == blogId)
-                                         .ToListAsync(cancellationToken);
-
-        return posts.Select(PostDto.FromEntity);
-    }
+    public async Task<IEnumerable<PostDto>> ListPostsAsync(int blogId, CancellationToken cancellationToken) =>
+        PostDto.FromEntity(await bloggingContext.Posts
+                                                .Where(p => p.BlogId == blogId)
+                                                .ToListAsync(cancellationToken));
 
     /// <inheritdoc />
     public async Task<PostDto?> GetPostAsync(int id, CancellationToken cancellationToken)

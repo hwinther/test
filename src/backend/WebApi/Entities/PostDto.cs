@@ -34,6 +34,9 @@ public record PostDto : IPost, IValidatableObject
 
         if (Content.Length > 8000)
             yield return new ValidationResult($"{nameof(Content)} is longer than the maximum amount of characters (8000)");
+
+        if (BlogId == default)
+            yield return new ValidationResult($"{nameof(BlogId)} must be set");
     }
 
     /// <summary>

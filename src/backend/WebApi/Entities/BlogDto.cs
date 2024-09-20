@@ -23,7 +23,7 @@ public record BlogDto : IBlog, IValidatableObject
         if (string.IsNullOrEmpty(Title))
             yield return new ValidationResult($"{nameof(Title)} must be set");
 
-        if (Title.Length > 1000)
+        if (Title.Length > 500)
             yield return new ValidationResult($"{nameof(Title)} is longer than the maximum amount of characters (500)");
 
         if (string.IsNullOrEmpty(Url))
