@@ -32,9 +32,9 @@ public static class RabbitMqHelper
     private static readonly ConnectionFactory ConnectionFactory = new()
     {
         HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOSTNAME") ?? "localhost",
+        Port = int.TryParse(Environment.GetEnvironmentVariable("RABBITMQ_PORT"), out var port) ? port : 5672,
         UserName = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_USER") ?? "guest",
         Password = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_PASS") ?? "guest",
-        Port = 5672,
         RequestedConnectionTimeout = TimeSpan.FromMilliseconds(3000)
     };
 

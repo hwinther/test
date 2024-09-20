@@ -1,0 +1,1 @@
+﻿global using static WebApi.Tests.MockObjects;

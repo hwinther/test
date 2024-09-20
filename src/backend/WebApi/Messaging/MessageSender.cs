@@ -14,7 +14,7 @@ namespace WebApi.Messaging;
 ///     context.
 ///     Implements IDisposable to ensure that resources are released properly when the object is no longer needed.
 /// </summary>
-public sealed class MessageSender : IDisposable
+public sealed class MessageSender : IMessageSender, IDisposable
 {
     private static readonly ActivitySource ActivitySource = new(nameof(MessageSender));
     private static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
@@ -44,10 +44,8 @@ public sealed class MessageSender : IDisposable
         _connection.Dispose();
     }
 
-    /// <summary>
-    ///     Sends a message to a RabbitMQ queue, including propagating the OpenTelemetry trace context.
-    /// </summary>
-    /// <returns>A string representing the message that was sent.</returns>
+    /// <inheritdoc />
+    /// <remarks>Including propagating the OpenTelemetry trace context.</remarks>
     public string SendMessage()
     {
         try
@@ -89,9 +87,9 @@ public sealed class MessageSender : IDisposable
 
             return body;
         }
-        catch (Exception ex)
+        catch (Exception exception)
         {
-            _logger.LogError(ex, "Message publishing failed.");
+            _logger.LogError(exception, "Message publishing failed.");
             throw;
         }
     }
@@ -116,4 +114,17 @@ public sealed class MessageSender : IDisposable
             _logger.LogError(ex, "Failed to inject trace context.");
         }
     }
+}
+
+/// <summary>
+///     Defines functionality to send messages to a RabbitMQ queue
+///     See also: <seealso cref="MessageSender">MessageSender</seealso>
+/// </summary>
+public interface IMessageSender
+{
+    /// <summary>
+    ///     Sends a message to a RabbitMQ queue
+    /// </summary>
+    /// <returns>A string representing the message that was sent.</returns>
+    public string SendMessage();
 }
