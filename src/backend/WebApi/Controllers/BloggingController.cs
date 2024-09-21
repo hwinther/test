@@ -50,7 +50,7 @@ public class BloggingController(ILogger<BloggingController> logger, IBloggingRep
     public async Task<ActionResult<BlogDto>> PostBlog(BlogDto blog, CancellationToken cancellationToken)
     {
         logger.LogInformation("PostBlog was called");
-        var blogEntry = await bloggingRepository.AddBlogAsync(blog, cancellationToken);
+        var blogEntry = await bloggingRepository.AddOrUpdateBlogAsync(blog, cancellationToken);
         if (blogEntry == null)
             return NotFound();
 
@@ -97,7 +97,7 @@ public class BloggingController(ILogger<BloggingController> logger, IBloggingRep
     public async Task<ActionResult<PostDto>> PostPost(PostDto post, CancellationToken cancellationToken)
     {
         logger.LogInformation("PostPost was called");
-        var postEntry = await bloggingRepository.AddPostAsync(post, cancellationToken);
+        var postEntry = await bloggingRepository.AddOrUpdatePostAsync(post, cancellationToken);
         if (postEntry == null)
             return NotFound();
 
