@@ -8,7 +8,17 @@ import eslintPluginSonarJs from 'eslint-plugin-sonarjs'
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
   { files: ['**/*.js', '**/*.ts', '**/*.tsx'] },
-  { ignores: ['node_modules/*', 'dist/*', '*.lock', 'src/api/endpoints/**', 'src/api/models/**', 'vite.config.ts'] },
+  {
+    ignores: [
+      'node_modules/*',
+      'dist/*',
+      'coverage/*',
+      '*.lock',
+      'src/api/endpoints/**',
+      'src/api/models/**',
+      'vite.config.ts',
+    ],
+  },
   {
     plugins: {
       eslintPluginSonarJs,
