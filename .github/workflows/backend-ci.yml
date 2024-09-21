@@ -198,7 +198,8 @@ jobs:
       - name: Stryker
         run: |
           dotnet tool install -g dotnet-stryker
-          dotnet stryker --reporters "html" --reports "json" --reporters "markdown" --project ../../tests/backend/WebApi.Tests/WebApi.Tests.csproj --output-path ../../tests/backend/StrykerOutput
+          dotnet stryker --reporter "html" --reporter "json" --reporter "markdown" --solution Backend.sln --output StrykerOutput
+          ls -la StrykerOutput
 
       # - name: Inspect code
       #   uses: muno92/resharper_inspectcode@v1
