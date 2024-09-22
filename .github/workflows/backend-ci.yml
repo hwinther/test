@@ -196,16 +196,27 @@ jobs:
           comment-content: ${{ steps.code-coverage-summary.outputs.markdown }}
 
       - name: Stryker
+        id: stryker
         run: |
           dotnet stryker --reporter "html" --reporter "json" --reporter "markdown" --solution Backend.sln --output StrykerOutput
-          ls -la StrykerOutput
           cp -r StrykerOutput/reports StrykerReports
-          ls -la ${{ env.WORKFLOW_AGENT_PATH }}${{ env.BACKEND_SOLUTION_PATH }}/StrykerReports
+          cat StrykerReports/mutation-report.md >> $GITHUB_STEP_SUMMARY
+          echo "markdown<<EOF" >> $GITHUB_OUTPUT
+          cat StrykerReports/mutation-report.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - uses: actions/upload-artifact@v4
         with:
           name: StrykerReports
           path: ${{ env.BACKEND_SOLUTION_PATH }}/StrykerReports
+
+      - name: "Create or Update PR Comment"
+        uses: im-open/update-pr-comment@v1.2.2
+        if: ${{ always() && github.event_name == 'pull_request' }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-Stryker"
+          comment-content: ${{ steps.stryker.outputs.markdown }}
 
       # - name: Inspect code
       #   uses: muno92/resharper_inspectcode@v1
