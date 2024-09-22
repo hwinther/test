@@ -200,7 +200,7 @@ jobs:
           dotnet stryker --reporter "html" --reporter "json" --reporter "markdown" --solution Backend.sln --output StrykerOutput
           ls -la StrykerOutput
           cp -r StrykerOutput/reports StrykerReports
-          ls -la ${{ env.BACKEND_SOLUTION_PATH }}/StrykerReports
+          ls -la ${{ env.WORKFLOW_AGENT_PATH }}${{ env.BACKEND_SOLUTION_PATH }}/StrykerReports
 
       - uses: actions/upload-artifact@v4
         with:
