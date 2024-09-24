@@ -195,15 +195,38 @@ jobs:
           comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-CodeCoverageSummary"
           comment-content: ${{ steps.code-coverage-summary.outputs.markdown }}
 
-      - name: Inspect code
-        uses: muno92/resharper_inspectcode@v1
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Stryker
+        id: stryker
+        run: |
+          dotnet stryker --reporter "html" --reporter "json" --reporter "markdown" --solution Backend.sln --output StrykerOutput
+          cp -r StrykerOutput/reports StrykerReports
+          cat StrykerReports/mutation-report.md >> $GITHUB_STEP_SUMMARY
+          echo "markdown<<EOF" >> $GITHUB_OUTPUT
+          cat StrykerReports/mutation-report.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - uses: actions/upload-artifact@v4
         with:
-          workingDirectory: ${{ env.BACKEND_SOLUTION_PATH }}
-          solutionPath: Backend.sln
-          dotnetVersion: ${{ env.DOTNET_VERSION }}
-          failOnIssue: false
-          solutionWideAnalysis: true
-          include: |
-            **.cs
-          ignoreIssueType: PropertyCanBeMadeInitOnly.Global
+          name: StrykerReports
+          path: ${{ env.BACKEND_SOLUTION_PATH }}/StrykerReports
+
+      - name: "Create or Update PR Comment"
+        uses: im-open/update-pr-comment@v1.2.2
+        if: ${{ always() && github.event_name == 'pull_request' }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-Stryker"
+          comment-content: ${{ steps.stryker.outputs.markdown }}
+
+      # - name: Inspect code
+      #   uses: muno92/resharper_inspectcode@v1
+      #   if: ${{ github.event_name == 'pull_request' }}
+      #   with:
+      #     workingDirectory: ${{ env.BACKEND_SOLUTION_PATH }}
+      #     solutionPath: Backend.sln
+      #     dotnetVersion: ${{ env.DOTNET_VERSION }}
+      #     failOnIssue: false
+      #     solutionWideAnalysis: true
+      #     include: |
+      #       **.cs
+      #     ignoreIssueType: PropertyCanBeMadeInitOnly.Global
