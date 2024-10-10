@@ -27,6 +27,8 @@ public class ServiceControllerTests
         // Assert
         Assert.That(result, Is.InstanceOf<ActionResult<VersionInformation>>());
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
+        _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "Version was called");
+        _loggerMock.VerifyNoError();
     }
 
     [Test]
@@ -50,6 +52,9 @@ public class ServiceControllerTests
             Assert.That(version.EnvironmentName, Is.InstanceOf<string>());
             Assert.That(version.InformationalVersion, Is.InstanceOf<string>());
         });
+
+        _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "Version was called");
+        _loggerMock.VerifyNoError();
     }
 
     [Test]
@@ -65,21 +70,7 @@ public class ServiceControllerTests
         Assert.That(okResult.Value, Is.Not.Null);
         Assert.That(okResult.Value, Is.AssignableFrom<GenericValue<string>>());
         Assert.That(okResult.Value is GenericValue<string> {Value: "Ok"});
-    }
-
-    [Test]
-    public async Task Ping_LogsInformationMessage()
-    {
-        // Act
-        await _controller.Ping();
-
-        // Assert
-        _loggerMock.Verify(static logger => logger.Log(
-                               It.Is<LogLevel>(static logLevel => logLevel == LogLevel.Information),
-                               It.Is<EventId>(static eventId => eventId.Id == 0),
-                               It.Is<It.IsAnyType>(static (@object, type) => @object.ToString() == "Ping was called" && type.Name == "FormattedLogValues"),
-                               It.IsAny<Exception>(),
-                               It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                           Times.Once);
+        _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "Ping was called");
+        _loggerMock.VerifyNoError();
     }
 }
