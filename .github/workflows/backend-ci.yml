@@ -218,15 +218,15 @@ jobs:
           comment-identifier: "${{ env.WORKFLOW_SHORT_NAME }}-Stryker"
           comment-content: ${{ steps.stryker.outputs.markdown }}
 
-      # - name: Inspect code
-      #   uses: muno92/resharper_inspectcode@v1
-      #   if: ${{ github.event_name == 'pull_request' }}
-      #   with:
-      #     workingDirectory: ${{ env.BACKEND_SOLUTION_PATH }}
-      #     solutionPath: Backend.sln
-      #     dotnetVersion: ${{ env.DOTNET_VERSION }}
-      #     failOnIssue: false
-      #     solutionWideAnalysis: true
-      #     include: |
-      #       **.cs
-      #     ignoreIssueType: PropertyCanBeMadeInitOnly.Global
+      - name: Inspect code
+        uses: muno92/resharper_inspectcode@v1
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          workingDirectory: ${{ env.BACKEND_SOLUTION_PATH }}
+          solutionPath: Backend.sln
+          dotnetVersion: ${{ env.DOTNET_VERSION }}
+          failOnIssue: false
+          solutionWideAnalysis: true
+          include: |
+            **.cs
+          ignoreIssueType: PropertyCanBeMadeInitOnly.Global
