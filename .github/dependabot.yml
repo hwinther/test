@@ -6,7 +6,9 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions"
-    directory: "/"
+    directories:
+      - "/"
+      - "/.github/actions/*/"
     open-pull-requests-limit: 20
     target-branch: "dev"
     schedule:
