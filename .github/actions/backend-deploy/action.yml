@@ -43,7 +43,7 @@ runs:
     #     creds: ${{ env.AZURE_CREDENTIALS }}
 
     - name: "Docker Login"
-      uses: azure/docker-login@v1
+      uses: azure/docker-login@v2
       with:
         login-server: ${{ env.DOCKER_REGISTRY_SERVER }}
         username: ${{ env.DOCKER_REGISTRY_USERNAME }}
