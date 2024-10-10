@@ -14,4 +14,6 @@ internal static class MockHelper
                               It.IsAny<Exception?>(),
                               It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                           times);
+
+    public static void VerifyNoError<T>(this Mock<ILogger<T>> loggerMock) => loggerMock.VerifyLog(LogLevel.Error, Times.Never());
 }

@@ -44,6 +44,8 @@ public class BloggingControllerTests
         var returnedBlogs = okResult.Value as IEnumerable<BlogDto>;
         Assert.That(returnedBlogs, Is.Not.Null);
         Assert.That(returnedBlogs.Count(), Is.EqualTo(2));
+        _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetBlogs was called");
+        _loggerMock.VerifyNoError();
     }
 
     [Test]
@@ -66,6 +68,9 @@ public class BloggingControllerTests
             Assert.That(returnedBlog.Title, Is.EqualTo(MockBlog.Title));
             Assert.That(returnedBlog.Url, Is.EqualTo(MockBlog.Url));
         });
+
+        _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetBlog was called with id 1");
+        _loggerMock.VerifyNoError();
     }
 
     [Test]
@@ -80,6 +85,8 @@ public class BloggingControllerTests
 
         // Assert
         Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+        _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetBlog was called with id 1");
+        _loggerMock.VerifyNoError();
     }
 
     [Test]
@@ -113,6 +120,9 @@ public class BloggingControllerTests
             Assert.That(returnedBlog.Title, Is.EqualTo(MockBlog.Title));
             Assert.That(returnedBlog.Url, Is.EqualTo(MockBlog.Url));
         });
+
+        _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "PostBlog was called");
+        _loggerMock.VerifyNoError();
     }
 
     [Test]
@@ -127,6 +137,8 @@ public class BloggingControllerTests
 
         // Assert
         Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+        _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "PostBlog was called");
+        _loggerMock.VerifyNoError();
     }
 
     [Test]
@@ -152,6 +164,8 @@ public class BloggingControllerTests
         var returnedPosts = okResult.Value as IEnumerable<PostDto>;
         Assert.That(returnedPosts, Is.Not.Null);
         Assert.That(returnedPosts.Count(), Is.EqualTo(2));
+        _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetPosts was called with id 1");
+        _loggerMock.VerifyNoError();
     }
 
     [Test]
@@ -175,6 +189,9 @@ public class BloggingControllerTests
             Assert.That(returnedPost.BlogId, Is.EqualTo(MockPost.BlogId));
             Assert.That(returnedPost.Content, Is.EqualTo(MockPost.Content));
         });
+
+        _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetPost was called with id 1");
+        _loggerMock.VerifyNoError();
     }
 
     [Test]
@@ -189,6 +206,8 @@ public class BloggingControllerTests
 
         // Assert
         Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+        _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetPost was called with id 1");
+        _loggerMock.VerifyNoError();
     }
 
     [Test]
@@ -223,6 +242,9 @@ public class BloggingControllerTests
             Assert.That(returnedPost.BlogId, Is.EqualTo(MockPost.BlogId));
             Assert.That(returnedPost.Content, Is.EqualTo(MockPost.Content));
         });
+
+        _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "PostPost was called");
+        _loggerMock.VerifyNoError();
     }
 
     [Test]
@@ -237,5 +259,7 @@ public class BloggingControllerTests
 
         // Assert
         Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+        _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "PostPost was called");
+        _loggerMock.VerifyNoError();
     }
 }

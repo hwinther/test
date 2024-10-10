@@ -41,7 +41,7 @@ public class WeatherForecastControllerTests
         var okResult = (OkObjectResult) result.Result;
         Assert.That(okResult.Value, Is.Not.Null);
         Assert.That(okResult.Value, Is.AssignableFrom<WeatherForecast[]>());
-        Assert.That(((WeatherForecast[]) okResult.Value).Count(), Is.EqualTo(5));
+        Assert.That(((WeatherForecast[]) okResult.Value).Length, Is.EqualTo(5));
     }
 
     [Test]
@@ -56,11 +56,19 @@ public class WeatherForecastControllerTests
         var okResult = (OkObjectResult) result.Result;
         Assert.That(okResult.Value, Is.Not.Null);
         Assert.That(okResult.Value, Is.AssignableFrom<WeatherForecast[]>());
+        var expectedValueRange = new[]
+        {
+            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+        };
+
         foreach (var weatherForecast in (WeatherForecast[]) okResult.Value)
         {
             Assert.That(weatherForecast.Date, Is.InstanceOf<DateOnly>());
             Assert.That(weatherForecast.TemperatureC, Is.InstanceOf<int>());
+            Assert.That(weatherForecast.TemperatureC, Is.LessThan(56));
+            Assert.That(weatherForecast.TemperatureC, Is.GreaterThan(-19));
             Assert.That(weatherForecast.Summary, Is.InstanceOf<string>());
+            Assert.That(expectedValueRange, Contains.Item(weatherForecast.Summary));
         }
     }
 
@@ -71,12 +79,6 @@ public class WeatherForecastControllerTests
         await _controller.Get();
 
         // Assert
-        _loggerMock.Verify(static logger => logger.Log(
-                               It.Is<LogLevel>(static logLevel => logLevel == LogLevel.Information),
-                               It.Is<EventId>(static eventId => eventId.Id == 0),
-                               It.Is<It.IsAnyType>(static (@object, type) => @object.ToString() == "GetWeatherForecast was called" && type.Name == "FormattedLogValues"),
-                               It.IsAny<Exception>(),
-                               It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                           Times.Once);
+        _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetWeatherForecast was called");
     }
 }
