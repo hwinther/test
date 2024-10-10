@@ -96,7 +96,7 @@ runs:
         images: ${{ env.DOCKER_REGISTRY_SERVER }}/${{ inputs.docker_image_name }}:${{ env.INFORMATIONAL_VERSION }}
 
     - name: "Create or update deploy results PR comment"
-      uses: im-open/update-pr-comment@v1.1.3
+      uses: im-open/update-pr-comment@v1.2.2
       if: ${{ github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
       with:
         github-token: ${{ env.GH_TOKEN }}
