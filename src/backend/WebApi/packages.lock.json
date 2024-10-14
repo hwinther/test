@@ -121,9 +121,9 @@
       },
       "SauceControl.InheritDoc": {
         "type": "Direct",
-        "requested": "[2.0.1, )",
-        "resolved": "2.0.1",
-        "contentHash": "qKTPOFisGzEfoAN6DeOzYhNN3d9+BMP8uOfpKMs9Zxhe0PB351uf1k9/10hAAtK2J2eq+9Q9l2VZ621SPM/Olg=="
+        "requested": "[2.0.2, )",
+        "resolved": "2.0.2",
+        "contentHash": "QGassHKg6wfLZStucfxW4lsfVf2KOxHSEtrd0whP9R6PJSSSua3WPcOXxyVzRVqfmXV8dLQcp9oCnMYiJNhFaQ=="
       },
       "Swashbuckle.AspNetCore": {
         "type": "Direct",
