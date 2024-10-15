@@ -39,7 +39,7 @@ jobs:
           fi
 
       - name: Get next version
-        uses: reecetech/version-increment@2024.9.2
+        uses: reecetech/version-increment@2024.10.1
         id: version
         if: ${{ steps.check-changes.outputs.has_diff == 'true' }}
         with:
