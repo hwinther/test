@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>nuget_distribution_example</PackageId>
-    <Version>0.0.7</Version>
+    <Version>0.0.9</Version>
     <Authors>Hans Christian Winther-Sørensen</Authors>
     <Company>WSH</Company>
     <PackageDescription>Distributing shared project files example</PackageDescription>
@@ -26,7 +26,8 @@
   <ItemGroup>
     <None Include="readme.md" Pack="true" PackagePath="\" />
     <None Include="build\*" Pack="true" PackagePath="build\" />
-    <None Include="O:\test\shared\NugetDistSample\content\.editorconfig" Pack="true" target="content\" />
+    <!--None Include="O:\test\shared\NugetDistSample\content\.editorconfig" Pack="true" target="content\" /-->
+    <None Include="O:\test\shared\NugetDistSample\content\.editorconfig" Pack="true" PackagePath="content\" />
   </ItemGroup>
 
 </Project>
