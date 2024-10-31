@@ -1,0 +1,9 @@
+﻿<Project>
+  <Target Name="DistSampleInit" BeforeTargets="CollectPackageReferences">
+    <Message Text="Dist sample init" Importance="High" />
+    <ItemGroup>
+      <File Include="$(MSBuildThisFileDirectory)..\content\**\*.*"></File>
+    </ItemGroup>
+    <Copy SourceFiles="@(File)" DestinationFolder="$(ProjectDir)\"></Copy>
+  </Target>
+</Project>
