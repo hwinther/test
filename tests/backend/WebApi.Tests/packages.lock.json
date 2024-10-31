@@ -683,6 +683,11 @@
         "resolved": "13.0.1",
         "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
       },
+      "nuget_distribution_example": {
+        "type": "Transitive",
+        "resolved": "0.0.1",
+        "contentHash": "+bcU6c2irx9dnY54EhLWKn8k1nKUtXiPXXondLnLC9A2ob1FPYX5bXHl1cNQ+ch6KPF7riwh+6lNoRWwGZAxaA=="
+      },
       "OpenTelemetry": {
         "type": "Transitive",
         "resolved": "1.9.0",
@@ -1050,7 +1055,8 @@
           "OpenTelemetry.Instrumentation.Runtime": "[1.9.0, )",
           "RabbitMQ.Client": "[6.8.1, )",
           "Swashbuckle.AspNetCore": "[6.9.0, )",
-          "Swashbuckle.AspNetCore.ReDoc": "[6.9.0, )"
+          "Swashbuckle.AspNetCore.ReDoc": "[6.9.0, )",
+          "nuget_distribution_example": "[0.0.1, )"
         }
       }
     },

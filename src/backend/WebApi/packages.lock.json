@@ -40,6 +40,12 @@
         "resolved": "1.21.0",
         "contentHash": "8NudeHOE56YsY59HYY89akRMup8Ho+7Y3cADTGjajjWroXVU9RQai2nA6PfteB8AuzmRHZ5NZQB2BnWhQEul5g=="
       },
+      "nuget_distribution_example": {
+        "type": "Direct",
+        "requested": "[0.0.1, )",
+        "resolved": "0.0.1",
+        "contentHash": "+bcU6c2irx9dnY54EhLWKn8k1nKUtXiPXXondLnLC9A2ob1FPYX5bXHl1cNQ+ch6KPF7riwh+6lNoRWwGZAxaA=="
+      },
       "OpenTelemetry.Exporter.Console": {
         "type": "Direct",
         "requested": "[1.9.0, )",
