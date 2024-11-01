@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <description>$description$</description>
+    <authors>$authors$</authors>
+    <copyright>$copyright$</copyright>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+  </metadata>
+  <files>
+      <!--file src="DistShared.targets" target="build" /-->
+      <file src="build/DistSample.props" target="build" />
+  </files>
+</package>
