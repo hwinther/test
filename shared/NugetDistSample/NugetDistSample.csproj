@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>nuget_distribution_example</PackageId>
-    <Version>0.0.22</Version>
+    <Version>0.0.23</Version>
     <Authors>Hans Christian Winther-Sørensen</Authors>
     <Company>WSH</Company>
     <PackageDescription>Distributing shared project files example</PackageDescription>
