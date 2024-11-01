@@ -1,12 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>nuget_distribution_example</PackageId>
-    <Version>0.0.9</Version>
+    <Version>0.0.22</Version>
     <Authors>Hans Christian Winther-Sørensen</Authors>
     <Company>WSH</Company>
     <PackageDescription>Distributing shared project files example</PackageDescription>
@@ -15,19 +14,14 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/hwinther/test</RepositoryUrl>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
-
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NoDefaultExcludes>true</NoDefaultExcludes>
-
     <!--NuspecFile>NugetDistSample.nuspec</NuspecFile>
     <NuspecProperties>id=$(PackageId);version=$(Version);authors=$(Authors);description=$(Description);title=$(Title);copyright=$(Company)</NuspecProperties-->
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="readme.md" Pack="true" PackagePath="\" />
     <None Include="build\*" Pack="true" PackagePath="build\" />
-    <!--None Include="O:\test\shared\NugetDistSample\content\.editorconfig" Pack="true" target="content\" /-->
-    <None Include="O:\test\shared\NugetDistSample\content\.editorconfig" Pack="true" PackagePath="content\" />
+    <None Include="content\**" Pack="true" PackagePath="content\" />
   </ItemGroup>
-
 </Project>
