@@ -61,10 +61,10 @@ static string? FindGitFolder(string? directory)
 static bool ExecuteCommandIfLineDoesNotExist(string filePath, string line, string command)
 {
     var lines = File.ReadAllLines(filePath);
-    if (lines.Contains(line))
+    if (Array.Exists(lines, l => l.Contains(line)))
         return false;
 
-    Console.WriteLine($"Executing: {command}");
+    Console.WriteLine($"Executing command: {command}");
 
     ProcessStartInfo processStartInfo = new()
     {
