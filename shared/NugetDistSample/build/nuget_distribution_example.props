@@ -1,0 +1,11 @@
+﻿<Project>
+  <Target Name="DistSampleInit" BeforeTargets="CollectPackageReferences">
+    <!--Message Text="Dist sample init SolutionDir=$(SolutionDir)" Importance="High" />
+    <Message Text="Dist sample init MSBuildThisFileDirectory=$(MSBuildThisFileDirectory)" Importance="High" />
+    <ItemGroup>
+      <File Include="$(MSBuildThisFileDirectory)..\content\**\*.*"></File>
+    </ItemGroup>
+    <Copy SourceFiles="@(File)" DestinationFolder="$(SolutionDir)\"></Copy-->
+    <Exec Command="dotnet $(MSBuildThisFileDirectory)..\lib\$(TargetFramework)\NugetDistSample.dll $(MSBuildThisFileDirectory) $(SolutionDir)" />
+  </Target>
+</Project>

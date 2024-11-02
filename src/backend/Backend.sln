@@ -21,7 +21,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B9B9AD30
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F9FCA971-68B4-4828-A6EC-1A16DDF1E983}"
 	ProjectSection(SolutionItems) = preProject
+		.runsettings = .runsettings
 		Directory.Build.props = Directory.Build.props
+		.config\dotnet-tools.json = .config\dotnet-tools.json
 		global.json = global.json
 	EndProjectSection
 EndProject
@@ -31,6 +33,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "log", "log", "{0BD80B55-00B
 	ProjectSection(SolutionItems) = preProject
 		log\placeholder.md = log\placeholder.md
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NugetDistSample", "..\..\shared\NugetDistSample\NugetDistSample.csproj", "{FC33B9B5-7F55-4C06-A9CE-811FE31DDE2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +54,10 @@ Global
 		{69BC9238-50AC-4F4C-B884-717F1E75493F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69BC9238-50AC-4F4C-B884-717F1E75493F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69BC9238-50AC-4F4C-B884-717F1E75493F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC33B9B5-7F55-4C06-A9CE-811FE31DDE2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC33B9B5-7F55-4C06-A9CE-811FE31DDE2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC33B9B5-7F55-4C06-A9CE-811FE31DDE2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC33B9B5-7F55-4C06-A9CE-811FE31DDE2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
