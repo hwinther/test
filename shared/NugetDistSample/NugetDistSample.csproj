@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>nuget_distribution_example</PackageId>
+    <Version>0.0.26</Version>
+    <Authors>Hans Christian Winther-Sørensen</Authors>
+    <Company>WSH</Company>
+    <PackageDescription>Distributing shared project files example</PackageDescription>
+    <Title>Nuget distribution example</Title>
+    <Description>Nuget distribution example</Description>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/hwinther/test</RepositoryUrl>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <!--NuspecFile>NugetDistSample.nuspec</NuspecFile>
+    <NuspecProperties>id=$(PackageId);version=$(Version);authors=$(Authors);description=$(Description);title=$(Title);copyright=$(Company)</NuspecProperties-->
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="readme.md" Pack="true" PackagePath="\" />
+    <None Include="build\*" Pack="true" PackagePath="build\" />
+    <None Include="content\**" Pack="true" PackagePath="content\" />
+  </ItemGroup>
+</Project>
