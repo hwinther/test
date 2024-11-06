@@ -18,6 +18,10 @@ frontend:
   - changed-files:
       - any-glob-to-any-file: "src/frontend/**"
 
+playwright:
+  - changed-files:
+      - any-glob-to-any-file: "tests/playwright/**"
+
 dependencies:
   - changed-files:
       - any-glob-to-any-file: ["src/**/*.lock.json", "src/**/yarn.lock"]
