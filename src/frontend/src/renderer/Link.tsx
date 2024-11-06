@@ -16,6 +16,8 @@ function Link(props: Readonly<LinkProps>): React.JSX.Element {
   const pageContext = usePageContext()
   let pathname = window.location.pathname
 
+  // TODO: Remove this once the `usePageContext` hook is fixed
+  // eslint-disable-next-line sonarjs/different-types-comparison -- This is a temporary fix
   if (pageContext !== undefined) {
     const { urlPathname } = pageContext
     pathname = urlPathname

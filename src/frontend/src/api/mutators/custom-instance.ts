@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return -- necessary to handle Axios response data */
 import Axios, { type AxiosError, type AxiosRequestConfig } from 'axios'
 
 export const AXIOS_INSTANCE = Axios.create({

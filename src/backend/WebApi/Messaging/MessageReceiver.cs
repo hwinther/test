@@ -22,7 +22,7 @@ public sealed class MessageReceiver : IDisposable
 
     private readonly ILogger<MessageReceiver> _logger;
     private readonly IConnection _connection;
-    private readonly IModel _channel;
+    private readonly IChannel _channel;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MessageReceiver" /> class, creating a connection to RabbitMQ
@@ -32,8 +32,13 @@ public sealed class MessageReceiver : IDisposable
     public MessageReceiver(ILogger<MessageReceiver> logger)
     {
         _logger = logger;
-        _connection = RabbitMqHelper.CreateConnection();
-        _channel = RabbitMqHelper.CreateModelAndDeclareTestQueue(_connection);
+        _connection = RabbitMqHelper.CreateConnectionAsync()
+                                    .GetAwaiter()
+                                    .GetResult();
+
+        _channel = RabbitMqHelper.CreateModelAndDeclareTestQueueAsync(_connection)
+                                 .GetAwaiter()
+                                 .GetResult();
     }
 
     /// <summary>
@@ -48,9 +53,9 @@ public sealed class MessageReceiver : IDisposable
     /// <summary>
     ///     Starts the message consumer which listens for messages on the declared queue and processes them.
     /// </summary>
-    public void StartConsumer()
+    public async Task StartConsumerAsync()
     {
-        RabbitMqHelper.StartConsumer(_channel, ReceiveMessage);
+        await RabbitMqHelper.StartConsumerAsync(_channel, ReceiveMessageAsync);
     }
 
     /// <summary>
@@ -59,7 +64,7 @@ public sealed class MessageReceiver : IDisposable
     ///     duration.
     /// </summary>
     /// <param name="ea">The event arguments containing the message and metadata.</param>
-    public void ReceiveMessage(BasicDeliverEventArgs ea)
+    public Task ReceiveMessageAsync(BasicDeliverEventArgs ea)
     {
         // Extract the PropagationContext of the upstream parent from the message headers.
         var parentContext = Propagator.Extract(default, ea.BasicProperties, ExtractTraceContextFromBasicProperties);
@@ -74,7 +79,7 @@ public sealed class MessageReceiver : IDisposable
         {
             var message = Encoding.UTF8.GetString(ea.Body.Span.ToArray());
 
-            _logger.LogInformation($"Message received: [{message}]");
+            _logger.LogInformation("Message received: [{Message}]", message);
 
             activity?.SetTag("message", message);
 
@@ -89,13 +94,15 @@ public sealed class MessageReceiver : IDisposable
         {
             _logger.LogError(ex, "Message processing failed.");
         }
+
+        return Task.CompletedTask;
     }
 
-    private IEnumerable<string> ExtractTraceContextFromBasicProperties(IBasicProperties props, string key)
+    private IEnumerable<string> ExtractTraceContextFromBasicProperties(IReadOnlyBasicProperties props, string key)
     {
         try
         {
-            if (props.Headers.TryGetValue(key, out var value) && value is byte[] bytes)
+            if (props.Headers != null && props.Headers.TryGetValue(key, out var value) && value is byte[] bytes)
                 return
                 [
                     Encoding.UTF8.GetString(bytes)

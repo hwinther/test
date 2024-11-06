@@ -1,11 +1,32 @@
 {
   "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "NodeNext",
+    "skipLibCheck": true,
+
+    /* Paths */
     "baseUrl": ".",
     "paths": {
-      "@tests/*": ["tests/*"]
+      "~pages/*": ["pages/*"],
+      "~tests/*": ["tests/*"]
     },
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "allowJs": true
   },
+  "include": [
+    "tests",
+    "eslint.config.mjs",
+    "playwright.config.ts",
+    "environment.d.ts"
+  ],
   "exclude": ["node_modules", "playwright-report", "test-results"]
 }
