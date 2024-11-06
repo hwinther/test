@@ -42,23 +42,22 @@ public static class RabbitMqHelper
     ///     Creates and returns a new RabbitMQ connection using the configured ConnectionFactory.
     /// </summary>
     /// <returns>A new IConnection instance for interacting with RabbitMQ.</returns>
-    public static IConnection CreateConnection() => ConnectionFactory.CreateConnection();
+    public static async Task<IConnection> CreateConnectionAsync() => await ConnectionFactory.CreateConnectionAsync();
 
     /// <summary>
     ///     Creates a new channel from the given connection, and declares a test queue for message delivery.
     /// </summary>
     /// <param name="connection">The RabbitMQ connection to use for creating the channel and declaring the queue.</param>
     /// <returns>A new IModel instance representing the channel with the declared queue.</returns>
-    public static IModel CreateModelAndDeclareTestQueue(IConnection connection)
+    public static async Task<IChannel> CreateModelAndDeclareTestQueueAsync(IConnection connection)
     {
-        var channel = connection.CreateModel();
+        var channel = await connection.CreateChannelAsync();
 
-        channel.QueueDeclare(
+        await channel.QueueDeclareAsync(
             TestQueueName,
             false,
             false,
-            false,
-            null);
+            false);
 
         return channel;
     }
@@ -68,13 +67,13 @@ public static class RabbitMqHelper
     /// </summary>
     /// <param name="channel">The channel to start the consumer on.</param>
     /// <param name="processMessage">The callback to invoke for each received message.</param>
-    public static void StartConsumer(IModel channel, Action<BasicDeliverEventArgs> processMessage)
+    public static async Task StartConsumerAsync(IChannel channel, Func<BasicDeliverEventArgs, Task> processMessage)
     {
-        var consumer = new EventingBasicConsumer(channel);
+        var consumer = new AsyncEventingBasicConsumer(channel);
 
-        consumer.Received += (bc, ea) => processMessage(ea);
+        consumer.ReceivedAsync += (bc, ea) => processMessage(ea);
 
-        channel.BasicConsume(TestQueueName, true, consumer);
+        await channel.BasicConsumeAsync(TestQueueName, true, consumer);
     }
 
     /// <summary>

@@ -23,9 +23,9 @@ public class SendMessageController(IMessageSender messageSender) : ControllerBas
     /// </summary>
     /// <returns>A string indicating the result of the message sending operation.</returns>
     [HttpGet]
-    public Task<ActionResult<GenericValue<string>>> Get() =>
-        Task.FromResult<ActionResult<GenericValue<string>>>(Ok(new GenericValue<string>
+    public async Task<ActionResult<GenericValue<string>>> Get() =>
+        Ok(new GenericValue<string>
         {
-            Value = messageSender.SendMessage()
-        }));
+            Value = await messageSender.SendMessageAsync()
+        });
 }
