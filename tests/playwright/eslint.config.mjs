@@ -28,6 +28,7 @@ export default [
           configFile: new URL('./cspell.json', import.meta.url).toString(),
         },
       ],
+      '@typescript-eslint/no-magic-numbers': 'off',
       '@typescript-eslint/triple-slash-reference': 'off',
       'import/no-absolute-path': 'off',
     },

@@ -7,5 +7,6 @@
     "noImplicitAny": true,
     "strictNullChecks": true
   },
+  "include": ["tests", "eslint.config.mjs"],
   "exclude": ["node_modules", "playwright-report", "test-results"]
 }
