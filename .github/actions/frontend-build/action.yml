@@ -92,13 +92,30 @@ runs:
       working-directory: ${{ inputs.working_directory }}
       run: |
         echo "::group::Lint"
-        [[ "${{ inputs.package_manager }}" == "npm" ]] && npm run lint -- -f compact 1>lint.out 2>&1 || (exit 0)
-        [[ "${{ inputs.package_manager }}" == "yarn" ]] && yarn lint -f compact 1>lint.out 2>&1 || (exit 0)
+        set +e
+        if [[ "${{ inputs.package_manager }}" == "npm" ]]; then
+          npm run lint -- -f compact 1>lint.out 2>&1
+          LINT_EXIT_CODE=$?
+        elif [[ "${{ inputs.package_manager }}" == "yarn" ]]; then
+          yarn lint -f compact 1>lint.out 2>&1
+          LINT_EXIT_CODE=$?
+        else
+          echo "::error::Invalid package manager: ${{ inputs.package_manager }}"
+          exit 1
+        fi
+        echo "Lint exit code: $LINT_EXIT_CODE"
+        set -e
+
         echo -e "\nLint output:\n"
         cat lint.out
 
         cat lint.out | grep ": line " | sed -e 's|${{ env.TRAILING_AGENT_WORK_PATH }}||' >lint.err || (exit 0)
-        if [ ! -s lint.err ]
+        if [[ $LINT_EXIT_CODE -ne 0 ]]
+        then
+          echo "::error::Linting failed with errors."
+          echo "## ❌ Linting failed with errors:" > lint.md
+          cat lint.out >> lint.md
+        elif [ ! -s lint.err ]
         then
           echo "## ✅ No linting issues 🎊" > lint.md
         else
@@ -120,8 +137,9 @@ runs:
         echo "result<<EOF"$'\n'"$(cat lint.md)"$'\n'EOF >> $GITHUB_OUTPUT
         cat lint.md >> $GITHUB_STEP_SUMMARY
 
-        if [ -s lint.err ]
+        if [ -s lint.err ] || [ $LINT_EXIT_CODE -ne 0 ]
         then
+          echo "::error::Linting issues found"
           exit 1
         fi
         echo "::endgroup::"
