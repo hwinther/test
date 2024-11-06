@@ -6,12 +6,13 @@ import { Link } from '~/renderer/Link'
 
 const BlogListView: React.FC = () => {
   const pageContext = usePageContext()
-  const id = pageContext?.routeParams?.id ?? window.location.pathname.split('/').at(-1)
-  const { data: blog, error: blogError, isLoading: blogIsLoading } = useGetBlog(parseInt(id ?? '0'))
-  const { data: posts, error: postsError, isLoading: postsIsLoading } = useGetPosts(parseInt(id ?? '0'))
+  const id = pageContext.routeParams.id ?? window.location.pathname.split('/').at(-1)
+  const { data: blog, error: blogError, isLoading: blogIsLoading } = useGetBlog(parseInt(id))
+  const { data: posts, error: postsError, isLoading: postsIsLoading } = useGetPosts(parseInt(id))
 
   if (blogIsLoading || postsIsLoading) return <div>Loading...</div>
-  if (blogError != null || blog === null || postsError != null || posts === null) return <div>Error loading blog</div>
+  if (blogError != null || blog === undefined || postsError != null || posts === undefined)
+    return <div>Error loading blog</div>
 
   return (
     <div>
@@ -23,7 +24,7 @@ const BlogListView: React.FC = () => {
         {posts?.map((post) => (
           <li key={post.postId}>
             <p>
-              <Link className="is-active" href={`/blog/${blog?.blogId}/post/${post?.postId}`}>
+              <Link className="is-active" href={`/blog/${blog?.blogId}/post/${post.postId}`}>
                 {post.title} - ({post.content})
               </Link>
             </p>

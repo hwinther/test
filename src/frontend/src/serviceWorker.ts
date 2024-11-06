@@ -49,7 +49,7 @@ export function register(config?: Config): void {
 
         // Add some additional logging to localhost, pointing developers to the
         // service worker/PWA documentation.
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises -- We are intentionally not awaiting the promise here because we don't need to handle its resolution.
         navigator.serviceWorker.ready.then(() => {
           console.log(
             'This web app is being served cache-first by a service ' +
@@ -128,9 +128,9 @@ function checkValidServiceWorker(swUrl: string, config?: Config): void {
       const contentType = response.headers.get('content-type')
       if (response.status === 404 || (contentType != null && !contentType.includes('javascript'))) {
         // No service worker found. Probably a different app. Reload the page.
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises -- We are intentionally not awaiting the promise here because we don't need to handle its resolution.
         navigator.serviceWorker.ready.then((registration) => {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises -- We are intentionally not awaiting the promise here because we don't need to handle its resolution.
           registration.unregister().then(() => {
             window.location.reload()
           })
@@ -152,10 +152,10 @@ export function unregister(): void {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready
       .then((registration) => {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises -- We are intentionally not awaiting the promise here because we don't need to handle its resolution.
         registration.unregister()
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         console.error(error.message)
       })
   }

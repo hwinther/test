@@ -34,5 +34,6 @@ afterEach(() => {
 })
 
 declare module 'vitest' {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- necessary to extend vitest Assertion interface with jest and TestingLibrary matchers
   interface Assertion<T = any> extends jest.Matchers<void, T>, matchers.TestingLibraryMatchers<T, void> {}
 }
