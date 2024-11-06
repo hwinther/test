@@ -1,4 +1,5 @@
-import { type ReactNode, createContext, useContext, useState } from 'react'
+import React from 'react'
+import { createContext, type ReactNode, useContext, useState } from 'react'
 type Dispatch = (Auth: string) => void
 
 interface AuthProviderProps {
@@ -9,7 +10,7 @@ interface AuthProviderProps {
 const AuthContext = createContext<null | string>(null)
 const AuthDispatchContext = createContext<Dispatch | null>(null)
 
-const AuthProvider = ({ children, initialState = null }: AuthProviderProps): JSX.Element => {
+const AuthProvider = ({ children, initialState = null }: AuthProviderProps): React.JSX.Element => {
   // it's a quick demo with useState but you can also have a more complex state with a useReducer
   const [token, setToken] = useState(initialState)
 
@@ -20,9 +21,7 @@ const AuthProvider = ({ children, initialState = null }: AuthProviderProps): JSX
   )
 }
 
-const useAuth = (): null | string => {
-  return useContext<null | string>(AuthContext)
-}
+const useAuth = (): null | string => useContext<null | string>(AuthContext)
 
 const useAuthDispatch = (): Dispatch => {
   const context = useContext<Dispatch | null>(AuthDispatchContext)

@@ -1,5 +1,6 @@
+import type { PageContext } from 'vike/types'
+
 import React from 'react'
-import { type PageContext } from 'vike/types'
 import { usePageContext } from 'vike-react/usePageContext'
 
 /**
@@ -9,18 +10,18 @@ import { usePageContext } from 'vike-react/usePageContext'
 function Page(): React.JSX.Element {
   const pageContext = usePageContext() as ExtendedPageContext & PageContext
 
-  let msg: string // Message shown to the user
+  let msg = '' // Message shown to the user
   const { abortReason, abortStatusCode } = pageContext
-  if (typeof abortReason === 'object' && abortReason?.notAdmin) {
+  if (typeof abortReason === 'object' && abortReason.notAdmin) {
     // Handle `throw render(403, { notAdmin: true })`
     msg = "You cannot access this page because you aren't an administrator."
   } else if (typeof abortReason === 'string') {
     // Handle `throw render(abortStatusCode, `You cannot access ${someCustomMessage}`)`
     msg = abortReason
-  } else if (abortStatusCode === 403) {
+  } else if (typeof abortStatusCode === 'number' && abortStatusCode === 403) {
     // Handle `throw render(403)`
     msg = "You cannot access this page because you don't have enough privileges."
-  } else if (abortStatusCode === 401) {
+  } else if (typeof abortStatusCode === 'number' && abortStatusCode === 401) {
     // Handle `throw render(401)`
     msg = "You cannot access this page because you aren't logged in. Please log in."
   } else {

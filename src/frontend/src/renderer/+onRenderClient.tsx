@@ -1,9 +1,10 @@
+import type { PageContext } from 'vike/types'
+
 // https://vike.dev/onRenderClient
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { type PageContext } from 'vike/types'
 
 import { AuthProvider } from '~/auth.context'
 import * as serviceWorker from '~/serviceWorker'
@@ -21,6 +22,7 @@ const queryClient = new QueryClient()
  * @param {PageContext} pageContext - The page context.
  */
 async function onRenderClient(pageContext: PageContext): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- The Page type is not known at compile time and can vary, hence using 'any'.
   const { Page }: { Page: any } = pageContext
   const rootElement = document.getElementById('root')
   if (rootElement != null) {

@@ -1,8 +1,9 @@
 import { type JSX, useEffect, useState } from 'react'
 
+import type { WeatherForecast } from '~/api/models'
+
 import { useVersion } from '~/api/endpoints/service/service'
 import { useGetWeatherForecast } from '~/api/endpoints/weather-forecast/weather-forecast'
-import { type WeatherForecast } from '~/api/models'
 import reactLogo from '~/assets/react.svg'
 import { useAuthDispatch } from '~/auth.context'
 
@@ -23,7 +24,7 @@ function Page(): JSX.Element {
   useEffect(() => {
     dispatch('token')
     setTimeout(() => {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises -- refetch does not need to be awaited here
       refetch()
     }, 2000)
   }, [refetch, dispatch])
@@ -59,7 +60,7 @@ function Page(): JSX.Element {
         </p>
       ))}
 
-      {version !== null && (
+      {version !== undefined && (
         <p style={{ fontSize: '0.7em' }}>
           Version: {version?.informationalVersion} Env: {version?.environmentName} Mode: {import.meta.env.MODE}
         </p>
