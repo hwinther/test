@@ -13,7 +13,6 @@ export default [
       eslintPluginSonarJs,
     },
   },
-  /* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- perfectionist.configs is a valid property */
   perfectionist.configs['recommended-natural'],
   cspellESLintPluginRecommended,
   eslintPluginSonarJs.configs.recommended,
