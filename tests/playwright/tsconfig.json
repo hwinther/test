@@ -4,9 +4,21 @@
     "paths": {
       "@tests/*": ["tests/*"]
     },
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "allowJs": true
   },
-  "include": ["tests", "eslint.config.mjs"],
+  "include": [
+    "tests",
+    "eslint.config.mjs",
+    "playwright.config.ts",
+    "environment.d.ts"
+  ],
   "exclude": ["node_modules", "playwright-report", "test-results"]
 }
