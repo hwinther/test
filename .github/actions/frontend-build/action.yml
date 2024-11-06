@@ -65,6 +65,9 @@ runs:
           echo "## ❌ Dependency installation failed with errors:" > dependency.md
           cat dependency.out >> dependency.md
           exit 1
+        else
+          echo "## ✅ Dependency installation successful" > dependency.md
+          cat dependency.out | grep "packages in" >> dependency.md
         fi
         echo "::endgroup::"
 
