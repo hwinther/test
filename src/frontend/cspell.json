@@ -6,14 +6,12 @@
     "mkdirp",
     "nocheck",
     "precached",
+    "sonarjs",
     "streetsidesoftware",
     "tsmerge",
     "vike",
     "visualstudio",
     "vsmarketplacebadge"
   ],
-  "ignorePaths": [
-    "node_modules/**",
-    "*.lock"
-  ]
+  "ignorePaths": ["node_modules/**", "*.lock"]
 }

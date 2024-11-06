@@ -37,16 +37,43 @@ runs:
         cache-dependency-path: "${{ inputs.working_directory }}/yarn.lock"
 
     - name: Install dependencies
+      id: dependency-install
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       run: |
         echo "::group::Install dependencies"
-        [[ "${{ inputs.package_manager }}" == "npm" ]] && npm ci || true
-        [[ "${{ inputs.package_manager }}" == "yarn" ]] && yarn install --immutable --immutable-cache --check-cache || true
+        set +e
+        if [[ "${{ inputs.package_manager }}" == "npm" ]]; then
+          npm ci 1>dependency.out 2>&1
+          exit_code=$?
+        elif [[ "${{ inputs.package_manager }}" == "yarn" ]]; then
+          yarn install --immutable --immutable-cache --check-cache 1>dependency.out 2>&1
+          exit_code=$?
+        else
+          echo "::error::Invalid package manager: ${{ inputs.package_manager }}"
+          exit_code=1
+        fi
+        echo "Dependency installation exit code: $exit_code"
+        set -e
+
+        echo -e "\nDependency installation:\n"
+        cat dependency.out
+
+        if [[ $exit_code -ne 0 ]]
+        then
+          echo "::error::Dependency installation failed with errors."
+          echo "## ❌ Dependency installation failed with errors:" > dependency.md
+          cat dependency.out >> dependency.md
+          exit 1
+        else
+          echo "## ✅ Dependency installation successful" > dependency.md
+          cat dependency.out | grep "packages in" >> dependency.md
+        fi
         echo "::endgroup::"
 
     - name: Build
       id: node-build
+      if: steps.dependency-install.outcome == 'success'
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       run: |
@@ -86,19 +113,36 @@ runs:
         echo "::endgroup::"
 
     - name: Lint
-      if: always()
+      if: steps.dependency-install.outcome == 'success'
       id: node-lint
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       run: |
         echo "::group::Lint"
-        [[ "${{ inputs.package_manager }}" == "npm" ]] && npm run lint -- -f compact 1>lint.out 2>&1 || (exit 0)
-        [[ "${{ inputs.package_manager }}" == "yarn" ]] && yarn lint -f compact 1>lint.out 2>&1 || (exit 0)
+        set +e
+        if [[ "${{ inputs.package_manager }}" == "npm" ]]; then
+          npm run lint -- -f compact 1>lint.out 2>&1
+          LINT_EXIT_CODE=$?
+        elif [[ "${{ inputs.package_manager }}" == "yarn" ]]; then
+          yarn lint -f compact 1>lint.out 2>&1
+          LINT_EXIT_CODE=$?
+        else
+          echo "::error::Invalid package manager: ${{ inputs.package_manager }}"
+          exit 1
+        fi
+        echo "Lint exit code: $LINT_EXIT_CODE"
+        set -e
+
         echo -e "\nLint output:\n"
         cat lint.out
 
         cat lint.out | grep ": line " | sed -e 's|${{ env.TRAILING_AGENT_WORK_PATH }}||' >lint.err || (exit 0)
-        if [ ! -s lint.err ]
+        if [[ $LINT_EXIT_CODE -ne 0 ]]
+        then
+          echo "::error::Linting failed with errors."
+          echo "## ❌ Linting failed with errors:" > lint.md
+          cat lint.out >> lint.md
+        elif [ ! -s lint.err ]
         then
           echo "## ✅ No linting issues 🎊" > lint.md
         else
@@ -120,8 +164,9 @@ runs:
         echo "result<<EOF"$'\n'"$(cat lint.md)"$'\n'EOF >> $GITHUB_OUTPUT
         cat lint.md >> $GITHUB_STEP_SUMMARY
 
-        if [ -s lint.err ]
+        if [ -s lint.err ] || [ $LINT_EXIT_CODE -ne 0 ]
         then
+          echo "::error::Linting issues found"
           exit 1
         fi
         echo "::endgroup::"
@@ -133,8 +178,9 @@ runs:
       working-directory: ${{ inputs.working_directory }}
       run: |
         echo "# ${{ env.WORKFLOW_SHORT_NAME }}" > combined.md
-        cat build.md >> combined.md
-        cat lint.md >> combined.md
+        cat dependency.md >> combined.md
+        [ -f build.md ] && cat build.md >> combined.md
+        [ -f lint.md ] && cat lint.md >> combined.md
         echo "result<<EOF"$'\n'"$(cat combined.md)"$'\n'EOF >> $GITHUB_OUTPUT
 
     - name: "Create or Update PR Comment"

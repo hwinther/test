@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { type RenderOptions, render } from '@testing-library/react'
+import { render, type RenderOptions } from '@testing-library/react'
 import { vi } from 'vitest'
 
 interface IExtendedRenderOptions extends RenderOptions {
@@ -33,16 +33,14 @@ const wrapInQueryProvider = (componentTree: React.JSX.Element): React.JSX.Elemen
 
 const setupComponent = (ui: React.JSX.Element, renderOptions?: IExtendedRenderOptions): React.JSX.Element => {
   if (renderOptions == null) return ui
-  let componentTree = <>{ui}</>
+  let componentTree = ui
   //if (renderOptions.withRouter) componentTree = wrapInRouter(componentTree, renderOptions.routerHistory);
   //if (renderOptions.withRedux) componentTree = wrapInRedux(componentTree, renderOptions);
   if (renderOptions.withQueryProvider !== false) componentTree = wrapInQueryProvider(componentTree)
-  if (renderOptions?.mockAuthContext !== false) {
+  if (renderOptions.mockAuthContext !== false) {
     // TODO: also remove it afterAll
     vi.mock('~/auth.context', () => ({
-      useAuthDispatch: () => {
-        return vi.fn()
-      },
+      useAuthDispatch: () => vi.fn(),
     }))
   }
   return componentTree
@@ -55,13 +53,14 @@ const customRender = (ui: React.JSX.Element, renderOptions?: IExtendedRenderOpti
     return render(componentTree)
   } catch (error) {
     console.log(error)
-    // eslint-disable-next-line @typescript-eslint/only-throw-error
+    // eslint-disable-next-line @typescript-eslint/only-throw-error -- We want to rethrow the caught error for debugging purposes
     throw error
   }
 }
 
-// eslint-disable-next-line import/export
+// eslint-disable-next-line import/export -- We need to re-export everything from '@testing-library/react' for convenience
 export * from '@testing-library/react'
 //export { default as userEvent } from '@testing-library/user-event'
 // override render export
-export { type IExtendedRenderOptions, customRender as render }
+// eslint-disable-next-line import/export -- We need to override the render export for custom rendering
+export { customRender as render, type IExtendedRenderOptions }

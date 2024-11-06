@@ -22,6 +22,10 @@ MAIN_BRANCH="main"
 
 current_branch="$(git rev-parse --abbrev-ref HEAD)"
 
+if [[ $current_branch =~ dependabot/.* ]]; then
+    exit 0
+fi
+
 case "$current_branch" in
 $DEV_BRANCH)
     error_msg="Aborting commit. Please use the following format: <Imperative verb> <short description of change>"

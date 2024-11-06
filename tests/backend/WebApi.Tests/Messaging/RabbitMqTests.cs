@@ -31,7 +31,7 @@ public class RabbitMqTests
 
     [Test]
     [Order(1)]
-    public void IsOpen_ReturnsTrue()
+    public async Task IsOpen_ReturnsTrue()
     {
         // Given
         var connectionFactory = new ConnectionFactory
@@ -40,7 +40,7 @@ public class RabbitMqTests
         };
 
         // When
-        using var connection = connectionFactory.CreateConnection();
+        await using var connection = await connectionFactory.CreateConnectionAsync();
 
         // Then
         Assert.That(connection.IsOpen);
@@ -48,7 +48,7 @@ public class RabbitMqTests
 
     [Test]
     [Order(2)]
-    public void MessageSender_SendsMessage()
+    public async Task MessageSender_SendsMessage()
     {
         // Given
         var connectionFactory = new ConnectionFactory
@@ -66,8 +66,8 @@ public class RabbitMqTests
         using var messageReceiver = new MessageReceiver(messageReceiverLogger.Object);
 
         // When
-        messageSender.SendMessage();
-        messageReceiver.ReceiveMessage(new BasicDeliverEventArgs());
+        await messageSender.SendMessageAsync();
+        await messageReceiver.ReceiveMessageAsync(new BasicDeliverEventArgs("consumerTag", ulong.MinValue, false, "exchange", "channel", new BasicProperties(), ReadOnlyMemory<byte>.Empty));
 
         // Then
         messageSenderLogger.VerifyLog(LogLevel.Information, Times.Once(), "Message sent:");
