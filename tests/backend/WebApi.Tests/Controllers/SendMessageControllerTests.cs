@@ -22,8 +22,8 @@ public class SendMessageControllerTests
     public async Task Get_ReturnsOkResult()
     {
         // Arrange
-        _messageSenderMock.Setup(static messageSender => messageSender.SendMessage())
-                          .Returns("Message sent");
+        _messageSenderMock.Setup(static messageSender => messageSender.SendMessageAsync())
+                          .ReturnsAsync("Message sent");
 
         // Act
         var result = await _controller.Get();

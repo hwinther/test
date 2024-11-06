@@ -21,7 +21,7 @@ public sealed class MessageSender : IMessageSender, IDisposable
 
     private readonly ILogger<MessageSender> _logger;
     private readonly IConnection _connection;
-    private readonly IModel _channel;
+    private readonly IChannel _channel;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MessageSender" /> class, establishing a connection and channel to
@@ -31,8 +31,13 @@ public sealed class MessageSender : IMessageSender, IDisposable
     public MessageSender(ILogger<MessageSender> logger)
     {
         _logger = logger;
-        _connection = RabbitMqHelper.CreateConnection();
-        _channel = RabbitMqHelper.CreateModelAndDeclareTestQueue(_connection);
+        _connection = RabbitMqHelper.CreateConnectionAsync()
+                                    .GetAwaiter()
+                                    .GetResult();
+
+        _channel = RabbitMqHelper.CreateModelAndDeclareTestQueueAsync(_connection)
+                                 .GetAwaiter()
+                                 .GetResult();
     }
 
     /// <summary>
@@ -46,7 +51,7 @@ public sealed class MessageSender : IMessageSender, IDisposable
 
     /// <inheritdoc />
     /// <remarks>Including propagating the OpenTelemetry trace context.</remarks>
-    public string SendMessage()
+    public async Task<string> SendMessageAsync()
     {
         try
         {
@@ -55,7 +60,7 @@ public sealed class MessageSender : IMessageSender, IDisposable
             var activityName = $"{RabbitMqHelper.TestQueueName} send";
 
             using var activity = ActivitySource.StartActivity(activityName, ActivityKind.Producer);
-            var props = _channel.CreateBasicProperties();
+            var props = new BasicProperties();
 
             // Depending on Sampling (and whether a listener is registered or not), the
             // activity above may not be created.
@@ -77,13 +82,14 @@ public sealed class MessageSender : IMessageSender, IDisposable
 
             var body = $"Published message: DateTime.Now = {DateTime.Now}.";
 
-            _channel.BasicPublish(
+            await _channel.BasicPublishAsync(
                 RabbitMqHelper.DefaultExchangeName,
                 RabbitMqHelper.TestQueueName,
+                true,
                 props,
                 Encoding.UTF8.GetBytes(body));
 
-            _logger.LogInformation($"Message sent: [{body}]");
+            _logger.LogInformation("Message sent: [{Body}]", body);
 
             return body;
         }
@@ -104,8 +110,7 @@ public sealed class MessageSender : IMessageSender, IDisposable
     {
         try
         {
-            if (props.Headers == null)
-                props.Headers = new Dictionary<string, object>();
+            props.Headers ??= new Dictionary<string, object?>();
 
             props.Headers[key] = value;
         }
@@ -126,5 +131,5 @@ public interface IMessageSender
     ///     Sends a message to a RabbitMQ queue
     /// </summary>
     /// <returns>A string representing the message that was sent.</returns>
-    public string SendMessage();
+    public Task<string> SendMessageAsync();
 }
