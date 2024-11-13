@@ -33,7 +33,7 @@ on:
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   TRAILING_AGENT_WORK_PATH: "/home/runner/work/test/test/"
-  DOTNET_VERSION: "8.0.x"
+  DOTNET_VERSION: "9.0.x"
   BACKEND_SOLUTION_PATH: "src/backend"
   BACKEND_SOLUTION_FILENAME: "Backend.sln"
   FRONTEND_PATH: "src/frontend"
