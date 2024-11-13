@@ -29,6 +29,13 @@
         "dotnet-stryker"
       ],
       "rollForward": false
+    },
+    "dotnet-outdated-tool": {
+      "version": "4.6.4",
+      "commands": [
+        "dotnet-outdated"
+      ],
+      "rollForward": false
     }
   }
 }

@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>nuget_distribution_example</PackageId>
-    <Version>0.0.26</Version>
+    <Version>0.0.33</Version>
     <Authors>Hans Christian Winther-Sørensen</Authors>
     <Company>WSH</Company>
     <PackageDescription>Distributing shared project files example</PackageDescription>
