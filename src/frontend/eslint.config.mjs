@@ -32,7 +32,6 @@ export default [
   {
     ...eslintConfigLove,
     rules: {
-      ...eslintConfigLove.rules,
       '@cspell/spellchecker': [
         'warn',
         {
