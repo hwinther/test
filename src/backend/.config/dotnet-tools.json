@@ -36,6 +36,13 @@
         "dotnet-outdated"
       ],
       "rollForward": false
+    },
+    "refitter": {
+      "version": "1.4.0",
+      "commands": [
+        "refitter"
+      ],
+      "rollForward": false
     }
   }
 }
