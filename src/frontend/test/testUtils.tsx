@@ -53,14 +53,11 @@ const customRender = (ui: React.JSX.Element, renderOptions?: IExtendedRenderOpti
     return render(componentTree)
   } catch (error) {
     console.log(error)
-    // eslint-disable-next-line @typescript-eslint/only-throw-error -- We want to rethrow the caught error for debugging purposes
     throw error
   }
 }
 
-// eslint-disable-next-line import/export -- We need to re-export everything from '@testing-library/react' for convenience
 export * from '@testing-library/react'
 //export { default as userEvent } from '@testing-library/user-event'
 // override render export
-// eslint-disable-next-line import/export -- We need to override the render export for custom rendering
 export { customRender as render, type IExtendedRenderOptions }

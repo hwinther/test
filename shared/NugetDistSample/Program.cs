@@ -6,19 +6,19 @@ using System.Text.RegularExpressions;
 if (args.Length == 2)
 {
     var msbuildDir = args[0];
-    var solutionDir = args[1];
+    var projectDir = args[1];
     Console.WriteLine($"MsbuildDir: {msbuildDir}");
-    Console.WriteLine($"SolutionDir: {solutionDir}");
+    Console.WriteLine($"ProjectDir: {projectDir}");
 
-    var solutionSignature = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(solutionDir));
-    var cachePath = Path.Combine(msbuildDir, "..", $"cached-run-{solutionSignature}");
+    var projectSignature = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(projectDir));
+    var cachePath = Path.Combine(msbuildDir, "..", $"cached-run-{projectSignature}");
     if (Path.Exists(cachePath))
     {
-        Console.WriteLine("Already executed for this solution.");
+        Console.WriteLine("Already executed for this project.");
         return;
     }
 
-    var gitFolderPath = FindGitFolder(solutionDir);
+    var gitFolderPath = FindGitFolder(projectDir);
     if (gitFolderPath == null)
     {
         Console.WriteLine(".git folder not found.");
@@ -39,7 +39,7 @@ if (args.Length == 2)
 }
 else
 {
-    Console.WriteLine("Usage: NugetDistSample <MsbuildDir> <SolutionDir>");
+    Console.WriteLine("Usage: NugetDistSample <MsbuildDir> <ProjectDir>");
 }
 
 return;

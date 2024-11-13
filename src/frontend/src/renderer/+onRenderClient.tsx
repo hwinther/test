@@ -22,7 +22,6 @@ const queryClient = new QueryClient()
  * @param {PageContext} pageContext - The page context.
  */
 async function onRenderClient(pageContext: PageContext): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- The Page type is not known at compile time and can vary, hence using 'any'.
   const { Page }: { Page: any } = pageContext
   const rootElement = document.getElementById('root')
   if (rootElement != null) {
