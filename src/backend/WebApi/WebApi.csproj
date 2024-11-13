@@ -35,6 +35,9 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="WebApi.Tests" />
+    <AssemblyAttribute Include="WebApi.Attributes.DefineConstantsAttribute">
+      <_Parameter1>"$(DefineConstants)"</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
   <Target Name="RestoreDotnetTools" BeforeTargets="CollectPackageReferences">
