@@ -5,7 +5,6 @@ import { escapeInject } from 'vike/server'
  * Renders the HTML template.
  * @returns {Promise<any>} The wrapped template.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- The return type is intentionally set to any to accommodate various HTML templates.
 async function onRenderHtml(): Promise<any> {
   return escapeInject`
 <!doctype html>

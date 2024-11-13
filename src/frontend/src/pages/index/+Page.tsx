@@ -24,7 +24,6 @@ function Page(): JSX.Element {
   useEffect(() => {
     dispatch('token')
     setTimeout(() => {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises -- refetch does not need to be awaited here
       refetch()
     }, 2000)
   }, [refetch, dispatch])

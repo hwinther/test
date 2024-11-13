@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/strict-boolean-expressions -- To simplify the configuration */
 import { defineConfig, devices } from '@playwright/test'
 /**
  * Read environment variables from file.
