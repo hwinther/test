@@ -1,11 +1,11 @@
 import React from 'react'
 import { createContext, type ReactNode, useContext, useState } from 'react'
-type Dispatch = (Auth: string) => void
-
 interface AuthProviderProps {
   children: ReactNode
   initialState?: null | string
 }
+
+type Dispatch = (Auth: string) => void
 
 const AuthContext = createContext<null | string>(null)
 const AuthDispatchContext = createContext<Dispatch | null>(null)
