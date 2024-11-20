@@ -31,6 +31,7 @@
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="7.0.0" />
+    <PackageReference Include="System.Private.Uri" Version="4.3.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,9 +48,7 @@
 
   <Target Name="CreateSwaggerJson" AfterTargets="Build" Condition="$(Configuration)=='Debug'">
     <Message Text="Updating swagger schema file" Importance="High" />
-    <Exec EnvironmentVariables="DOTNET_ENVIRONMENT=Swagger;ASPNETCORE_ENVIRONMENT=Swagger"
-          Command="dotnet swagger tofile --output swagger.json $(OutputPath)$(AssemblyName).dll v1"
-          WorkingDirectory="$(ProjectDir)" />
+    <Exec EnvironmentVariables="DOTNET_ENVIRONMENT=Swagger;ASPNETCORE_ENVIRONMENT=Swagger" Command="dotnet swagger tofile --output swagger.json $(OutputPath)$(AssemblyName).dll v1" WorkingDirectory="$(ProjectDir)" />
   </Target>
 
 </Project>
