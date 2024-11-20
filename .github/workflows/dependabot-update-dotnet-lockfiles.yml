@@ -7,6 +7,7 @@ on:
 env:
   SOLUTION_PATH: "src/backend"
   SOLUTION_NAME: "Backend.sln"
+  DOTNET_VERSION: "9.0.x"
 
 jobs:
   update-lockfiles:
@@ -18,6 +19,11 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           token: ${{ secrets.WORKFLOW_TOKEN }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Setup git user
         run: |
