@@ -23,10 +23,10 @@
     "axios": "1.6.8",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-streaming": "0.3.33",
-    "vike": "0.4.177",
-    "vike-react": "0.5.6",
-    "vike-react-query": "0.1.0"
+    "react-streaming": "0.3.43",
+    "vike": "0.4.204",
+    "vike-react": "0.5.8",
+    "vike-react-query": "0.1.1"
   },
   "devDependencies": {
     "@cspell/eslint-plugin": "8.16.0",
@@ -46,7 +46,7 @@
     "eslint-config-love": "99.0.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-formatter-compact": "8.40.0",
-    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jsdoc": "50.5.0",
     "eslint-plugin-n": "17.13.0",
     "eslint-plugin-perfectionist": "3.9.1",
