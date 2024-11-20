@@ -3,6 +3,30 @@ import type { PageContext } from 'vike/types'
 import React from 'react'
 import { usePageContext } from 'vike-react/usePageContext'
 
+export interface ExtendedPageContext {
+  abortReason?: string | { notAdmin: true }
+}
+
+/**
+ * Center component.
+ * @param {Readonly<{ children: React.ReactNode }>} props - The component props.
+ * @returns {React.JSX.Element} The rendered component.
+ */
+function Center({ children }: Readonly<{ children: React.ReactNode }>): React.JSX.Element {
+  return (
+    <div
+      style={{
+        alignItems: 'center',
+        display: 'flex',
+        height: 'calc(100vh - 100px)',
+        justifyContent: 'center',
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
 /**
  * Page component.
  * @returns {React.JSX.Element} The rendered component.
@@ -37,30 +61,6 @@ function Page(): React.JSX.Element {
       <p style={{ fontSize: '1.3em' }}>{msg}</p>
     </Center>
   )
-}
-
-/**
- * Center component.
- * @param {Readonly<{ children: React.ReactNode }>} props - The component props.
- * @returns {React.JSX.Element} The rendered component.
- */
-function Center({ children }: Readonly<{ children: React.ReactNode }>): React.JSX.Element {
-  return (
-    <div
-      style={{
-        alignItems: 'center',
-        display: 'flex',
-        height: 'calc(100vh - 100px)',
-        justifyContent: 'center',
-      }}
-    >
-      {children}
-    </div>
-  )
-}
-
-export interface ExtendedPageContext {
-  abortReason?: { notAdmin: true } | string
 }
 
 export default Page
