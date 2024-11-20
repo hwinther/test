@@ -60,4 +60,4 @@ const customRender = (ui: React.JSX.Element, renderOptions?: IExtendedRenderOpti
 export * from '@testing-library/react'
 //export { default as userEvent } from '@testing-library/user-event'
 // override render export
-export { customRender as render, type IExtendedRenderOptions }
+export { type IExtendedRenderOptions, customRender as render }
