@@ -1,3 +1,4 @@
+using System.Diagnostics.Metrics;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Entities;
 
@@ -10,6 +11,9 @@ namespace WebApi.Controllers;
 [Route("[controller]")]
 public class ServiceController(ILogger<ServiceController> logger) : ControllerBase
 {
+    private static readonly Meter ServiceMeter = new("Test.WebApi.Service", "1.0");
+    private static readonly Counter<long> PingCounter = ServiceMeter.CreateCounter<long>("ping");
+
     /// <summary>
     ///     Returns ok
     /// </summary>
@@ -18,6 +22,7 @@ public class ServiceController(ILogger<ServiceController> logger) : ControllerBa
     public Task<ActionResult<GenericValue<string>>> Ping()
     {
         logger.LogInformation("Ping was called");
+        PingCounter.Add(1);
         return Task.FromResult<ActionResult<GenericValue<string>>>(Ok(new GenericValue<string>
         {
             Value = "Ok"

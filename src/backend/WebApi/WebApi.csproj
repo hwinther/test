@@ -1,12 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <UserSecretsId>6bc0ffdf-8845-4a70-a19b-b04e4adbcbb0</UserSecretsId>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerfileTag>api</DockerfileTag>
+    <UserSecretsId>test.Backend.WebApi</UserSecretsId>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
     <InheritDocEnabled>true</InheritDocEnabled>
+    <IsPublishable>true</IsPublishable>
+    <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <ContainerBaseImage>mcr.microsoft.com/dotnet/aspnet:9.0-noble-chiseled-extra</ContainerBaseImage>
+    <ContainerRuntimeIdentifier>linux-arm64</ContainerRuntimeIdentifier>
+    <ContainerRepository>backend/web-api</ContainerRepository>
+    <DockerfileTag>dev</DockerfileTag>
+    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
