@@ -6,18 +6,14 @@ services:
     build:
       context: .
       dockerfile: WebApi/Dockerfile
-    entrypoint: "dotnet WebApi.dll --urls http://*:5000"
+    entrypoint: "dotnet WebApi.dll --urls http://*:8080"
     ports:
-     - "5000:5000"
-    env_file:
-      - otel-dotnet.env # enable OpenTelemetry .NET Automatic Instrumentation
+     - "5000:8080"
     environment:
       DB_CONNECTION: "Server=sqlserver,1433;Initial Catalog=api;User=sa;Password=DevelopmentOnlyPassword1;TrustServerCertificate=True;"
-      # OpenTelemetry environmental variables:
-      OTEL_SERVICE_NAME: "service"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
-      OTEL_DOTNET_AUTO_TRACES_ADDITIONAL_SOURCES: "Examples.Service"
-      OTEL_DOTNET_AUTO_METRICS_ADDITIONAL_SOURCES: "Examples.Service"
+      #OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard:18889"
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
       RABBITMQ_HOSTNAME: rabbitmq
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -27,6 +23,7 @@ services:
       - sqlserver
       - rabbitmq
       - zipkin
+      - aspire-dashboard
 
   frontend:
     image: ${DOCKER_REGISTRY-}frontend
@@ -64,6 +61,13 @@ services:
       RABBITMQ_ERLANG_COOKIE: "rabbitcookie"
       RABBITMQ_DEFAULT_USER: "guest"
       RABBITMQ_DEFAULT_PASS: "guest"
+
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard
+    container_name: aspire-dashboard
+    ports:
+      - 4317:18889
+      - 18888:18888
 
   # OpenTelemetry Collector
   otel-collector:

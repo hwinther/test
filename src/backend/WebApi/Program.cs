@@ -5,12 +5,14 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using WebApi.Database;
+using WebApi.Entities;
 using WebApi.Filters;
 using WebApi.Messaging;
 using WebApi.Middleware;
@@ -31,33 +33,48 @@ builder.Services.AddDbContext<BloggingContext>(options =>
 builder.Services.AddScoped<IBloggingRepository, BloggingRepository>();
 
 const string serviceName = "Test.WebApi";
+const string serviceNameSpace = "Test";
+var versionInformation = new VersionInformation(Assembly.GetExecutingAssembly());
 
 builder.Services.AddSingleton<IMessageSender, MessageSender>();
 
-builder.Logging.AddOpenTelemetry(static options =>
+builder.Logging.AddOpenTelemetry(options =>
 {
     options.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                                              .AddService(serviceName))
-           .AddConsoleExporter();
+                                              .AddService(serviceName, serviceNameSpace, versionInformation.InformationalVersion))
+           .AddConsoleExporter()
+           .AddOtlpExporter();
 });
 
 builder.Services.AddOpenTelemetry()
-       .ConfigureResource(static resource => resource.AddService(serviceName))
-       .WithTracing(static tracing => tracing
-                                      .AddAspNetCoreInstrumentation()
-                                      .AddHttpClientInstrumentation()
-                                      .AddSource(nameof(MessageSender))
-                                      //.AddConsoleExporter()
-                                      .AddZipkinExporter(static options =>
-                                      {
-                                          var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
-                                          options.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
-                                      }))
-       .WithMetrics(static metrics => metrics
-                                      .AddAspNetCoreInstrumentation()
-                                      .AddHttpClientInstrumentation()
-                                      //.AddConsoleExporter()
-                                      .AddRuntimeInstrumentation());
+       .ConfigureResource(resource => resource.AddService(serviceName, serviceNameSpace, versionInformation.InformationalVersion));
+
+var meterProvider = Sdk.CreateMeterProviderBuilder()
+                       .ConfigureResource(resourceBuilder => resourceBuilder
+                                              .AddService(serviceName, serviceNameSpace, versionInformation.InformationalVersion))
+                       .AddMeter("Test.WebApi.Service")
+                       .AddAspNetCoreInstrumentation()
+                       .AddHttpClientInstrumentation()
+                       .AddRuntimeInstrumentation()
+                       .AddConsoleExporter()
+                       .AddOtlpExporter()
+                       .Build();
+
+var tracerProvider = Sdk.CreateTracerProviderBuilder()
+                        .ConfigureResource(resourceBuilder => resourceBuilder
+                                               .AddService(serviceName, serviceNameSpace, versionInformation.InformationalVersion))
+                        .AddSource(serviceName)
+                        .AddAspNetCoreInstrumentation()
+                        .AddHttpClientInstrumentation()
+                        .AddSource(nameof(MessageSender))
+                        .AddConsoleExporter()
+                        .AddZipkinExporter(static options =>
+                        {
+                            var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
+                            options.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
+                        })
+                        .AddOtlpExporter()
+                        .Build();
 
 builder.Services.AddControllers(static options =>
 {
@@ -130,6 +147,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+meterProvider.Dispose();
+tracerProvider.Dispose();
 
 /// <summary>
 ///     Test visibility class
