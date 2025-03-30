@@ -794,8 +794,8 @@
       },
       "Swashbuckle.AspNetCore.ReDoc": {
         "type": "Transitive",
-        "resolved": "7.0.0",
-        "contentHash": "Jw7q1ji3bMqCHkKJvvOiL9ylNiGX88yaYNVdA8h1bziQ2OmpXXk4IHS1blgFhXKb+Ag/b9YgPtOK66C3p5lNjg=="
+        "resolved": "8.0.0",
+        "contentHash": "u3jXTrw6DhLiDctE6KMBDRv7g29GpatEK5Klqi7W/HT+tX00OhGZSAzNMfnnWsR1z53FVY1CaObYEhDfP8w/oQ=="
       },
       "Swashbuckle.AspNetCore.Swagger": {
         "type": "Transitive",
@@ -1032,7 +1032,7 @@
           "OpenTelemetry.Instrumentation.Runtime": "[1.11.0, )",
           "RabbitMQ.Client": "[7.0.0, )",
           "Swashbuckle.AspNetCore": "[7.0.0, )",
-          "Swashbuckle.AspNetCore.ReDoc": "[7.0.0, )",
+          "Swashbuckle.AspNetCore.ReDoc": "[8.0.0, )",
           "System.Private.Uri": "[4.3.2, )"
         }
       }
