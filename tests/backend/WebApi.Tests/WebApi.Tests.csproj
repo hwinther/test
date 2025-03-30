@@ -19,7 +19,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
     <PackageReference Include="System.Private.Uri" Version="4.3.2" />
     <PackageReference Include="Testcontainers.MsSql" Version="4.0.0" />
-    <PackageReference Include="Testcontainers.RabbitMq" Version="4.0.0" />
+    <PackageReference Include="Testcontainers.RabbitMq" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
