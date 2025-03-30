@@ -68,11 +68,11 @@
       },
       "Testcontainers.MsSql": {
         "type": "Direct",
-        "requested": "[4.0.0, )",
-        "resolved": "4.0.0",
-        "contentHash": "HausfOB3+UDDujygP2laXCUiNtrKrWJMeKnpTvP4F9JP0GswSsYlJS/mKEWw8ZXSpUd31K8enGZ7wW0HHeyg0w==",
+        "requested": "[4.3.0, )",
+        "resolved": "4.3.0",
+        "contentHash": "cuFPklU0tcFB0X2KyUNMBoPFMxmUCG793Jj0SNIWni+LG7YgUp3r6T2jbwAWKZHpFS3/Q/SIvpUPfcgB1pAd3g==",
         "dependencies": {
-          "Testcontainers": "4.0.0"
+          "Testcontainers": "4.3.0"
         }
       },
       "Testcontainers.RabbitMq": {
