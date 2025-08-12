@@ -50,7 +50,7 @@ jobs:
         working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
 
