@@ -48,7 +48,7 @@ jobs:
           # TODO: Could we use increment patch when bugfixes land on dev?
 
       - name: Create tag
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         if: ${{ steps.check-changes.outputs.has_diff == 'true' }}
         with:
           github-token: ${{ secrets.WORKFLOW_TOKEN }}
