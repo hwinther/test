@@ -20,7 +20,7 @@
     "@cspell/eslint-plugin": "9.1.1",
     "@eslint/js": "9.29.0",
     "@playwright/test": "1.51.1",
-    "@types/node": "22.13.10",
+    "@types/node": "24.3.1",
     "@typescript-eslint/eslint-plugin": "8.34.1",
     "@typescript-eslint/parser": "8.34.1",
     "dotenv": "16.4.5",
