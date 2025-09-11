@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/pseudo-random */
 import { type JSX, useCallback, useEffect, useState } from 'react'
 
 import type { Cargo, GameState, Port, Ship } from './types'
