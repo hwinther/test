@@ -1,0 +1,374 @@
+.maritime-ventures-game {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  color: white;
+  font-family: 'Courier New', monospace;
+  height: 90vh;
+  max-width: 1200px;
+  overflow: hidden;
+  position: fixed;
+  top: 5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95vw;
+  z-index: 1000;
+}
+
+.game-header {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid #4a90e2;
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
+}
+
+.game-header h1 {
+  color: #ffd700;
+  font-size: 24px;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.game-stats {
+  display: flex;
+  gap: 20px;
+}
+
+.game-stats span {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  font-weight: bold;
+  padding: 5px 10px;
+}
+
+.close-game {
+  background: #ff4757;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  height: 30px;
+  width: 30px;
+}
+
+.close-game:hover {
+  background: #ff3742;
+}
+
+.game-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.dev-button {
+  background: #2ed573;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 6px 10px;
+  transition: background 0.2s;
+}
+
+.dev-button:hover {
+  background: #26cc63;
+}
+
+.game-content {
+  display: flex;
+  height: calc(100% - 80px);
+  overflow: hidden;
+}
+
+.left-panel,
+.right-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.left-panel {
+  border-right: 2px solid #4a90e2;
+}
+
+.current-port,
+.your-ships,
+.ship-market,
+.available-cargo {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  padding: 15px;
+}
+
+.current-port h3,
+.your-ships h3,
+.ship-market h3,
+.available-cargo h3 {
+  border-bottom: 1px solid #4a90e2;
+  color: #ffd700;
+  margin: 0 0 15px 0;
+  padding-bottom: 5px;
+}
+
+.ship-card,
+.cargo-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid #4a90e2;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.ship-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.ship-info {
+  flex: 1;
+}
+
+.ship-card h4,
+.cargo-card h4 {
+  color: #87ceeb;
+  margin: 0 0 8px 0;
+}
+
+.ship-card p,
+.cargo-card p {
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+.ship-actions,
+.cargo-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  min-width: 100px;
+}
+
+.ship-actions button,
+.cargo-actions select,
+.ship-options button {
+  background: #4a90e2;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 6px 10px;
+}
+
+.ship-actions button:hover,
+.ship-options button:hover {
+  background: #357abd;
+}
+
+.ship-actions button:disabled,
+.ship-options button:disabled {
+  background: #666;
+  cursor: not-allowed;
+}
+
+.ship-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ship-options button {
+  font-size: 14px;
+  padding: 10px;
+}
+
+.cargo-actions select {
+  background: #4a90e2;
+  color: white;
+}
+
+.mini-game-placeholder {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+.mini-game-placeholder h2 {
+  color: #ffd700;
+  margin-bottom: 20px;
+}
+
+.mini-game-placeholder button {
+  background: #4a90e2;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 10px;
+  padding: 10px 20px;
+}
+
+.mini-game-placeholder button:hover {
+  background: #357abd;
+}
+
+/* Scrollbar styling */
+.left-panel::-webkit-scrollbar,
+.right-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.left-panel::-webkit-scrollbar-track,
+.right-panel::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.left-panel::-webkit-scrollbar-thumb,
+.right-panel::-webkit-scrollbar-thumb {
+  background: #4a90e2;
+  border-radius: 4px;
+}
+
+.left-panel::-webkit-scrollbar-thumb:hover,
+.right-panel::-webkit-scrollbar-thumb:hover {
+  background: #357abd;
+}
+
+/* Ship Market Cards */
+.ship-market-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid #4a90e2;
+  border-radius: 8px;
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  padding: 15px;
+  align-items: center;
+}
+
+.ship-preview {
+  background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+  border: 2px solid #333;
+  border-radius: 8px 0 0 8px;
+  height: 30px;
+  position: relative;
+  width: 50px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.ship-preview::before {
+  background: #333;
+  content: '';
+  height: 12px;
+  left: 42px;
+  position: absolute;
+  top: 9px;
+  width: 12px;
+  border-radius: 0 6px 6px 0;
+}
+
+.ship-preview::after {
+  background: #fff;
+  content: '';
+  height: 8px;
+  left: 8px;
+  position: absolute;
+  top: 11px;
+  width: 25px;
+  border-radius: 3px;
+}
+
+/* Different ship types */
+.cargo-ship {
+  background: linear-gradient(45deg, #8B4513, #D2691E);
+}
+
+.cargo-ship::after {
+  background: linear-gradient(90deg, #654321, #8B4513);
+}
+
+.container-ship {
+  background: linear-gradient(45deg, #4169E1, #6495ED);
+}
+
+.container-ship::after {
+  background: 
+    linear-gradient(90deg, #FF0000 0%, #FF0000 20%, #00FF00 20%, #00FF00 40%, #0000FF 40%, #0000FF 60%, #FFFF00 60%, #FFFF00 80%, #FF00FF 80%);
+  height: 6px;
+  top: 12px;
+}
+
+.tanker-ship {
+  background: linear-gradient(45deg, #2F4F4F, #708090);
+  border-radius: 12px;
+}
+
+.tanker-ship::before {
+  background: #1C1C1C;
+  border-radius: 0 8px 8px 0;
+  height: 8px;
+  top: 11px;
+  width: 8px;
+}
+
+.tanker-ship::after {
+  background: #C0C0C0;
+  border-radius: 6px;
+  height: 6px;
+  top: 12px;
+  width: 20px;
+}
+
+.ship-details {
+  flex: 1;
+}
+
+.ship-details h4 {
+  color: #87ceeb;
+  font-size: 16px;
+  margin: 0 0 8px 0;
+}
+
+.ship-details p {
+  font-size: 12px;
+  margin: 2px 0;
+}
+
+.buy-ship-btn {
+  background: #4a90e2;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 12px 20px;
+  min-width: 100px;
+}
+
+.buy-ship-btn:hover {
+  background: #357abd;
+}
+
+.buy-ship-btn:disabled {
+  background: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
