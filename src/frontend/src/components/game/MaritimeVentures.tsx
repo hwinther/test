@@ -521,16 +521,16 @@ export function MaritimeVentures({ onClose }: MaritimeVenturesProps): JSX.Elemen
             </div>
 
             {/* Trade routes (optional decorative lines) */}
-            <svg className="trade-routes" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <svg className="trade-routes" preserveAspectRatio="none" viewBox="0 0 100 100">
               <defs>
-                <pattern id="dashed" patternUnits="userSpaceOnUse" width="4" height="1">
-                  <rect width="2" height="1" fill="#4a90e2" opacity="0.3"/>
+                <pattern height="1" id="dashed" patternUnits="userSpaceOnUse" width="4">
+                  <rect fill="#4a90e2" height="1" opacity="0.3" width="2"/>
                 </pattern>
               </defs>
               {/* Example trade route lines */}
-              <path d="M22,35 Q40,20 48,25" stroke="url(#dashed)" strokeWidth="0.5" fill="none" opacity="0.4"/>
-              <path d="M48,25 Q65,15 85,38" stroke="url(#dashed)" strokeWidth="0.5" fill="none" opacity="0.4"/>
-              <path d="M85,38 Q80,50 75,65" stroke="url(#dashed)" strokeWidth="0.5" fill="none" opacity="0.4"/>
+              <path d="M22,35 Q40,20 48,25" fill="none" opacity="0.4" stroke="url(#dashed)" strokeWidth="0.5"/>
+              <path d="M48,25 Q65,15 85,38" fill="none" opacity="0.4" stroke="url(#dashed)" strokeWidth="0.5"/>
+              <path d="M85,38 Q80,50 75,65" fill="none" opacity="0.4" stroke="url(#dashed)" strokeWidth="0.5"/>
             </svg>
           </div>
           
@@ -598,7 +598,7 @@ export function MaritimeVentures({ onClose }: MaritimeVenturesProps): JSX.Elemen
                     <div className="ship-info">
                       <h4>{ship.name}</h4>
                       <p>Type: {ship.type} | Capacity: {ship.capacity}t</p>
-                      <p className={capacityClass}>Used: {usedCapacity}t | Available: {getShipRemainingCapacity(ship)}t</p>
+                      <p className={capacityClass}>Used: {usedCapacity}t | Available: {remainingCapacity}t</p>
                       <p>Speed: {ship.speed} knots</p>
                       <p>Best for: {getBestForText(ship.type)}</p>
                       <p>Location: {getLocationDisplay(ship)}</p>
