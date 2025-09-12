@@ -11,6 +11,9 @@ export interface Cargo {
 
 export interface DockingGameState {
   docked: boolean
+  hasCollided: boolean
+  message: string
+  messageType: '' | 'crash' | 'info' | 'success'
   obstacles: { height: number; width: number; x: number; y: number }[]
   shipAngle: number
   shipSpeed: number
@@ -55,6 +58,7 @@ export interface RescueGameState {
 
 export interface Ship {
   capacity: number
+  cargo?: Cargo[]
   condition: number // 0-100
   cost: number
   id: string

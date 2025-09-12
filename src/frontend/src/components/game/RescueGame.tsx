@@ -5,7 +5,7 @@ import type { RescueGameState, Ship } from './types'
 import './RescueGame.css'
 
 interface RescueGameProps {
-  readonly onComplete: (success: boolean, bonus: number) => void
+  readonly onComplete: (success: boolean, bonus: number, penalty?: number) => void
   readonly ship: Ship
 }
 
@@ -36,29 +36,26 @@ export function RescueGame({ onComplete, ship }: RescueGameProps): JSX.Element {
 
   const [keys, setKeys] = useState<Set<string>>(new Set())
 
-  const checkRescue = useCallback((boatX: number, boatY: number) => {
-    setGameState(prev => {
-      const updatedSurvivors = prev.survivors.map(survivor => {
-        if (!survivor.rescued) {
-          const distance = Math.sqrt(
-            Math.pow(boatX - survivor.x, 2) + 
-            Math.pow(boatY - survivor.y, 2)
-          )
-          if (distance < 25) {
-            return { ...survivor, rescued: true }
-          }
+  const checkRescue = useCallback((boatX: number, boatY: number, currentSurvivors: RescueGameState['survivors']) => {
+    const updatedSurvivors = currentSurvivors.map(survivor => {
+      if (!survivor.rescued) {
+        const distance = Math.sqrt(
+          Math.pow(boatX - survivor.x, 2) + 
+          Math.pow(boatY - survivor.y, 2)
+        )
+        if (distance < 25) {
+          return { ...survivor, rescued: true }
         }
-        return survivor
-      })
-
-      const newRescuedCount = updatedSurvivors.filter(s => s.rescued).length
-
-      return {
-        ...prev,
-        rescuedCount: newRescuedCount,
-        survivors: updatedSurvivors
       }
+      return survivor
     })
+    
+    let rescuedCount = 0
+    for (const survivor of updatedSurvivors) {
+      if (survivor.rescued) rescuedCount++
+    }
+    
+    return { rescuedCount, survivors: updatedSurvivors }
   }, [])
 
   useEffect(() => {
@@ -105,12 +102,14 @@ export function RescueGame({ onComplete, ship }: RescueGameProps): JSX.Element {
         if (keys.has('ArrowDown')) newY = Math.min(380, newY + 8)
 
         // Check for rescues
-        checkRescue(newX, newY)
+        const rescueResult = checkRescue(newX, newY, prev.survivors)
 
         return {
           ...prev,
           boatX: newX,
-          boatY: newY
+          boatY: newY,
+          rescuedCount: rescueResult.rescuedCount,
+          survivors: rescueResult.survivors
         }
       })
     }, 16) // ~60 FPS for smooth movement
@@ -133,10 +132,10 @@ export function RescueGame({ onComplete, ship }: RescueGameProps): JSX.Element {
   useEffect(() => {
     if (gameState.rescuedCount === gameState.survivors.length) {
       const bonus = Math.floor((gameState.timeLeft / 90) * 3000) + 1000
-      onComplete(true, bonus)
+      onComplete(true, bonus, 0)
     } else if (gameState.timeLeft <= 0) {
       const bonus = gameState.rescuedCount * 200
-      onComplete(gameState.rescuedCount > 0, bonus)
+      onComplete(gameState.rescuedCount > 0, bonus, 0)
     }
   }, [gameState.rescuedCount, gameState.survivors.length, gameState.timeLeft, onComplete])
 

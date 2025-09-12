@@ -131,10 +131,51 @@
   display: flex;
   gap: 12px;
   align-items: flex-start;
+  min-height: 60px; /* Ensure enough height for scaled ships */
+  overflow: visible; /* Allow scaled ships to extend beyond card */
 }
 
 .ship-info {
   flex: 1;
+}
+
+.cargo-info {
+  background: rgba(255, 255, 255, 0.1);
+  border-left: 3px solid #ffd700;
+  border-radius: 4px;
+  margin-top: 8px;
+  padding: 8px;
+}
+
+.cargo-info p {
+  margin: 2px 0 !important;
+}
+
+.cargo-item {
+  color: #e6f3ff;
+  font-size: 11px !important;
+  margin-left: 8px;
+}
+
+.capacity-warning {
+  color: #ff6b6b;
+  font-weight: bold;
+}
+
+.capacity-full {
+  color: #ff4757;
+}
+
+.capacity-high {
+  color: #ffa502;
+}
+
+.capacity-medium {
+  color: #26de81;
+}
+
+.capacity-low {
+  color: #45aaf2;
 }
 
 .ship-card h4,
@@ -181,6 +222,14 @@
   cursor: not-allowed;
 }
 
+.sell-ship-btn {
+  background: #e74c3c !important;
+}
+
+.sell-ship-btn:hover {
+  background: #c0392b !important;
+}
+
 .ship-options {
   display: flex;
   flex-direction: column;
@@ -195,6 +244,28 @@
 .cargo-actions select {
   background: #4a90e2;
   color: white;
+}
+
+.cargo-actions select option:disabled {
+  background: #666;
+  color: #ccc;
+  font-style: italic;
+}
+
+.cargo-unavailable {
+  margin-top: 10px;
+  padding: 8px;
+  background: rgba(255, 165, 0, 0.1);
+  border: 1px solid #ff9500;
+  border-radius: 4px;
+}
+
+.unavailable-reason {
+  color: #ffa500;
+  font-size: 12px;
+  font-style: italic;
+  margin: 0;
+  text-align: center;
 }
 
 .mini-game-placeholder {
@@ -271,6 +342,8 @@
   width: 50px;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
   flex-shrink: 0;
+  /* Add margin to accommodate larger scaled ships */
+  margin-right: 10px;
 }
 
 .ship-preview::before {
@@ -371,4 +444,267 @@
   background: #666;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+/* World Map Styles */
+.world-map-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.world-map {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  border-radius: 15px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  color: white;
+  font-family: 'Courier New', monospace;
+  max-width: 1000px;
+  padding: 30px;
+  width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.world-map h2 {
+  color: #ffd700;
+  font-size: 28px;
+  margin: 0 0 10px 0;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.world-map > p {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 30px;
+  color: #fff;
+}
+
+.ocean-map {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  background: linear-gradient(180deg, #1e40af 0%, #1e3a8a 50%, #1e40af 100%);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 30px;
+  border: 3px solid #4a90e2;
+}
+
+.ocean-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(135, 206, 235, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(100, 149, 237, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 20%, rgba(72, 61, 139, 0.1) 0%, transparent 50%);
+}
+
+.wave {
+  position: absolute;
+  width: 200%;
+  height: 20px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: wave-flow 6s ease-in-out infinite;
+}
+
+.wave-1 {
+  top: 20%;
+  animation-delay: 0s;
+}
+
+.wave-2 {
+  top: 50%;
+  animation-delay: 2s;
+}
+
+.wave-3 {
+top: 80%;
+  animation-delay: 4s;
+}
+
+@keyframes wave-flow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(0%); }
+}
+
+.continent {
+  position: absolute;
+  z-index: 1;
+}
+
+.continent-shape {
+  background: #4a5d23;
+  border: 2px solid #2d3818;
+  border-radius: 50% 20% 40% 30%;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.north-america {
+  top: 20%;
+  left: 5%;
+  width: 180px;
+  height: 120px;
+}
+
+.north-america .continent-shape {
+  width: 100%;
+  height: 100%;
+  border-radius: 60% 40% 20% 80%;
+}
+
+.europe {
+  top: 15%;
+  left: 45%;
+  width: 120px;
+  height: 80px;
+}
+
+.europe .continent-shape {
+  width: 100%;
+  height: 100%;
+  border-radius: 30% 70% 50% 20%;
+}
+
+.asia {
+  top: 25%;
+  left: 60%;
+  width: 250px;
+  height: 140px;
+}
+
+.asia .continent-shape {
+  width: 100%;
+  height: 100%;
+  border-radius: 40% 20% 60% 30%;
+}
+
+.port-marker {
+  position: absolute;
+  background: linear-gradient(145deg, #ffd700, #ffed4e);
+  border: 3px solid #b8860b;
+  border-radius: 50%;
+  color: #1a1a1a;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 8px;
+  text-align: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+  min-width: 80px;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+}
+
+.port-marker:hover:not(:disabled) {
+  background: linear-gradient(145deg, #ffed4e, #ffd700);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+  transform: scale(1.1);
+}
+
+.port-marker:disabled {
+  background: linear-gradient(145deg, #666, #555);
+  border-color: #444;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.port-marker.current-port {
+  border-color: #ff4757;
+  box-shadow: 0 0 20px rgba(255, 71, 87, 0.6);
+  animation: pulse-current 2s ease-in-out infinite;
+}
+
+@keyframes pulse-current {
+  0% { box-shadow: 0 0 20px rgba(255, 71, 87, 0.6); }
+  50% { box-shadow: 0 0 30px rgba(255, 71, 87, 0.9); }
+  100% { box-shadow: 0 0 20px rgba(255, 71, 87, 0.6); }
+}
+
+.port-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.port-label {
+  font-size: 10px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.current-indicator {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 16px;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.traveling-ship {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 8px;
+  color: white;
+  padding: 8px 12px;
+  text-align: center;
+  z-index: 15;
+}
+
+.ship-icon {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.ship-name {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.trade-routes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.cancel-travel-btn {
+  background: #ff4757;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  display: block;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 auto;
+  padding: 12px 30px;
+  transition: background 0.3s ease;
+}
+
+.cancel-travel-btn:hover {
+  background: #ff3838;
 }

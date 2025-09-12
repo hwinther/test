@@ -9,9 +9,13 @@
     "sonarjs",
     "streetsidesoftware",
     "tsmerge",
+    "undock",
+    "undocked",
+    "undocking",
     "vike",
     "visualstudio",
-    "vsmarketplacebadge"
+    "vsmarketplacebadge",
+    "wasd"
   ],
   "ignorePaths": ["node_modules/**", "*.lock"]
 }
