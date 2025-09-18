@@ -55,7 +55,7 @@ export function MaritimeVentures({ onClose }: MaritimeVenturesProps): JSX.Elemen
   const [currentMiniGame, setCurrentMiniGame] = useState<'docking' | 'rescue' | 'undocking' | null>(null)
   const [gameActive, setGameActive] = useState(true)
   const [showWorldMap, setShowWorldMap] = useState(false)
-  const [travelingShip, setTravelingShip] = useState<Ship | null>(null)
+  const [travelingShip, setTravelingShip] = useState<null | Ship>(null)
 
   const generateCargo = useCallback((): Cargo[] => {
     const cargo: Cargo[] = []

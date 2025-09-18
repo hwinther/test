@@ -6,6 +6,7 @@ import { useVersion } from '~/api/endpoints/service/service'
 import { useGetWeatherForecast } from '~/api/endpoints/weather-forecast/weather-forecast'
 import reactLogo from '~/assets/react.svg'
 import { useAuthDispatch } from '~/auth.context'
+import { MarioGame } from '~/components/game/MarioGame'
 import { MaritimeVentures } from '~/components/game/MaritimeVentures'
 // import { useKonamiCode } from '~/hooks/useKonamiCode'
 
@@ -20,6 +21,7 @@ import viteLogo from '/vite.svg'
 function Page(): JSX.Element {
   const [count, setCount] = useState(0)
   const [showGame, setShowGame] = useState(false)
+  const [showMarioGame, setShowMarioGame] = useState(false)
   const dispatch = useAuthDispatch()
   const { data: weatherForecasts, refetch } = useGetWeatherForecast()
   const { data: version } = useVersion()
@@ -39,6 +41,10 @@ function Page(): JSX.Element {
   
   if (showGame) {
     return <MaritimeVentures onClose={() => setShowGame(false)} />
+  }
+
+  if (showMarioGame) {
+    return <MarioGame onClose={() => setShowMarioGame(false)} />
   }
 
   return (
@@ -75,6 +81,22 @@ function Page(): JSX.Element {
           }}
         >
           🚢 Play Maritime Ventures
+        </button>
+        <button
+          onClick={() => {
+            setShowMarioGame(true)
+          }}
+          style={{ 
+            background: '#e24a4a',
+            border: 'none',
+            borderRadius: '5px',
+            color: 'white',
+            cursor: 'pointer',
+            marginLeft: '10px',
+            padding: '10px 20px'
+          }}
+        >
+          🍄 Play Mario Clone
         </button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
