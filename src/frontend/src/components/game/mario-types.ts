@@ -22,6 +22,20 @@ export interface Enemy {
   y: number
 }
 
+export interface FlagPole {
+  flag: {
+    height: number
+    width: number
+    x: number
+    y: number
+  }
+  height: number
+  reached: boolean
+  width: number
+  x: number
+  y: number
+}
+
 export interface KeyState {
   down: boolean
   jump: boolean
@@ -44,6 +58,7 @@ export interface MarioGameState {
   cameraX: number
   collectibles: Collectible[]
   enemies: Enemy[]
+  flagPole: FlagPole
   gameStatus: 'complete' | 'gameOver' | 'paused' | 'playing'
   gameTime: number
   level: number

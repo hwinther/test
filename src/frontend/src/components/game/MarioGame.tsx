@@ -5,6 +5,7 @@ import { type JSX, useCallback, useEffect, useRef, useState } from 'react'
 import type { 
   Collectible, 
   Enemy, 
+  FlagPole,
   KeyState, 
   MarioGameState, 
   Platform, 
@@ -104,10 +105,26 @@ const createInitialGameState = (): MarioGameState => {
     { collected: false, height: 24, id: 'mushroom1', type: 'mushroom', value: 1000, width: 24, x: 850, y: 120 }
   ]
 
+  // Create flag pole at the end of the level
+  const flagPole: FlagPole = {
+    flag: {
+      height: 20,
+      width: 30,
+      x: 1850,
+      y: 100
+    },
+    height: 250,
+    reached: false,
+    width: 10,
+    x: 1850,
+    y: 100
+  }
+
   return {
     cameraX: 0,
     collectibles,
     enemies,
+    flagPole,
     gameStatus: 'playing',
     gameTime: 0,
     level: 1,
@@ -264,6 +281,9 @@ export function MarioGame({ onClose }: MarioGameProps): JSX.Element {
 
       // Keep player in bounds
       if (player.x < 0) player.x = 0
+      if (player.x > newState.levelWidth - player.width) {
+        player.x = newState.levelWidth - player.width
+      }
       if (player.y > newState.levelHeight) {
         // Player fell off the level
         player.lives--
@@ -433,6 +453,44 @@ export function MarioGame({ onClose }: MarioGameProps): JSX.Element {
         y: particle.y + particle.velocityY
       })).filter(particle => particle.life > 0)
 
+      // Check flag pole collision
+      if (!newState.flagPole.reached && checkCollision(player, newState.flagPole)) {
+        newState.flagPole.reached = true
+        
+        // Calculate score based on height reached on the flag pole
+        const flagPoleHeight = newState.flagPole.height
+        const playerHeightOnPole = (newState.flagPole.y + flagPoleHeight) - player.y
+        const heightRatio = Math.max(0, Math.min(1, playerHeightOnPole / flagPoleHeight))
+        
+        // Score based on height: 100-5000 points
+        const flagScore = Math.floor(100 + (heightRatio * 4900))
+        newState.score += flagScore
+        
+        // Add particle effect for flag score
+        newState.particles.push({
+          id: `flag-score-${Date.now()}`,
+          life: 120,
+          maxLife: 120,
+          type: 'coin',
+          velocityX: 0,
+          velocityY: -1,
+          x: newState.flagPole.x,
+          y: player.y
+        })
+        
+        // Move flag down to player height
+        newState.flagPole.flag.y = player.y
+        
+        // Start level complete sequence after short delay
+        setTimeout(() => {
+          // eslint-disable-next-line sonarjs/no-nested-functions
+          setGameState(prev => ({
+            ...prev,
+            gameStatus: 'complete'
+          }))
+        }, 500)
+      }
+
       // Update game time
       newState.gameTime += 1/60 // Assuming 60 FPS
 
@@ -482,6 +540,28 @@ export function MarioGame({ onClose }: MarioGameProps): JSX.Element {
       ctx.lineWidth = 1
       ctx.strokeRect(platform.x, platform.y, platform.width, platform.height)
     })
+
+    // Draw flag pole
+    const flagPole = gameState.flagPole
+    // Flag pole
+    ctx.fillStyle = '#8B4513'
+    ctx.fillRect(flagPole.x, flagPole.y, flagPole.width, flagPole.height)
+    
+    // Flag
+    if (flagPole.reached) {
+      // Flag moves down when reached
+      ctx.fillStyle = '#32CD32'
+    } else {
+      // Normal flag color
+      ctx.fillStyle = '#FF0000'
+    }
+    ctx.fillRect(flagPole.flag.x, flagPole.flag.y, flagPole.flag.width, flagPole.flag.height)
+    
+    // Flag pole ornament at top
+    ctx.fillStyle = '#FFD700'
+    ctx.beginPath()
+    ctx.arc(flagPole.x + flagPole.width/2, flagPole.y, 8, 0, 2 * Math.PI)
+    ctx.fill()
 
     // Draw collectibles
     gameState.collectibles.forEach(collectible => {
@@ -602,7 +682,18 @@ export function MarioGame({ onClose }: MarioGameProps): JSX.Element {
         case 'coin':
           ctx.fillStyle = '#FFD700'
           ctx.font = '12px Arial'
-          ctx.fillText('+' + (gameState.collectibles.find(c => c.type === 'coin')?.value || 100), particle.x, particle.y)
+          // Check if this is a flag score particle by checking if it's near the flag pole
+          if (Math.abs(particle.x - gameState.flagPole.x) < 50) {
+            // This is the flag score particle
+            const flagPoleHeight = gameState.flagPole.height
+            const playerHeightOnPole = (gameState.flagPole.y + flagPoleHeight) - particle.y
+            const heightRatio = Math.max(0, Math.min(1, playerHeightOnPole / flagPoleHeight))
+            const flagScore = Math.floor(100 + (heightRatio * 4900))
+            ctx.fillText(`+${flagScore}`, particle.x, particle.y)
+          } else {
+            // Regular coin particle
+            ctx.fillText('+' + (gameState.collectibles.find(c => c.type === 'coin')?.value || 100), particle.x, particle.y)
+          }
           break
         case 'explosion':
           ctx.fillStyle = '#FFA500'
@@ -635,6 +726,25 @@ export function MarioGame({ onClose }: MarioGameProps): JSX.Element {
       ctx.fillText('Press R to restart or ESC to exit', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50)
       ctx.textAlign = 'left'
     }
+
+    // Level complete screen
+    if (gameState.gameStatus === 'complete') {
+      ctx.fillStyle = 'rgba(0, 100, 0, 0.8)'
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+      
+      ctx.fillStyle = '#FFFF00'
+      ctx.font = '36px Arial'
+      ctx.textAlign = 'center'
+      ctx.fillText('LEVEL COMPLETE!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60)
+      ctx.fillStyle = '#FFFFFF'
+      ctx.font = '24px Arial'
+      ctx.fillText('🏁 Flag Captured! 🏁', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20)
+      ctx.font = '18px Arial'
+      ctx.fillText(`Final Score: ${gameState.score}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20)
+      ctx.fillText(`Time: ${Math.floor(gameState.gameTime)}s`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50)
+      ctx.fillText('Press R to restart or ESC to exit', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 80)
+      ctx.textAlign = 'left'
+    }
   }, [gameState])
 
   // Game loop
@@ -659,7 +769,7 @@ export function MarioGame({ onClose }: MarioGameProps): JSX.Element {
     const handleGameKeyDown = (event: KeyboardEvent) => {
       if (event.code === 'Escape') {
         onClose?.()
-      } else if (event.code === 'KeyR' && gameState.gameStatus === 'gameOver') {
+      } else if (event.code === 'KeyR' && (gameState.gameStatus === 'gameOver' || gameState.gameStatus === 'complete')) {
         setGameState(createInitialGameState())
       } else {
         handleKeyDown(event)
@@ -701,8 +811,10 @@ export function MarioGame({ onClose }: MarioGameProps): JSX.Element {
         <p>Arrow Keys / WASD: Move</p>
         <p>Space / Up Arrow: Jump</p>
         <p>Shift: Run</p>
+        <p>🏁 Goal: Reach the flag pole at the end!</p>
+        <p>💰 Higher on the pole = More points (100-5000)</p>
         <p>ESC: Exit Game</p>
-        <p>R: Restart (when game over)</p>
+        <p>R: Restart (when game over/complete)</p>
       </div>
     </div>
   )
