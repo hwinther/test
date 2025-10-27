@@ -7,6 +7,9 @@
   "description": "playwright test project",
   "repository": "https://github.com/hwinther/test",
   "author": "hwinther",
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
     "build": "tsc --noEmit",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",

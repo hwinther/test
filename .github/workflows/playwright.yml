@@ -31,7 +31,7 @@ on:
         description: (empty)|qa-|test-|dev-
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: "24"
   WORKFLOW_SHORT_NAME: "test-e2e"
   PLAYWRIGHT_PATH: "tests/playwright"
   TRAILING_AGENT_WORK_PATH: "/home/runner/work/test/test/"
