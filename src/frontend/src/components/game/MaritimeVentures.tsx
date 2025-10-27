@@ -36,6 +36,32 @@ interface MaritimeVenturesProps {
 }
 
 /**
+ * Determines the location suffix for a ship action
+ * @param {string} action - The action being performed
+ * @returns {string} The location suffix
+ */
+const getLocationSuffix = (action: string): string => {
+  switch (action) {
+    case 'dock': return '-waiting'
+    case 'undock': return '-undocking'
+    default: return '-rescue'
+  }
+}
+
+/**
+ * Determines the mini-game type for a ship action
+ * @param {string} action - The action being performed
+ * @returns {'docking' | 'rescue' | 'undocking'} The mini-game type
+ */
+const getMiniGameType = (action: string): 'docking' | 'rescue' | 'undocking' => {
+  switch (action) {
+    case 'dock': return 'docking'
+    case 'undock': return 'undocking'
+    default: return 'rescue'
+  }
+}
+
+/**
  * Main game component for the Maritime Ventures Easter egg
  * @param {MaritimeVenturesProps} props - Component properties
  * @returns {JSX.Element} The game interface
@@ -103,36 +129,23 @@ export function MaritimeVentures({ onClose }: MaritimeVenturesProps): JSX.Elemen
 
   const handleShipAction = (shipId: string, action: 'dock' | 'rescue' | 'undock'): void => {
     const ship = gameState.ships.find(s => s.id === shipId)
-    if (ship) {
-      // Determine new location suffix
-      let locationSuffix = '-rescue'
-      if (action === 'dock') {
-        locationSuffix = '-waiting'
-      } else if (action === 'undock') {
-        locationSuffix = '-undocking'
-      }
-      
-      // Determine mini-game type
-      let miniGameType: 'docking' | 'rescue' | 'undocking' = 'rescue'
-      if (action === 'dock') {
-        miniGameType = 'docking'
-      } else if (action === 'undock') {
-        miniGameType = 'undocking'
-      }
-      
-      // Update ship location to show it's engaged in the action
-      setGameState(prev => ({
-        ...prev,
-        ships: prev.ships.map(s => 
-          s.id === shipId 
-            ? { ...s, location: `${s.location}${locationSuffix}` }
-            : s
-        )
-      }))
-      
-      setSelectedShip(ship)
-      setCurrentMiniGame(miniGameType)
-    }
+    if (!ship) return
+
+    const locationSuffix = getLocationSuffix(action)
+    const miniGameType = getMiniGameType(action)
+    
+    // Update ship location to show it's engaged in the action
+    setGameState(prev => ({
+      ...prev,
+      ships: prev.ships.map(s => 
+        s.id === shipId 
+          ? { ...s, location: `${s.location}${locationSuffix}` }
+          : s
+      )
+    }))
+    
+    setSelectedShip(ship)
+    setCurrentMiniGame(miniGameType)
   }
 
   const handleTowingService = (shipId: string): void => {
@@ -205,57 +218,93 @@ export function MaritimeVentures({ onClose }: MaritimeVenturesProps): JSX.Elemen
     }
   }
 
+  /**
+   * Updates ship location after mini-game completion
+   * @param {Ship} ship - The ship to update
+   * @param {boolean} success - Whether the mini-game was successful
+   * @returns {Ship} Updated ship with new location
+   */
+  const updateShipLocationAfterMiniGame = (ship: Ship, success: boolean): Ship => {
+    const baseLocation = ship.location.replace('-waiting', '').replace('-rescue', '').replace('-undocking', '')
+    
+    switch (currentMiniGame) {
+      case 'docking':
+        return { ...ship, location: success ? `${baseLocation}-docked` : baseLocation }
+      case 'rescue':
+        return { ...ship, location: baseLocation }
+      case 'undocking':
+        return updateUndockingLocation(ship, baseLocation, success)
+      default:
+        return ship
+    }
+  }
+
+  /**
+   * Handles undocking location logic
+   * @param {Ship} ship - The ship being undocked
+   * @param {string} baseLocation - The base location
+   * @param {boolean} success - Whether undocking was successful
+   * @returns {Ship} Updated ship
+   */
+  const updateUndockingLocation = (ship: Ship, baseLocation: string, success: boolean): Ship => {
+    if (baseLocation.endsWith('-docked')) {
+      const portLocation = baseLocation.replace('-docked', '')
+      return { ...ship, location: success ? portLocation : baseLocation }
+    }
+    
+    const newLocation = success ? baseLocation : `${baseLocation}-docked`
+    return { ...ship, location: newLocation }
+  }
+
+  /**
+   * Calculates updated money and reputation after mini-game
+   * @param {boolean} success - Whether the mini-game was successful
+   * @param {number} bonus - Bonus money for success
+   * @param {number} penalty - Penalty for damages
+   * @param {number} currentMoney - Current money amount
+   * @param {number} currentReputation - Current reputation
+   * @returns {object} Updated money and reputation values
+   */
+  const calculateGameRewards = (
+    success: boolean, 
+    bonus: number, 
+    penalty: number, 
+    currentMoney: number, 
+    currentReputation: number
+  ): { money: number; reputation: number } => {
+    let newMoney = currentMoney
+    let newReputation = currentReputation
+
+    if (success && selectedShip) {
+      newMoney += bonus
+      newReputation = Math.min(100, newReputation + 2)
+    }
+
+    if (penalty > 0) {
+      newMoney = Math.max(0, newMoney - penalty)
+      newReputation = Math.max(0, newReputation - 5)
+    }
+
+    return { money: newMoney, reputation: newReputation }
+  }
+
   const handleMiniGameComplete = (success: boolean, bonus: number, penalty: number = 0): void => {
     setGameState(prev => {
-      let newMoney = prev.money
-      let newReputation = prev.reputation
+      const { money: newMoney, reputation: newReputation } = calculateGameRewards(
+        success, 
+        bonus, 
+        penalty, 
+        prev.money, 
+        prev.reputation
+      )
 
-      if (success && selectedShip) {
-        newMoney += bonus
-        newReputation = Math.min(100, newReputation + 2)
-      }
-
-      // Apply penalty for damages (collision, etc.)
-      if (penalty > 0) {
-        newMoney = Math.max(0, newMoney - penalty)
-        newReputation = Math.max(0, newReputation - 5) // Reputation hit for damages
-      }
-
-      // Update ship location based on mini-game result
-      const updatedShips = selectedShip ? prev.ships.map(ship => {
-        if (ship.id === selectedShip.id) {
-          let baseLocation = ship.location.replace('-waiting', '').replace('-rescue', '').replace('-undocking', '')
-          
-          if (currentMiniGame === 'docking') {
-            return { 
-              ...ship, 
-              location: success ? `${baseLocation}-docked` : baseLocation 
-            }
-          } else if (currentMiniGame === 'rescue') {
-            return { 
-              ...ship, 
-              location: baseLocation 
-            }
-          } else if (currentMiniGame === 'undocking') {
-            // For undocking, if the ship is currently docked, we need to handle it differently
-            if (baseLocation.endsWith('-docked')) {
-              const portLocation = baseLocation.replace('-docked', '')
-              const newLocation = success ? portLocation : baseLocation
-              return { 
-                ...ship, 
-                location: newLocation
-              }
-            } else {
-              const newLocation = success ? baseLocation : `${baseLocation}-docked`
-              return { 
-                ...ship, 
-                location: newLocation
-              }
-            }
-          }
-        }
-        return ship
-      }) : prev.ships
+      const updatedShips = selectedShip 
+        ? prev.ships.map(ship => 
+            ship.id === selectedShip.id 
+              ? updateShipLocationAfterMiniGame(ship, success)
+              : ship
+          )
+        : prev.ships
 
       return {
         ...prev,

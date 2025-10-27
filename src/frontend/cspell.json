@@ -2,7 +2,10 @@
   "version": "0.2",
   "language": "en",
   "words": [
+    "fireflower",
     "githubusercontent",
+    "goomba",
+    "koopa",
     "mkdirp",
     "nocheck",
     "precached",
@@ -17,5 +20,8 @@
     "vsmarketplacebadge",
     "wasd"
   ],
-  "ignorePaths": ["node_modules/**", "*.lock"]
+  "ignorePaths": [
+    "node_modules/**",
+    "*.lock"
+  ]
 }

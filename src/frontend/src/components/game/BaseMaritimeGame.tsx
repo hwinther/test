@@ -35,6 +35,11 @@ interface BaseGameProps {
 
 /**
  * Base game component for both docking and undocking
+ * @param {object} root0 - The component props
+ * @param {BaseGameProps['gameType']} root0.gameType - The type of game (docking or undocking)
+ * @param {BaseGameProps['onComplete']} root0.onComplete - Callback function called when game completes
+ * @param {BaseGameProps['ship']} root0.ship - The ship object containing ship properties
+ * @returns {JSX.Element} The rendered maritime game component
  */
 export function BaseMaritimeGame({ gameType, onComplete, ship }: BaseGameProps): JSX.Element {
   const completionRef = useRef(false)
@@ -279,6 +284,11 @@ export function BaseMaritimeGame({ gameType, onComplete, ship }: BaseGameProps):
   )
 }
 
+/**
+ * Creates the initial game state based on the game type
+ * @param {('docking' | 'undocking')} gameType - The type of game to initialize
+ * @returns {BaseGameState} The initial game state object
+ */
 function getInitialGameState(gameType: 'docking' | 'undocking'): BaseGameState {
   const commonObstacles: GameObstacle[] = [
     // Harbor entrance walls (create a channel)

@@ -12,10 +12,10 @@ interface UndockingGameProps {
 
 /**
  * Undocking game component - wrapper around BaseMaritimeGame
- * @param props The component props
- * @param props.onComplete Callback function called when undocking completes
- * @param props.onExit Callback function called when exiting the game
- * @param props.ship The ship object being used
+ * @param {UndockingGameProps} props The component props
+ * @param {(success: boolean, bonus: number, penalty?: number) => void} props.onComplete Callback function called when undocking completes
+ * @param {() => void} props.onExit Callback function called when exiting the game
+ * @param {Ship | undefined} props.ship The ship object being used
  * @returns {JSX.Element} JSX element for the undocking game
  */
 function UndockingGame({ onComplete, onExit, ship }: UndockingGameProps): JSX.Element {
