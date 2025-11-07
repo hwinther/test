@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Q&A Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .chat-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #fafafa;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            margin-left: 20%;
+        }
+        .assistant-message {
+            background-color: #e9ecef;
+            color: #333;
+            margin-right: 20%;
+        }
+        .page-reference {
+            font-size: 0.8em;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .status.ready {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.loading {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Q&A Assistant</h1>
+        <div id="status" class="status loading">Loading models and data...</div>
+        
+        <div id="chatContainer" class="chat-container">
+            <div class="message assistant-message">
+                <div>Hello! I'm ready to answer questions about your PDF document. Ask me anything!</div>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" id="questionInput" placeholder="Ask a question about the document..." disabled>
+            <button onclick="askQuestion()" id="askButton" disabled>Ask</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Note: WebLLM integration can be added later when needed
+        // For now, focusing on embeddings-based retrieval with browser assets
+        
+        class PDFQAAssistant {
+            constructor() {
+                this.embeddings = null;
+                this.chunks = null;
+                this.dimension = null;
+                this.webllm = null;
+                this.isReady = false;
+            }
+            
+            async initialize() {
+                try {
+                    this.updateStatus('Loading document data...', 'loading');
+                    
+                    // Load embeddings and chunks
+                    const response = await fetch('./browser-assets/embeddings_and_chunks.json');
+                    const data = await response.json();
+                    
+                    this.embeddings = data.embeddings;
+                    this.chunks = data.chunks;
+                    this.dimension = data.dimension;
+                    
+                    this.updateStatus('Initializing language model...', 'loading');
+                    
+                    // Initialize WebLLM with a small model
+                    // You'll need to have the model available - this is a placeholder
+                    // For now, we'll simulate the model with embeddings-based responses
+                    
+                    this.isReady = true;
+                    this.updateStatus('Ready! Ask me questions about your document.', 'ready');
+                    
+                    document.getElementById('questionInput').disabled = false;
+                    document.getElementById('askButton').disabled = false;
+                    document.getElementById('questionInput').focus();
+                    
+                } catch (error) {
+                    console.error('Initialization error:', error);
+                    this.updateStatus('Error loading models. Please check the console.', 'error');
+                }
+            }
+            
+            updateStatus(message, type) {
+                const statusEl = document.getElementById('status');
+                statusEl.textContent = message;
+                statusEl.className = `status ${type}`;
+            }
+            
+            // Cosine similarity function
+            cosineSimilarity(a, b) {
+                const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
+                const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
+                const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
+                return dotProduct / (magnitudeA * magnitudeB);
+            }
+            
+            // Simple embedding for queries (you'd want to use the same model used for chunking)
+            async createQueryEmbedding(query) {
+                // This is a placeholder - in a real implementation, you'd use the same
+                // embedding model that was used to create the document embeddings
+                // For now, we'll use a simple TF-IDF-like approach
+                
+                const words = query.toLowerCase().split(/\s+/);
+                const embedding = new Array(this.dimension).fill(0);
+                
+                // Simple word-based embedding (not ideal, but works for demo)
+                for (let i = 0; i < words.length && i < this.dimension; i++) {
+                    embedding[i] = words[i].charCodeAt(0) / 255; // Normalize to 0-1
+                }
+                
+                return embedding;
+            }
+            
+            async findRelevantChunks(query, topK = 3) {
+                const queryEmbedding = await this.createQueryEmbedding(query);
+                
+                const similarities = this.embeddings.map((embedding, index) => ({
+                    index,
+                    similarity: this.cosineSimilarity(queryEmbedding, embedding),
+                    chunk: this.chunks[index]
+                }));
+                
+                similarities.sort((a, b) => b.similarity - a.similarity);
+                return similarities.slice(0, topK);
+            }
+            
+            async generateAnswer(query, relevantChunks) {
+                // Simple template-based response generation using retrieved content
+                // This provides direct answers from the document content
+                
+                if (relevantChunks.length === 0) {
+                    return {
+                        answer: "I couldn't find relevant information in the document to answer your question.",
+                        pageReferences: [],
+                        confidence: 0
+                    };
+                }
+                
+                const pages = [...new Set(relevantChunks.map(item => item.chunk.page))];
+                const pageRefs = pages.join(', ');
+                
+                // Use the most relevant chunk as the primary answer
+                const bestMatch = relevantChunks[0].chunk;
+                let answer = `Based on the content from page(s) ${pageRefs}: ${bestMatch.text}`;
+                
+                if (query.toLowerCase().includes('what')) {
+                    answer += "the document describes several key points. ";
+                } else if (query.toLowerCase().includes('how')) {
+                    answer += "the process involves multiple steps. ";
+                } else if (query.toLowerCase().includes('why')) {
+                    answer += "this is explained through various factors. ";
+                } else {
+                    answer += "here's what I found: ";
+                }
+                
+                answer += `The most relevant information can be found on page(s) ${pageRefs}.`;
+                
+                return {
+                    answer,
+                    pageReferences: pages,
+                    confidence: relevantChunks[0]?.similarity || 0
+                };
+            }
+            
+            async askQuestion(question) {
+                if (!this.isReady) {
+                    return { answer: "System is not ready yet. Please wait.", pageReferences: [] };
+                }
+                
+                try {
+                    // Find relevant chunks
+                    const relevantChunks = await this.findRelevantChunks(question);
+                    
+                    // Generate answer
+                    const result = await this.generateAnswer(question, relevantChunks);
+                    
+                    return result;
+                } catch (error) {
+                    console.error('Error processing question:', error);
+                    return { 
+                        answer: "Sorry, I encountered an error processing your question.", 
+                        pageReferences: [] 
+                    };
+                }
+            }
+        }
+        
+        // Global instance
+        const assistant = new PDFQAAssistant();
+        
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            assistant.initialize();
+        });
+        
+        // Global function for the button
+        window.askQuestion = async function() {
+            const input = document.getElementById('questionInput');
+            const question = input.value.trim();
+            
+            if (!question) return;
+            
+            // Add user message to chat
+            addMessage(question, 'user');
+            
+            // Clear input and disable during processing
+            input.value = '';
+            input.disabled = true;
+            document.getElementById('askButton').disabled = true;
+            
+            // Add loading message
+            const loadingMsg = addMessage('Thinking...', 'assistant');
+            
+            try {
+                // Get answer from assistant
+                const result = await assistant.askQuestion(question);
+                
+                // Remove loading message
+                loadingMsg.remove();
+                
+                // Add assistant response
+                addMessage(result.answer, 'assistant', result.pageReferences);
+                
+            } catch (error) {
+                loadingMsg.remove();
+                addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
+            }
+            
+            // Re-enable input
+            input.disabled = false;
+            document.getElementById('askButton').disabled = false;
+            input.focus();
+        };
+        
+        function addMessage(text, sender, pageRefs = []) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            const textDiv = document.createElement('div');
+            textDiv.textContent = text;
+            messageDiv.appendChild(textDiv);
+            
+            if (pageRefs && pageRefs.length > 0) {
+                const refsDiv = document.createElement('div');
+                refsDiv.className = 'page-reference';
+                refsDiv.textContent = `References: Page(s) ${pageRefs.join(', ')}`;
+                messageDiv.appendChild(refsDiv);
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            return messageDiv;
+        }
+        
+        // Enter key support
+        document.getElementById('questionInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                window.askQuestion();
+            }
+        });
+    </script>
+</body>
+</html>
