@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Norwegian Legal Document Q&A</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .search-tips {
+            background-color: #e9ecef;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .search-tips h3 {
+            margin-top: 0;
+        }
+        .quick-searches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .quick-search-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .quick-search-btn:hover {
+            background-color: #5a6268;
+        }
+        .chat-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #fafafa;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            margin-left: 20%;
+        }
+        .assistant-message {
+            background-color: #e9ecef;
+            color: #333;
+            margin-right: 20%;
+        }
+        .chunk-metadata {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+            border-top: 1px solid #ddd;
+            padding-top: 5px;
+        }
+        .chunk-type {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            margin-right: 5px;
+        }
+        .section-ref {
+            background-color: #28a745;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.7em;
+            margin-right: 3px;
+        }
+        .keywords {
+            color: #6c757d;
+            font-style: italic;
+        }
+        .confidence-score {
+            float: right;
+            background-color: #ffc107;
+            color: #212529;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.7em;
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .status.ready {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.loading {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Stortingets Forretningsorden - Q&A System</h1>
+        
+        <div class="search-tips">
+            <h3>Søketips / Search Tips</h3>
+            <ul>
+                <li><strong>Paragrafkeferanser:</strong> Søk etter "§ 35" eller "paragraf 35"</li>
+                <li><strong>Emner:</strong> "votering", "komité", "fremmøte", "debatt"</li>
+                <li><strong>Prosedyrer:</strong> "avstemming", "møteledelse", "sakgang"</li>
+                <li><strong>Roller:</strong> "president", "representant", "opposisjon"</li>
+            </ul>
+        </div>
+        
+        <div class="quick-searches">
+            <button class="quick-search-btn" onclick="quickSearch('§ 35')">§ 35</button>
+            <button class="quick-search-btn" onclick="quickSearch('votering')">Votering</button>
+            <button class="quick-search-btn" onclick="quickSearch('komité')">Komité</button>
+            <button class="quick-search-btn" onclick="quickSearch('fremmøte')">Fremmøte</button>
+            <button class="quick-search-btn" onclick="quickSearch('Stortingspresident')">President</button>
+            <button class="quick-search-btn" onclick="quickSearch('debatt')">Debatt</button>
+        </div>
+        
+        <div id="status" class="status loading">Laster dokumentdata...</div>
+        
+        <div id="chatContainer" class="chat-container">
+            <div class="message assistant-message">
+                <div>Hei! Jeg er klar til å svare på spørsmål om Stortingets forretningsorden. Spør meg om paragrafer, prosedyrer, eller bruk hurtigsøkene over.</div>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" id="questionInput" placeholder="Spør om paragrafer, prosedyrer, eller emner i forretningsordenen..." disabled>
+            <button onclick="askQuestion()" id="askButton" disabled>Spør</button>
+        </div>
+    </div>
+
+    <script>
+        class EnhancedNorwegianQA {
+            constructor() {
+                this.chunks = null;
+                this.embeddings = null;
+                this.dimension = null;
+                this.isReady = false;
+            }
+            
+            async initialize() {
+                try {
+                    this.updateStatus('Laster dokumentdata...', 'loading');
+                    
+                    const response = await fetch('./browser-assets/embeddings_and_chunks.json');
+                    if (!response.ok) {
+                        throw new Error(`Failed to load: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    this.embeddings = data.embeddings;
+                    this.chunks = data.chunks;
+                    this.dimension = data.dimension;
+                    
+                    this.isReady = true;
+                    this.updateStatus('Klar! Spør om Stortingets forretningsorden.', 'ready');
+                    
+                    document.getElementById('questionInput').disabled = false;
+                    document.getElementById('askButton').disabled = false;
+                    document.getElementById('questionInput').focus();
+                    
+                    console.log(`Loaded ${this.chunks.length} chunks from document`);
+                    
+                } catch (error) {
+                    console.error('Initialization error:', error);
+                    this.updateStatus('Feil ved lasting av dokumentdata. Sjekk at improved_create_embeddings.py er kjørt.', 'error');
+                }
+            }
+            
+            updateStatus(message, type) {
+                const statusEl = document.getElementById('status');
+                statusEl.textContent = message;
+                statusEl.className = `status ${type}`;
+            }
+            
+            // Enhanced similarity calculation
+            cosineSimilarity(a, b) {
+                const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
+                const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
+                const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
+                return dotProduct / (magnitudeA * magnitudeB);
+            }
+            
+            // Enhanced query processing for Norwegian
+            enhanceQuery(query) {
+                let enhanced = query.toLowerCase();
+                
+                // Normalize Norwegian terms
+                const replacements = {
+                    'paragraf': '§',
+                    'avsnitt': '§',
+                    'stemme': 'votering',
+                    'avstemming': 'votering',
+                    'møteleder': 'president',
+                    'fravær': 'fremmøte'
+                };
+                
+                for (const [from, to] of Object.entries(replacements)) {
+                    enhanced = enhanced.replace(new RegExp(from, 'g'), to);
+                }
+                
+                return enhanced;
+            }
+            
+            // Search specifically for section references
+            searchBySection(query) {
+                const sectionMatch = query.match(/§\s*(\d+)/);
+                if (!sectionMatch) return [];
+                
+                const sectionNum = sectionMatch[1];
+                const results = [];
+                
+                for (let i = 0; i < this.chunks.length; i++) {
+                    const chunk = this.chunks[i];
+                    const sectionNumbers = chunk.section_numbers || [];
+                    
+                    // Check for exact section match
+                    if (sectionNumbers.some(sec => sec.includes(sectionNum))) {
+                        results.push({
+                            index: i,
+                            similarity: 1.0,
+                            chunk: chunk,
+                            matchType: 'exact_section'
+                        });
+                    } else if (chunk.text.includes(`§ ${sectionNum}`) || chunk.text.includes(`§${sectionNum}`)) {
+                        results.push({
+                            index: i,
+                            similarity: 0.9,
+                            chunk: chunk,
+                            matchType: 'text_section'
+                        });
+                    }
+                }
+                
+                return results;
+            }
+            
+            async findRelevantChunks(query, topK = 5) {
+                // First try section-specific search
+                const sectionResults = this.searchBySection(query);
+                if (sectionResults.length > 0) {
+                    return sectionResults.slice(0, topK);
+                }
+                
+                // Enhance query for better semantic search
+                const enhancedQuery = this.enhanceQuery(query);
+                
+                // Create a simple embedding for the query (this is simplified)
+                // In a real implementation, you'd use the same model as server-side
+                const queryWords = enhancedQuery.split(/\s+/);
+                const queryEmbedding = new Array(this.dimension).fill(0);
+                
+                // Simple word-based embedding simulation
+                for (let i = 0; i < Math.min(queryWords.length, this.dimension); i++) {
+                    queryEmbedding[i] = queryWords[i].charCodeAt(0) / 255;
+                }
+                
+                // Calculate similarities with importance weighting
+                const similarities = this.embeddings.map((embedding, index) => {
+                    const chunk = this.chunks[index];
+                    const baseSimilarity = this.cosineSimilarity(queryEmbedding, embedding);
+                    
+                    // Apply importance score and keyword matching
+                    let adjustedScore = baseSimilarity * (chunk.importance_score || 1.0);
+                    
+                    // Boost for keyword matches
+                    const keywords = chunk.keywords || [];
+                    const queryLower = query.toLowerCase();
+                    const keywordMatches = keywords.filter(kw => queryLower.includes(kw)).length;
+                    adjustedScore += keywordMatches * 0.1;
+                    
+                    // Boost for chunk type relevance
+                    if (chunk.chunk_type === 'section' && (query.includes('§') || query.includes('paragraf'))) {
+                        adjustedScore += 0.2;
+                    }
+                    
+                    return {
+                        index,
+                        similarity: adjustedScore,
+                        chunk: chunk,
+                        matchType: 'semantic'
+                    };
+                });
+                
+                similarities.sort((a, b) => b.similarity - a.similarity);
+                return similarities.slice(0, topK);
+            }
+            
+            generateAnswer(query, relevantChunks) {
+                if (relevantChunks.length === 0) {
+                    return {
+                        answer: "Jeg fant ikke relevant informasjon om dette emnet i forretningsordenen. Prøv andre søkeord eller se hurtigsøkene.",
+                        chunks: []
+                    };
+                }
+                
+                const bestMatch = relevantChunks[0];
+                let answer = "";
+                
+                if (bestMatch.matchType === 'exact_section') {
+                    answer = `Basert på ${bestMatch.chunk.section_numbers?.join(', ') || 'den relevante paragrafen'}:\n\n${bestMatch.chunk.text}`;
+                } else {
+                    const pages = [...new Set(relevantChunks.map(item => item.chunk.page))];
+                    answer = `Basert på side ${pages.join(', ')} i forretningsordenen:\n\n${bestMatch.chunk.text}`;
+                }
+                
+                return {
+                    answer: answer,
+                    chunks: relevantChunks.slice(0, 3) // Return top 3 for display
+                };
+            }
+            
+            async askQuestion(question) {
+                if (!this.isReady) {
+                    return { answer: "Systemet er ikke klart ennå. Vennligst vent.", chunks: [] };
+                }
+                
+                try {
+                    const relevantChunks = await this.findRelevantChunks(question, 5);
+                    return this.generateAnswer(question, relevantChunks);
+                } catch (error) {
+                    console.error('Error processing question:', error);
+                    return { answer: "Beklager, det oppstod en feil. Prøv igjen.", chunks: [] };
+                }
+            }
+        }
+        
+        // Global instance
+        const assistant = new EnhancedNorwegianQA();
+        
+        // Global functions
+        window.quickSearch = function(searchTerm) {
+            document.getElementById('questionInput').value = searchTerm;
+            askQuestion();
+        };
+        
+        window.askQuestion = async function() {
+            const input = document.getElementById('questionInput');
+            const question = input.value.trim();
+            
+            if (!question) return;
+            
+            addMessage(question, 'user');
+            input.value = '';
+            input.disabled = true;
+            document.getElementById('askButton').disabled = true;
+            
+            const loadingMsg = addMessage('Søker...', 'assistant');
+            
+            try {
+                const result = await assistant.askQuestion(question);
+                loadingMsg.remove();
+                addMessage(result.answer, 'assistant', result.chunks);
+            } catch (error) {
+                loadingMsg.remove();
+                addMessage('Beklager, det oppstod en feil. Prøv igjen.', 'assistant');
+                console.error('Error:', error);
+            }
+            
+            input.disabled = false;
+            document.getElementById('askButton').disabled = false;
+            input.focus();
+        };
+        
+        function addMessage(text, sender, chunks = []) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            const textDiv = document.createElement('div');
+            textDiv.style.whiteSpace = 'pre-wrap';
+            textDiv.textContent = text;
+            messageDiv.appendChild(textDiv);
+            
+            // Add chunk metadata for assistant messages
+            if (sender === 'assistant' && chunks && chunks.length > 0) {
+                chunks.forEach((chunkData, index) => {
+                    const chunk = chunkData.chunk;
+                    const metadataDiv = document.createElement('div');
+                    metadataDiv.className = 'chunk-metadata';
+                    
+                    let metadataHTML = `
+                        <span class="confidence-score">${(chunkData.similarity * 100).toFixed(1)}%</span>
+                        <span class="chunk-type">${chunk.chunk_type || 'regular'}</span>
+                        Side ${chunk.page}
+                    `;
+                    
+                    if (chunk.section_numbers && chunk.section_numbers.length > 0) {
+                        metadataHTML += ' ' + chunk.section_numbers.map(sec => 
+                            `<span class="section-ref">${sec}</span>`
+                        ).join(' ');
+                    }
+                    
+                    if (chunk.keywords && chunk.keywords.length > 0) {
+                        metadataHTML += `<br><span class="keywords">Nøkkelord: ${chunk.keywords.join(', ')}</span>`;
+                    }
+                    
+                    metadataDiv.innerHTML = metadataHTML;
+                    messageDiv.appendChild(metadataDiv);
+                });
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            return messageDiv;
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            assistant.initialize();
+        });
+        
+        // Enter key support
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('questionInput')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    askQuestion();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

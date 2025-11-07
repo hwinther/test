@@ -1,0 +1,36 @@
+{
+  "name": "pdf-qa-training",
+  "version": "1.0.0",
+  "description": "Train a small model for PDF Q&A that runs in the browser",
+  "main": "index.js",
+  "scripts": {
+    "setup": "python -m venv venv && call venv\\Scripts\\activate.bat && pip install -r requirements.txt",
+    "setup-unix": "python -m venv venv && source venv/bin/activate && pip install -r requirements.txt",
+    "activate": "call venv\\Scripts\\activate.bat",
+    "activate-unix": "source venv/bin/activate",
+    "install-deps": "pip install -r requirements.txt",
+    "process-pdf": "python pdf-processing/process_pdf.py",
+    "create-embeddings": "python rag-approach/create_embeddings.py",
+    "train-model": "python fine-tuning/train_small_model.py",
+    "serve": "python -m http.server 8000 -d web-interface",
+    "serve-dev": "cd web-interface && npm install && npm run dev",
+    "build-web": "cd web-interface && npm install && npm run build",
+    "setup-norwegian": "python setup_norwegian_legal.py",
+    "build": "echo 'Build process - copy assets and optimize for production'"
+  },
+  "dependencies": {
+    "@mlc-ai/web-llm": "^0.2.46"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "keywords": [
+    "pdf",
+    "qa",
+    "machine-learning",
+    "browser",
+    "webassembly"
+  ],
+  "author": "",
+  "license": "MIT"
+}
