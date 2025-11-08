@@ -1,18 +1,37 @@
-import type { Ship } from './types'
+import type { GameState, Ship } from './types'
+
 import { getLocationSuffix, getMiniGameType, getShipCapacity, getShipCost, getShipSpeed } from './shipUtils'
 
-export function createShipActionHandlers(
-  gameState: any,
-  updateShip: (shipId: string, updater: (ship: Ship) => Ship) => void,
-  spendMoney: (amount: number) => boolean,
-  addMoney: (amount: number) => void,
-  addShip: (ship: Ship) => void,
-  removeShip: (shipId: string) => void,
-  setSelectedShip: (ship: Ship | null) => void,
-  setCurrentMiniGame: (game: 'docking' | 'rescue' | 'undocking' | null) => void,
-  setTravelingShip: (ship: Ship | null) => void,
-  setShowWorldMap: (show: boolean) => void,
-) {
+interface ShipActionHandlerOptions {
+  addMoney: (amount: number) => void
+  addShip: (ship: Ship) => void
+  gameState: GameState
+  removeShip: (shipId: string) => void
+  setCurrentMiniGame: (game: 'docking' | 'rescue' | 'undocking' | null) => void
+  setSelectedShip: (ship: null | Ship) => void
+  setShowWorldMap: (show: boolean) => void
+  setTravelingShip: (ship: null | Ship) => void
+  spendMoney: (amount: number) => boolean
+  updateShip: (shipId: string, updater: (ship: Ship) => Ship) => void
+}
+
+/**
+ * Creates ship action handlers for managing ship operations like docking, undocking, and rescue operations
+ * @param {ShipActionHandlerOptions} options - Configuration options for ship action handlers
+ * @returns {object} Object containing ship action handler functions
+ */
+export function createShipActionHandlers({
+  addMoney,
+  addShip,
+  gameState,
+  removeShip,
+  setCurrentMiniGame,
+  setSelectedShip,
+  setShowWorldMap,
+  setTravelingShip,
+  spendMoney,
+  updateShip,
+}: ShipActionHandlerOptions) {
   const handleShipAction = (shipId: string, action: 'dock' | 'rescue' | 'undock'): void => {
     const ship = gameState.ships.find((s: Ship) => s.id === shipId)
     if (!ship) return
@@ -83,11 +102,11 @@ export function createShipActionHandlers(
   }
 
   return {
+    addDevMoney,
+    buyShip,
     handleShipAction,
     handleTowingService,
     handleTravelToPort,
-    buyShip,
     sellShip,
-    addDevMoney,
   }
 }

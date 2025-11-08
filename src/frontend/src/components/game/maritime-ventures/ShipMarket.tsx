@@ -1,4 +1,5 @@
 import type { JSX } from 'react'
+
 import { getBestForText, getShipScale } from './shipUtils'
 
 interface ShipMarketProps {
@@ -7,11 +8,18 @@ interface ShipMarketProps {
 }
 
 const shipTypes = [
-  { type: 'cargo' as const, name: 'Cargo Ship', capacity: 1000, speed: 15, cost: 50000 },
-  { type: 'container' as const, name: 'Container Ship', capacity: 1500, speed: 18, cost: 80000 },
-  { type: 'tanker' as const, name: 'Tanker', capacity: 2000, speed: 12, cost: 120000 }
+  { capacity: 1000, cost: 50000, name: 'Cargo Ship', speed: 15, type: 'cargo' as const },
+  { capacity: 1500, cost: 80000, name: 'Container Ship', speed: 18, type: 'container' as const },
+  { capacity: 2000, cost: 120000, name: 'Tanker', speed: 12, type: 'tanker' as const }
 ]
 
+/**
+ * Component that displays the ship market where players can purchase new ships
+ * @param {ShipMarketProps} props - The component props
+ * @param {{ money: number }} props.gameState - Current game state with player's money
+ * @param {(shipType: 'cargo' | 'container' | 'tanker') => void} props.onBuyShip - Callback function to purchase a ship
+ * @returns {JSX.Element} JSX element rendering the ship market interface
+ */
 export function ShipMarket({ gameState, onBuyShip }: ShipMarketProps): JSX.Element {
   return (
     <div className="ship-market">

@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+
 import type { GameState, Ship } from './types'
 
 const INITIAL_SHIPS = [
@@ -14,6 +15,10 @@ const INITIAL_SHIPS = [
   },
 ]
 
+/**
+ * Custom hook for managing the main game state in the maritime ventures game
+ * @returns {object} Object containing game state and state management functions
+ */
 export function useGameState() {
   const [gameState, setGameState] = useState<GameState>({
     completedJobs: 0,
@@ -92,15 +97,15 @@ export function useGameState() {
   }, [])
 
   return {
-    gameState,
-    updateGameState,
     addMoney,
-    spendMoney,
-    updateShip,
     addShip,
-    removeShip,
     completeJobs,
-    updateReputation,
+    gameState,
     incrementGameTime,
+    removeShip,
+    spendMoney,
+    updateGameState,
+    updateReputation,
+    updateShip,
   }
 }

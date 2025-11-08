@@ -1,4 +1,5 @@
 import type { JSX } from 'react'
+
 import type { Ship } from './types'
 
 const INITIAL_PORTS = [
@@ -10,13 +11,22 @@ const INITIAL_PORTS = [
 ]
 
 interface WorldMapProps {
-  readonly travelingShip: Ship
   readonly gameState: { money: number }
-  readonly onPortSelection: (portId: string) => void
   readonly onClose: () => void
+  readonly onPortSelection: (portId: string) => void
+  readonly travelingShip: Ship
 }
 
-export function WorldMap({ travelingShip, gameState, onPortSelection, onClose }: WorldMapProps): JSX.Element {
+/**
+ * Component that displays a world map for selecting ship destinations
+ * @param {WorldMapProps} props - The component props
+ * @param {{ money: number }} props.gameState - Current game state with player's money
+ * @param {() => void} props.onClose - Callback function to close the world map
+ * @param {(portId: string) => void} props.onPortSelection - Callback function when a port is selected
+ * @param {Ship} props.travelingShip - The ship that will travel to the selected destination
+ * @returns {JSX.Element} JSX element rendering the world map interface
+ */
+export function WorldMap({ gameState, onClose, onPortSelection, travelingShip }: WorldMapProps): JSX.Element {
   return (
     <div className="world-map-overlay">
       <div className="world-map">

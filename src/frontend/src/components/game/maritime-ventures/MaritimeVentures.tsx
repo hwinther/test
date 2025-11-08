@@ -6,13 +6,13 @@ import type { Port, Ship } from './types'
 import { AvailableCargo } from './AvailableCargo'
 import { DockingGame } from './DockingGame'
 import { RescueGame } from './RescueGame'
-import { ShipMarket } from './ShipMarket'
-import UndockingGame from './UndockingGame'
-import { WorldMap } from './WorldMap'
 import { createShipActionHandlers } from './shipActionHandlers'
+import { ShipMarket } from './ShipMarket'
 import { canAcceptCargo, getBestForText, getLocationDisplay, getShipCargoWeight, getShipRemainingCapacity, getShipScale } from './shipUtils'
+import UndockingGame from './UndockingGame'
 import { useCargoManagement } from './useCargoManagement'
 import { useGameState } from './useGameState'
+import { WorldMap } from './WorldMap'
 import './MaritimeVentures.css'
 
 const INITIAL_PORTS: Port[] = [
@@ -35,15 +35,15 @@ interface MaritimeVenturesProps {
 export function MaritimeVentures({ onClose }: MaritimeVenturesProps): JSX.Element {
   // Game state management
   const {
-    gameState,
     addMoney,
-    spendMoney,
-    updateShip,
     addShip,
-    removeShip,
     completeJobs,
+    gameState,
+    incrementGameTime,
+    removeShip,
+    spendMoney,
     updateReputation,
-    incrementGameTime
+    updateShip
   } = useGameState()
 
   // Cargo management
@@ -58,24 +58,24 @@ export function MaritimeVentures({ onClose }: MaritimeVenturesProps): JSX.Elemen
 
   // Ship action handlers
   const {
+    addDevMoney,
+    buyShip,
     handleShipAction,
     handleTowingService,
     handleTravelToPort,
-    buyShip,
-    sellShip,
-    addDevMoney
-  } = createShipActionHandlers(
-    gameState,
-    updateShip,
-    spendMoney,
+    sellShip
+  } = createShipActionHandlers({
     addMoney,
     addShip,
+    gameState,
     removeShip,
-    setSelectedShip,
     setCurrentMiniGame,
+    setSelectedShip,
+    setShowWorldMap,
     setTravelingShip,
-    setShowWorldMap
-  )
+    spendMoney,
+    updateShip,
+  })
 
   // Port selection handler for world map
   const handlePortSelection = (portId: string): void => {
@@ -198,13 +198,13 @@ export function MaritimeVentures({ onClose }: MaritimeVenturesProps): JSX.Elemen
   if (showWorldMap && travelingShip) {
     return (
       <WorldMap
-        travelingShip={travelingShip}
         gameState={gameState}
-        onPortSelection={handlePortSelection}
         onClose={() => {
           setShowWorldMap(false)
           setTravelingShip(null)
         }}
+        onPortSelection={handlePortSelection}
+        travelingShip={travelingShip}
       />
     )
   }

@@ -1,5 +1,7 @@
 import type { JSX } from 'react'
+
 import type { Cargo, Ship } from './types'
+
 import { canAcceptCargo, getShipRemainingCapacity } from './shipUtils'
 
 const INITIAL_PORTS = [
@@ -16,33 +18,14 @@ interface AvailableCargoProps {
   readonly onAcceptCargo: (cargoId: string, shipId: string) => void
 }
 
-function getUnavailabilityReason(
-  cargo: Cargo, 
-  shipsAtPort: Ship[], 
-  shipsAtOrigin: Ship[], 
-  availableShips: Ship[]
-): string {
-  const origin = INITIAL_PORTS.find(p => p.id === cargo.origin)
-  
-  if (shipsAtPort.length === 0) {
-    if (shipsAtOrigin.length === 0) {
-      return `No ships at ${origin?.name || cargo.origin}`
-    } else {
-      const dockedCount = shipsAtOrigin.filter(s => s.location === `${cargo.origin}-docked`).length
-      const sailingCount = shipsAtOrigin.filter(s => s.location === cargo.origin).length
-      if (sailingCount > 0 && dockedCount === 0) {
-        return `${sailingCount} ship${sailingCount > 1 ? 's' : ''} at ${origin?.name || cargo.origin} but not docked`
-      } else {
-        return `No suitable ships available at ${origin?.name || cargo.origin}`
-      }
-    }
-  } else if (availableShips.length === 0) {
-    return `Ships at port but insufficient capacity for ${cargo.weight}t cargo`
-  }
-  
-  return ""
-}
-
+/**
+ * Component that displays available cargo jobs and allows players to assign them to ships
+ * @param {AvailableCargoProps} props - The component props
+ * @param {Cargo[]} props.availableCargo - Array of available cargo to be transported
+ * @param {{ ships: Ship[] }} props.gameState - Current game state containing ships
+ * @param {(cargoId: string, shipId: string) => void} props.onAcceptCargo - Callback function to accept cargo assignment
+ * @returns {JSX.Element} JSX element rendering the available cargo interface
+ */
 export function AvailableCargo({ availableCargo, gameState, onAcceptCargo }: AvailableCargoProps): JSX.Element {
   return (
     <div className="available-cargo">
@@ -93,4 +76,39 @@ export function AvailableCargo({ availableCargo, gameState, onAcceptCargo }: Ava
       })}
     </div>
   )
+}
+
+/**
+ * Determines why a cargo cannot be accepted and returns an appropriate message
+ * @param {Cargo} cargo - The cargo being evaluated
+ * @param {Ship[]} shipsAtPort - Ships currently docked at the port
+ * @param {Ship[]} shipsAtOrigin - Ships at the origin location (docked or sailing)
+ * @param {Ship[]} availableShips - Ships that can accept the cargo
+ * @returns {string} Reason why the cargo cannot be accepted
+ */
+function getUnavailabilityReason(
+  cargo: Cargo, 
+  shipsAtPort: Ship[], 
+  shipsAtOrigin: Ship[], 
+  availableShips: Ship[]
+): string {
+  const origin = INITIAL_PORTS.find(p => p.id === cargo.origin)
+  
+  if (shipsAtPort.length === 0) {
+    if (shipsAtOrigin.length === 0) {
+      return `No ships at ${origin?.name || cargo.origin}`
+    } else {
+      const dockedCount = shipsAtOrigin.filter(s => s.location === `${cargo.origin}-docked`).length
+      const sailingCount = shipsAtOrigin.filter(s => s.location === cargo.origin).length
+      if (sailingCount > 0 && dockedCount === 0) {
+        return `${sailingCount} ship${sailingCount > 1 ? 's' : ''} at ${origin?.name || cargo.origin} but not docked`
+      } else {
+        return `No suitable ships available at ${origin?.name || cargo.origin}`
+      }
+    }
+  } else if (availableShips.length === 0) {
+    return `Ships at port but insufficient capacity for ${cargo.weight}t cargo`
+  }
+  
+  return ""
 }
