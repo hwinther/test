@@ -8,13 +8,13 @@
     "node": ">=24.0.0"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
+    "dev": "vike dev",
+    "build": "tsc && vike build",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "lint/fix": "eslint . --fix",
     "format/check": "prettier . --check",
     "format/fix": "prettier . --write",
-    "preview": "vite preview",
+    "preview": "vike preview",
     "orval": "orval --config ./orval.config.cjs",
     "test": "vitest",
     "test:ui": "vitest --ui",
