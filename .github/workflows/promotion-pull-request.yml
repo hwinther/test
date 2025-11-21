@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/test'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: main
 
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: test
 
@@ -147,7 +147,7 @@ jobs:
   #   runs-on: ubuntu-latest
   #   if: ${{ contains(github.ref, 'refs/heads/feature/') || contains(github.ref, 'refs/heads/bugfix/') }}
   #   steps:
-  #     - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v6
   #       with:
   #         ref: dev
 

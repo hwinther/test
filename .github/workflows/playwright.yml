@@ -46,7 +46,7 @@ jobs:
         working-directory: ${{ env.PLAYWRIGHT_PATH }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - uses: ./.github/actions/frontend-build
         with:
@@ -65,7 +65,7 @@ jobs:
     environment: ${{ inputs.deploy_target }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - uses: actions/setup-node@v6
         name: Setup node (npm)

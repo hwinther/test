@@ -12,7 +12,7 @@ jobs:
     if: ${{ github.event.pull_request.user.login != 'dependabot[bot]' }} # Disabled for dependabot due to security restrictions
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
 
