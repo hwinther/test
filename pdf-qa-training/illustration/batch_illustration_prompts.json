@@ -1,0 +1,182 @@
+{
+  "metadata": {
+    "total_prompts": 10,
+    "service_optimized_for": "dall_e",
+    "generated_from": "enhanced_illustration_prompts.json",
+    "description": "Norwegian Parliament procedure illustration prompts"
+  },
+  "prompts": [
+    {
+      "id": "illustration_001",
+      "section": "§ 1: Konstituering etter stortingsvalg",
+      "topic": "parliamentary_constitution",
+      "original_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 1: Konstituering etter stortingsvalg' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "optimized_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 1: Konstituering etter stortingsvalg' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "suggested_filename": "parliament-procedure-section-1-parliamentary-constitution.png",
+      "metadata": {
+        "chapter": "Chapter 1: Hvordan Stortinget konstituerer seg",
+        "word_count": 1454,
+        "key_actors": [
+          "new_parliamentarians",
+          "election_officials"
+        ],
+        "setting": "parliament_chamber"
+      }
+    },
+    {
+      "id": "illustration_002",
+      "section": "§ 2: Konstituering av følgende storting i samme",
+      "topic": "parliamentary_constitution",
+      "original_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 2: Konstituering av følgende storting i samme' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "optimized_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 2: Konstituering av følgende storting i samme' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "suggested_filename": "parliament-procedure-section-2-parliamentary-constitution.png",
+      "metadata": {
+        "chapter": "Chapter 1: Hvordan Stortinget konstituerer seg",
+        "word_count": 468,
+        "key_actors": [
+          "new_parliamentarians",
+          "election_officials"
+        ],
+        "setting": "parliament_chamber"
+      }
+    },
+    {
+      "id": "illustration_003",
+      "section": "§ 4: Representantenes plassering i stortingssalen 9",
+      "topic": "parliamentary_constitution",
+      "original_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 4: Representantenes plassering i stortingssalen 9' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "optimized_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 4: Representantenes plassering i stortingssalen 9' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "suggested_filename": "parliament-procedure-section-4-parliamentary-constitution.png",
+      "metadata": {
+        "chapter": "Chapter 1: Hvordan Stortinget konstituerer seg",
+        "word_count": 673,
+        "key_actors": [
+          "new_parliamentarians",
+          "election_officials"
+        ],
+        "setting": "parliament_chamber"
+      }
+    },
+    {
+      "id": "illustration_004",
+      "section": "§ 6: Valg av presidenter og sekretærer",
+      "topic": "parliamentary_constitution",
+      "original_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 6: Valg av presidenter og sekretærer' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "optimized_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 6: Valg av presidenter og sekretærer' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "suggested_filename": "parliament-procedure-section-6-parliamentary-constitution.png",
+      "metadata": {
+        "chapter": "Chapter 1: Hvordan Stortinget konstituerer seg",
+        "word_count": 776,
+        "key_actors": [
+          "new_parliamentarians",
+          "election_officials"
+        ],
+        "setting": "parliament_chamber"
+      }
+    },
+    {
+      "id": "illustration_005",
+      "section": "§ 8: Presidentens, visepresidenters eller",
+      "topic": "parliamentary_constitution",
+      "original_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 8: Presidentens, visepresidenters eller' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "optimized_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 8: Presidentens, visepresidenters eller' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "suggested_filename": "parliament-procedure-section-8-parliamentary-constitution.png",
+      "metadata": {
+        "chapter": "Chapter 1: Hvordan Stortinget konstituerer seg",
+        "word_count": 239,
+        "key_actors": [
+          "new_parliamentarians",
+          "election_officials"
+        ],
+        "setting": "parliament_chamber"
+      }
+    },
+    {
+      "id": "illustration_006",
+      "section": "§ 10: Valgkomiteen",
+      "topic": "parliamentary_constitution",
+      "original_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 10: Valgkomiteen' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "optimized_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 10: Valgkomiteen' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "suggested_filename": "parliament-procedure-section-10-parliamentary-constitution.png",
+      "metadata": {
+        "chapter": "Chapter 1: Hvordan Stortinget konstituerer seg",
+        "word_count": 1101,
+        "key_actors": [
+          "new_parliamentarians",
+          "election_officials"
+        ],
+        "setting": "parliament_chamber"
+      }
+    },
+    {
+      "id": "illustration_007",
+      "section": "§ 11: Stortingets faste komiteer",
+      "topic": "parliamentary_constitution",
+      "original_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 11: Stortingets faste komiteer' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "optimized_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 11: Stortingets faste komiteer' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "suggested_filename": "parliament-procedure-section-11-parliamentary-constitution.png",
+      "metadata": {
+        "chapter": "Chapter 1: Hvordan Stortinget konstituerer seg",
+        "word_count": 376,
+        "key_actors": [
+          "new_parliamentarians",
+          "election_officials"
+        ],
+        "setting": "parliament_chamber"
+      }
+    },
+    {
+      "id": "illustration_008",
+      "section": "§ 12: Stortingets fagkomiteer",
+      "topic": "parliamentary_leadership",
+      "original_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Depict the parliament president with a ceremonial gavel or speaker's hammer, sitting in an elevated chair. Show other members looking up respectfully, with some whispering among themselves. Focus on the speaker's area with the official podium and ceremonial elements of the parliament. This illustration specifically represents '§ 12: Stortingets fagkomiteer' from Norwegian parliamentary procedures. Show leadership and respect through posture and positioning, but maintain warmth in the expressions. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "optimized_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Depict the parliament president with a ceremonial gavel or speaker's hammer, sitting in an elevated chair. Show other members looking up respectfully, with some whispering among themselves. Focus on the speaker's area with the official podium and ceremonial elements of the parliament. This illustration specifically represents '§ 12: Stortingets fagkomiteer' from Norwegian parliamentary procedures. Show leadership and respect through posture and positioning, but maintain warmth in the expressions. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "suggested_filename": "parliament-procedure-section-12-parliamentary-leadership.png",
+      "metadata": {
+        "chapter": "Chapter 1: Hvordan Stortinget konstituerer seg",
+        "word_count": 313,
+        "key_actors": [
+          "parliament_president",
+          "vice_presidents",
+          "secretaries"
+        ],
+        "setting": "speakers_podium"
+      }
+    },
+    {
+      "id": "illustration_009",
+      "section": "§ 13: Sammensetning av fagkomiteene",
+      "topic": "parliamentary_constitution",
+      "original_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 13: Sammensetning av fagkomiteene' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "optimized_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Show new parliamentarians in formal attire being sworn in, with some looking nervous and others confident. Include ceremonial elements like official seals, flags, and documents being verified. Set in the main parliament chamber with its distinctive semicircular seating arrangement and elevated speaker's podium. This illustration specifically represents '§ 13: Sammensetning av fagkomiteene' from Norwegian parliamentary procedures. Use dignified colors and formal postures while keeping the cartoon style friendly and approachable. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "suggested_filename": "parliament-procedure-section-13-parliamentary-constitution.png",
+      "metadata": {
+        "chapter": "Chapter 1: Hvordan Stortinget konstituerer seg",
+        "word_count": 822,
+        "key_actors": [
+          "new_parliamentarians",
+          "election_officials"
+        ],
+        "setting": "parliament_chamber"
+      }
+    },
+    {
+      "id": "illustration_010",
+      "section": "§ 14: Saksfordelingen mellom fagkomiteene",
+      "topic": "parliamentary_leadership",
+      "original_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Depict the parliament president with a ceremonial gavel or speaker's hammer, sitting in an elevated chair. Show other members looking up respectfully, with some whispering among themselves. Focus on the speaker's area with the official podium and ceremonial elements of the parliament. Include these specific visual elements: EU_flag, Norway_flag, European_map. This illustration specifically represents '§ 14: Saksfordelingen mellom fagkomiteene' from Norwegian parliamentary procedures. Show leadership and respect through posture and positioning, but maintain warmth in the expressions. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "optimized_prompt": "Create a colorful cartoon illustration in the style of a friendly educational comic. Depict the parliament president with a ceremonial gavel or speaker's hammer, sitting in an elevated chair. Show other members looking up respectfully, with some whispering among themselves. Focus on the speaker's area with the official podium and ceremonial elements of the parliament. Include these specific visual elements: EU_flag, Norway_flag, European_map. This illustration specifically represents '§ 14: Saksfordelingen mellom fagkomiteene' from Norwegian parliamentary procedures. Show leadership and respect through posture and positioning, but maintain warmth in the expressions. Include Norwegian cultural elements such as the distinctive architecture of the Stortinget building, Norwegian flags, and make sure all politicians look like friendly, diverse cartoon characters representing modern Norwegian society. Use bright, engaging colors with a warm and educational tone. The style should be similar to educational comics or children's book illustrations that explain government to citizens. Make sure the illustration is informative yet entertaining, helping people understand democratic processes in an accessible way.",
+      "suggested_filename": "parliament-procedure-section-14-parliamentary-leadership.png",
+      "metadata": {
+        "chapter": "Chapter 1: Hvordan Stortinget konstituerer seg",
+        "word_count": 1262,
+        "key_actors": [
+          "parliament_president",
+          "vice_presidents",
+          "secretaries"
+        ],
+        "setting": "speakers_podium"
+      }
+    }
+  ]
+}

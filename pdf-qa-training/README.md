@@ -2,6 +2,17 @@
 
 This project demonstrates multiple approaches to create a Q&A system from a PDF document that can run in the browser.
 
+## New Feature: Illustration Prompts 🎨
+
+The `/illustration` directory contains a complete system for generating cartoon-style educational illustrations about Norwegian parliamentary procedures:
+
+- **76 detailed illustration prompts** for AI image generation
+- Content-aware prompts specific to each parliamentary section
+- Optimized for DALL-E, Midjourney, and Stable Diffusion
+- Educational cartoon style with Norwegian cultural elements
+
+**Quick Start**: Navigate to `/illustration` and open `README_ILLUSTRATIONS.md`
+
 ## Approaches
 
 ### 1. RAG (Retrieval-Augmented Generation) - Recommended
@@ -31,8 +42,24 @@ This project demonstrates multiple approaches to create a Q&A system from a PDF 
 
 ## File Structure
 
-- `pdf-processing/` - PDF text extraction and chunking
-- `rag-approach/` - Vector embeddings and retrieval
-- `fine-tuning/` - Model fine-tuning scripts
-- `web-interface/` - Browser-based Q&A interface
-- `models/` - Processed models and embeddings
+```
+pdf-qa-training/
+├── improved_chunks.json           # Processed PDF chunks (source data)
+├── pdf-processing/                # PDF text extraction and chunking
+├── rag-approach/                  # Vector embeddings and retrieval
+├── fine-tuning/                   # Model fine-tuning scripts
+├── web-interface/                 # Browser-based Q&A interface
+├── illustration/                  # 🎨 NEW: Cartoon illustration prompts
+│   ├── enhanced_illustration_prompts.json
+│   ├── batch_illustration_prompts.json
+│   ├── generate_enhanced_illustration_prompts.py
+│   └── README_ILLUSTRATIONS.md
+└── models/                        # Processed models and embeddings
+```
+
+The illustration system allows you to create educational cartoon images that explain Norwegian parliamentary procedures in an accessible, friendly way. Perfect for:
+
+- Educational materials and textbooks
+- Government communication
+- Civic education programs
+- Interactive learning applications
