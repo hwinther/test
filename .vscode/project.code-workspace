@@ -1,0 +1,59 @@
+{
+  "folders": [
+    {
+      "name": "ROOT",
+      "path": "../"
+    },
+    {
+      "name": "backend",
+      "path": "../src/backend"
+    },
+    {
+      "name": "frontend",
+      "path": "../src/frontend"
+    },
+    {
+      "name": "playwright",
+      "path": "../tests/playwright"
+    },
+    {
+      "name": "pdf-training",
+      "path": "../pdf-qa-training"
+    }
+  ],
+  "settings": {
+    "editor.formatOnType": false,
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file",
+    "files.autoSave": "onFocusChange", // optional but recommended
+    "explorer.fileNesting.enabled": true,
+    "files.exclude": {
+      "node_modules/": true,
+      "packages/": true
+    },
+    "eslint.format.enable": true,
+    "eslint.lintTask.enable": true,
+    "cSpell.words": [
+      "cobertura",
+      "dorny",
+      "endgroup",
+      "gkampitakis",
+      "hwinther",
+      "irongut",
+      "openapi",
+      "precached",
+      "sonarjs",
+      "tanstack",
+      "vitest",
+      "webapps"
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "orta.vscode-jest",
+      "streetsidesoftware.code-spell-checker"
+    ]
+  }
+}
