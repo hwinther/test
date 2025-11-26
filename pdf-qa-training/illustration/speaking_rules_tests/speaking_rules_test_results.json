@@ -1,0 +1,44 @@
+{
+  "professional_debate": {
+    "description": "Professional parliamentary debate photography",
+    "prompt": "Professional photograph of Norwegian parliament chamber during formal debate. Speaker at central podium addressing seated parliamentarians in formal business attire. Classical parliamentary architecture with wooden benches arranged in semicircle. Serious, dignified atmosphere of formal government proceedings.",
+    "negative": "cartoon, comic, anime, casual clothing, modern furniture, text, logos, watermarks, blurry, low quality",
+    "image_path": "speaking_rules_tests\\professional_debate_1763914144.png",
+    "success": true
+  },
+  "architectural_chamber": {
+    "description": "Architectural focus on chamber design",
+    "prompt": "Architectural interior photograph of Norwegian Stortinget parliament chamber. Focus on formal seating arrangement, speaker's podium, and classical government building architecture. Empty chamber showing formal parliamentary layout and traditional Norwegian government design elements.",
+    "negative": "people, cartoon, modern design, casual, text, signage, colorful, childish",
+    "image_path": "speaking_rules_tests\\architectural_chamber_1763914149.png",
+    "success": true
+  },
+  "formal_speaker_focus": {
+    "description": "Formal speaker at podium focus",
+    "prompt": "Professional portrait of parliamentarian speaking from official podium in Norwegian parliament. Formal government setting, traditional parliamentary architecture, speaker in business suit addressing chamber. Documentary style photography of formal government proceedings.",
+    "negative": "cartoon, casual, informal, modern, text, logos, comic style, bright colors",
+    "image_path": "speaking_rules_tests\\formal_speaker_focus_1763914154.png",
+    "success": true
+  },
+  "wide_chamber_view": {
+    "description": "Wide parliamentary chamber view",
+    "prompt": "Wide angle professional photograph of full Norwegian parliament chamber during formal session. Classical semicircular seating arrangement filled with parliamentarians in dark business suits. Traditional government architecture, formal parliamentary procedure in progress, dignified atmosphere.",
+    "negative": "cartoon, empty chamber, casual clothing, modern design, text, watermarks, comic style",
+    "image_path": "speaking_rules_tests\\wide_chamber_view_1763914159.png",
+    "success": true
+  },
+  "procedural_diagram": {
+    "description": "Educational procedural diagram",
+    "prompt": "Clean educational diagram showing Norwegian parliamentary speaking procedures. Professional infographic style showing formal chamber layout, speaker positions, and procedural flow. Technical illustration for government education, clean lines, professional color scheme.",
+    "negative": "cartoon, people, photographs, decorative, childish, bright colors, text overlays",
+    "image_path": "speaking_rules_tests\\procedural_diagram_1763914164.png",
+    "success": true
+  },
+  "documentary_style": {
+    "description": "Documentary parliamentary photography",
+    "prompt": "Documentary style photograph of Norwegian parliament in session. Natural lighting, authentic government proceedings, parliamentarians engaged in formal debate. Photojournalistic approach to parliamentary procedure, serious and professional tone.",
+    "negative": "staged, cartoon, comic, artificial lighting, casual, text, logos, comic book style",
+    "image_path": "speaking_rules_tests\\documentary_style_1763914168.png",
+    "success": true
+  }
+}

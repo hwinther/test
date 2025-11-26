@@ -142,7 +142,9 @@ poorly drawn, amateur, sketch, draft
             "restore_faces": False,
             "tiling": False,
             "do_not_save_samples": True,
-            "do_not_save_grid": True
+            "do_not_save_grid": True,
+            "enable_hr": False,  # Disable high-res to prevent WebUI errors
+            "hr_additional_modules": []  # Explicitly set to prevent None errors
         }
         
         try:
@@ -260,7 +262,7 @@ poorly drawn, amateur, sketch, draft
         with open(metadata_file, 'w', encoding='utf-8') as f:
             json.dump(metadata, f, indent=2, ensure_ascii=False)
         
-        print(f"\n✨ Batch generation complete!")
+        print("\n✨ Batch generation complete!")
         print(f"   Generated: {len(generated_files)} images")
         print(f"   Metadata saved: {metadata_file}")
         

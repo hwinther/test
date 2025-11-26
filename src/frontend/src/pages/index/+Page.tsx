@@ -6,6 +6,7 @@ import { useVersion } from '~/api/endpoints/service/service'
 import { useGetWeatherForecast } from '~/api/endpoints/weather-forecast/weather-forecast'
 import reactLogo from '~/assets/react.svg'
 import { useAuthDispatch } from '~/auth.context'
+import { Chatbot } from '~/components/chatbot/Chatbot'
 import { MarioGame } from '~/components/game/mario/MarioGame'
 import { MaritimeVentures } from '~/components/game/maritime-ventures/MaritimeVentures'
 // import { useKonamiCode } from '~/hooks/useKonamiCode'
@@ -38,7 +39,7 @@ function Page(): JSX.Element {
   // if (isKonamiActivated) {
   //   return <MaritimeVentures />
   // }
-  
+
   if (showGame) {
     return <MaritimeVentures onClose={() => setShowGame(false)} />
   }
@@ -70,14 +71,14 @@ function Page(): JSX.Element {
           onClick={() => {
             setShowGame(true)
           }}
-          style={{ 
+          style={{
             background: '#4a90e2',
             border: 'none',
             borderRadius: '5px',
             color: 'white',
             cursor: 'pointer',
             marginLeft: '10px',
-            padding: '10px 20px'
+            padding: '10px 20px',
           }}
         >
           🚢 Play Maritime Ventures
@@ -86,14 +87,14 @@ function Page(): JSX.Element {
           onClick={() => {
             setShowMarioGame(true)
           }}
-          style={{ 
+          style={{
             background: '#e24a4a',
             border: 'none',
             borderRadius: '5px',
             color: 'white',
             cursor: 'pointer',
             marginLeft: '10px',
-            padding: '10px 20px'
+            padding: '10px 20px',
           }}
         >
           🍄 Play Mario Clone
@@ -115,6 +116,8 @@ function Page(): JSX.Element {
           Version: {version?.informationalVersion} Env: {version?.environmentName} Mode: {import.meta.env.MODE}
         </p>
       )}
+
+      <Chatbot />
     </>
   )
 }
