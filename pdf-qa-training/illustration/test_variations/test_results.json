@@ -1,0 +1,37 @@
+{
+  "realistic_professional": {
+    "style": "Professional photorealistic style",
+    "image_path": "test_variations\\test_realistic_professional.png",
+    "prompt": "Professional photorealistic illustration of Norwegian parliamentary procedures - speaking rules. Clean, modern parliamentary chamber with formal seating arrangement. Politicians in business attire during a formal session. High quality, detailed, professional photography style, good lighting, sharp focus, documentary style.",
+    "negative": "cartoon, anime, sketch, blurry, low quality, distorted faces, text, watermark",
+    "success": true
+  },
+  "technical_diagram": {
+    "style": "Technical diagram/infographic style",
+    "image_path": "test_variations\\test_technical_diagram.png",
+    "prompt": "Clean technical diagram illustrating Norwegian parliamentary procedures - speaking rules. Infographic style with clear lines, professional layout, educational diagram, architectural drawing style of parliamentary chamber, formal business illustration, technical drawing, clean vector art style.",
+    "negative": "cartoon, messy, hand-drawn, sketchy, blurry, text overlays, watermark",
+    "success": true
+  },
+  "minimal_clean": {
+    "style": "Minimal clean illustration",
+    "image_path": "test_variations\\test_minimal_clean.png",
+    "prompt": "Minimalist clean illustration of Norwegian parliamentary procedures - speaking rules. Simple, elegant design with clear shapes and professional colors. Modern flat design style, parliamentary setting, formal but approachable, clean lines, professional illustration.",
+    "negative": "cluttered, busy, cartoon, childish, text, watermark, messy",
+    "success": true
+  },
+  "semi_realistic": {
+    "style": "Semi-realistic educational style",
+    "image_path": "test_variations\\test_semi_realistic.png",
+    "prompt": "Semi-realistic educational illustration of Norwegian parliamentary procedures - speaking rules. Professional but approachable art style, educational textbook illustration, parliamentary chamber setting, formal attire, clear and informative, high quality digital art.",
+    "negative": "cartoon, anime, childish, blurry, low quality, text overlays",
+    "success": true
+  },
+  "architectural_focus": {
+    "style": "Architectural emphasis",
+    "image_path": "test_variations\\test_architectural_focus.png",
+    "prompt": "Architectural illustration focusing on Norwegian parliamentary procedures - speaking rules. Emphasis on the Norwegian parliament building interior, formal chamber architecture, professional perspective drawing, detailed parliamentary seating, formal government setting, architectural rendering style.",
+    "negative": "cartoon, sketchy, blurry, people focus, text, watermark",
+    "success": true
+  }
+}
