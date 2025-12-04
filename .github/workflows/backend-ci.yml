@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - dev
+      - main
     tags:
       - "v*"
     paths:
@@ -13,8 +13,6 @@ on:
   pull_request:
     branches:
       - main
-      - test
-      - dev
     paths:
       - "src/backend/**"
       - "tests/backend/**"
