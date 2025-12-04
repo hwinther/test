@@ -13,10 +13,6 @@ import { PageLayout } from './PageLayout'
 
 const queryClient = new QueryClient()
 
-// if (process.env.NODE_ENV === 'development') {
-//   require('./mock');
-// }
-
 /**
  * Renders the client-side page.
  * @param {PageContext} pageContext - The page context.
