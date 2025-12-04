@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
-  <Target Name="RefitGenerator" BeforeTargets="build" Condition="'$(Configuration)' == 'Debug'">
+  <Target Name="RefitGenerator" BeforeTargets="build" Condition="'$(Configuration)' == 'Debug-temp-disabled'">
     <Warning Code="DSAMPLE002" Text="Generating API client with refitter" />
     <Exec Command="dotnet refitter ..\WebApi\swagger.json --namespace WebApi.Client --output WebApiClient.cs" />
   </Target>
