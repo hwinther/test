@@ -2,16 +2,9 @@ name: "Playwright e2e tests - environment"
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - qa
-      - test
   pull_request:
     branches:
       - main
-      - qa
-      - test
-      - dev
       - "feature/*"
       - "bugfix/*"
     paths:
@@ -30,33 +23,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  call-workflow-main:
+  # call-workflow-main:
+  #   if: ${{ github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.base_ref == 'main' && github.event.pull_request.draft == false) }}
+  #   uses: hwinther/test/.github/workflows/playwright.yml@main
+  #   with:
+  #     deploy_target: prod
+  #     repo_name: main
+  #     url_prefix: ""
+  #   secrets: inherit
+  # call-workflow-qa:
+  #   if: ${{ github.ref == 'refs/heads/qa' || (github.event_name == 'pull_request' && github.base_ref == 'qa' && github.event.pull_request.draft == false) }}
+  #   uses: hwinther/test/.github/workflows/playwright.yml@main
+  #   with:
+  #     deploy_target: qa
+  #     repo_name: qa
+  #     url_prefix: qa-
+  #   secrets: inherit
+  # call-workflow-test:
+  #   if: ${{ github.ref == 'refs/heads/test' || (github.event_name == 'pull_request' && github.base_ref == 'test' && github.event.pull_request.draft == false) }}
+  #   uses: hwinther/test/.github/workflows/playwright.yml@main
+  #   with:
+  #     deploy_target: test
+  #     repo_name: test
+  #     url_prefix: test-
+  #   secrets: inherit
+  call-workflow-dev:
     if: ${{ github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.base_ref == 'main' && github.event.pull_request.draft == false) }}
     uses: hwinther/test/.github/workflows/playwright.yml@main
-    with:
-      deploy_target: prod
-      repo_name: main
-      url_prefix:
-    secrets: inherit
-  call-workflow-qa:
-    if: ${{ github.ref == 'refs/heads/qa' || (github.event_name == 'pull_request' && github.base_ref == 'qa' && github.event.pull_request.draft == false) }}
-    uses: hwinther/test/.github/workflows/playwright.yml@qa
-    with:
-      deploy_target: qa
-      repo_name: qa
-      url_prefix: qa-
-    secrets: inherit
-  call-workflow-test:
-    if: ${{ github.ref == 'refs/heads/test' || (github.event_name == 'pull_request' && github.base_ref == 'test' && github.event.pull_request.draft == false) }}
-    uses: hwinther/test/.github/workflows/playwright.yml@test
-    with:
-      deploy_target: test
-      repo_name: test
-      url_prefix: test-
-    secrets: inherit
-  call-workflow-dev:
-    if: ${{ github.ref == 'refs/heads/dev' || (github.event_name == 'pull_request' && github.base_ref == 'dev' && github.event.pull_request.draft == false) }}
-    uses: hwinther/test/.github/workflows/playwright.yml@dev
     with:
       deploy_target: dev
       repo_name: dev
