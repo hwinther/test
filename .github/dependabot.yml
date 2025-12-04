@@ -10,7 +10,7 @@ updates:
   - "/"
   - "/.github/actions/*/"
   open-pull-requests-limit: 20
-  target-branch: "dev"
+  target-branch: "main"
   schedule:
     interval: "daily"
   assignees:
@@ -22,7 +22,7 @@ updates:
   - "/src/backend/WebApi"
   - "/src/frontend"
   open-pull-requests-limit: 20
-  target-branch: "dev"
+  target-branch: "main"
   schedule:
     interval: "daily"
   assignees:
@@ -31,7 +31,7 @@ updates:
 - package-ecosystem: "nuget"
   directory: "/src/backend"
   open-pull-requests-limit: 20
-  target-branch: "dev"
+  target-branch: "main"
   schedule:
     interval: "daily"
   assignees:
@@ -61,7 +61,7 @@ updates:
 - package-ecosystem: "npm"
   directory: "/src/frontend"
   open-pull-requests-limit: 20
-  target-branch: "dev"
+  target-branch: "main"
   schedule:
     interval: "weekly"
     day: "sunday"
@@ -115,7 +115,7 @@ updates:
 - package-ecosystem: "npm"
   directory: "/tests/playwright"
   open-pull-requests-limit: 20
-  target-branch: "dev"
+  target-branch: "main"
   schedule:
     interval: "weekly"
     day: "sunday"

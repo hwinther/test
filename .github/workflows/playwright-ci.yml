@@ -1,4 +1,4 @@
-name: "Frontend CI"
+name: "Playwright CI"
 
 on:
   workflow_dispatch:
@@ -8,13 +8,13 @@ on:
     tags:
       - "v*"
     paths:
-      - "src/frontend/**"
+      - "/**"
   pull_request:
     branches:
       - main
     paths:
-      - "src/frontend/**"
-      - ".github/workflows/frontend-ci.yml"
+      - "tests/playwright/**"
+      - ".github/workflows/playwright-ci.yml"
     types: [opened, reopened, labeled, synchronize, ready_for_review]
 
 # Sets permissions of the GITHUB_TOKEN to allow creating checks and updating PR
@@ -30,8 +30,8 @@ concurrency:
 
 env:
   NODE_VERSION: "24"
-  WORKFLOW_SHORT_NAME: "frontend"
-  FRONTEND_PATH: "src/frontend"
+  WORKFLOW_SHORT_NAME: "playwright"
+  FRONTEND_PATH: "tests/playwright"
   TRAILING_AGENT_WORK_PATH: "/home/runner/work/test/test/"
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
