@@ -60,7 +60,7 @@ jobs:
     environment: ${{ inputs.deploy_target }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Get version
         uses: reecetech/version-increment@2024.10.1
@@ -105,7 +105,7 @@ jobs:
           echo "Directory.Build.props content after version replacement:"
           cat Directory.Build.props
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - uses: actions/cache@v4

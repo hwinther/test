@@ -20,7 +20,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v6
       name: Setup node (npm)
       if: inputs.package_manager == 'npm'
       with:
@@ -28,7 +28,7 @@ runs:
         cache: "npm"
         cache-dependency-path: "${{ inputs.working_directory }}/package-lock.json"
 
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v6
       name: Setup node (yarn)
       if: inputs.package_manager == 'yarn'
       with:
@@ -206,7 +206,7 @@ runs:
       run: yarn coverage
 
     - name: Test reporter
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@v2
       id: test-reporter
       if: ${{ env.run_tests == 'true' }}
       with:

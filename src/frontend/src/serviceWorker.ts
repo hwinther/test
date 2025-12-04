@@ -26,8 +26,8 @@ interface Config {
 /**
  * Register the service worker after performing some checks.
  * @param {Config} config - The configuration object.
- * @param {Function} config.onSuccess - The success callback function.
- * @param {Function} config.onUpdate - The update callback function.
+ * @param {(registration: ServiceWorkerRegistration) => void} config.onSuccess - The success callback function.
+ * @param {(registration: ServiceWorkerRegistration) => void} config.onUpdate - The update callback function.
  */
 export function register(config?: Config): void {
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {

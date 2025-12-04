@@ -34,8 +34,6 @@ const wrapInQueryProvider = (componentTree: React.JSX.Element): React.JSX.Elemen
 const setupComponent = (ui: React.JSX.Element, renderOptions?: IExtendedRenderOptions): React.JSX.Element => {
   if (renderOptions == null) return ui
   let componentTree = ui
-  //if (renderOptions.withRouter) componentTree = wrapInRouter(componentTree, renderOptions.routerHistory);
-  //if (renderOptions.withRedux) componentTree = wrapInRedux(componentTree, renderOptions);
   if (renderOptions.withQueryProvider !== false) componentTree = wrapInQueryProvider(componentTree)
   if (renderOptions.mockAuthContext !== false) {
     // TODO: also remove it afterAll
