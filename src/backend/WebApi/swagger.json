@@ -490,5 +490,19 @@
         "description": "Weather forecast model"
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Blogging"
+    },
+    {
+      "name": "SendMessage"
+    },
+    {
+      "name": "Service"
+    },
+    {
+      "name": "WeatherForecast"
+    }
+  ]
 }
