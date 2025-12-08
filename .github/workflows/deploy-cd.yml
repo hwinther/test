@@ -149,7 +149,7 @@ jobs:
           base_name: "login"
           project_type: "todo"
           dockerfile_path: "WebApi/Dockerfile"
-          docker_image_name: "hwinther/test/api-${{ inputs.deploy_target }}"
+          docker_image_name: "hwinther/test/api"
           azure_resource_name: "app-api-${{ inputs.deploy_target }}-ne"
           skip_setup: true
 
@@ -157,7 +157,7 @@ jobs:
         uses: ./.github/actions/frontend-deploy
         with:
           dockerfile_path: "Dockerfile"
-          docker_image_name: "hwinther/test/frontend-${{ inputs.deploy_target }}"
+          docker_image_name: "hwinther/test/frontend"
 
       # - name: Send deploy success message to slack
       #   if: ${{ success() }}
