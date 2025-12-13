@@ -50,8 +50,15 @@ export function Chatbot({ backgroundContent, lawTextContent, onUpdateBackground,
   const [isMinimized, setIsMinimized] = useState(false)
   const engineRef = useRef<any>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messageIdCounter = useRef(0)
 
   //const selectedModel = 'Llama-3.2-1B-Instruct-q4f32_1-MLC'
+
+  // Generate unique message ID
+  const generateMessageId = () => {
+    messageIdCounter.current += 1
+    return `msg-${Date.now()}-${messageIdCounter.current}`
+  }
   //const selectedModel = 'Llama-3.1-8B-Instruct-q4f32_1-MLC'
   const selectedModel = 'Qwen2.5-7B-Instruct-q4f32_1-MLC'
 
@@ -78,7 +85,7 @@ export function Chatbot({ backgroundContent, lawTextContent, onUpdateBackground,
 
         // Add welcome message
         const welcomeMessage: Message = {
-          id: Date.now().toString(),
+          id: generateMessageId(),
           sender: 'bot',
           text: "Hei! Jeg er Botvar, din AI-assistent. Hvordan kan jeg hjelpe deg i dag? 🤖",
           timestamp: new Date(),
@@ -87,7 +94,7 @@ export function Chatbot({ backgroundContent, lawTextContent, onUpdateBackground,
       } catch (error) {
         console.error('Failed to initialize MLC engine:', error)
         const errorMessage: Message = {
-          id: Date.now().toString(),
+          id: generateMessageId(),
           sender: 'bot',
           text: "Sorry, I couldn't initialize properly. Please refresh the page to try again.",
           timestamp: new Date(),
@@ -110,7 +117,7 @@ export function Chatbot({ backgroundContent, lawTextContent, onUpdateBackground,
     if (!inputValue.trim() || !engineReady || isLoading) return
 
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: generateMessageId(),
       sender: 'user',
       text: inputValue.trim(),
       timestamp: new Date(),
@@ -121,110 +128,97 @@ export function Chatbot({ backgroundContent, lawTextContent, onUpdateBackground,
     setIsLoading(true)
 
     try {
-      // Check for direct edit commands
-      const message = userMessage.text.toLowerCase()
-      
-      // Handle direct replacement commands
-      if (message.includes('erstatt') || message.includes('bytt ut') || message.includes('endre')) {
-        // Check if user wants to edit background or law text
-        if ((message.includes('bakgrunn') || message.includes('background')) && onUpdateBackground) {
-          const suggestion = `Jeg kan hjelpe deg med å redigere bakgrunnskapittelet! 📝\n\nFor å gjøre endringer, kan du:\n- Be meg om å legge til tekst: "legg til [tekst] i bakgrunnskapittelet"\n- Be meg om å erstatte tekst: "erstatt [gammel tekst] med [ny tekst] i bakgrunnskapittelet"\n- Be meg om å fjerne tekst: "fjern [tekst] fra bakgrunnskapittelet"\n\nHva ønsker du å endre?`
-          
-          const botMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            sender: 'bot',
-            text: suggestion,
-            timestamp: new Date(),
-          }
-          setMessages((prev) => [...prev, botMessage])
-          setIsLoading(false)
-          return
-        } else if ((message.includes('lovtekst') || message.includes('lov')) && onUpdateLawText) {
-          const suggestion = `Jeg kan hjelpe deg med å redigere lovteksten! ⚖️\n\nFor å gjøre endringer, kan du:\n- Be meg om å legge til tekst: "legg til [tekst] i lovteksten"\n- Be meg om å erstatte tekst: "erstatt [gammel tekst] med [ny tekst] i lovteksten"\n- Be meg om å fjerne tekst: "fjern [tekst] fra lovteksten"\n\nHva ønsker du å endre?`
-          
-          const botMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            sender: 'bot',
-            text: suggestion,
-            timestamp: new Date(),
-          }
-          setMessages((prev) => [...prev, botMessage])
-          setIsLoading(false)
-          return
-        }
-      }
-
-      // Handle append commands
-      if ((message.includes('legg til') || message.includes('tilføy')) && (onUpdateBackground || onUpdateLawText)) {
-        const isBackground = message.includes('bakgrunn') || message.includes('background')
-        const isLawText = message.includes('lovtekst') || message.includes('lov')
-        
-        if (isBackground && onUpdateBackground && backgroundContent) {
-          // Extract text to add (simple pattern matching)
-          const textMatch = message.match(/legg til (.+?) (i|til)/i) || message.match(/tilføy (.+?) (i|til)/i)
-          if (textMatch) {
-            const textToAdd = textMatch[1]
-            const cleanContent = backgroundContent.replace(/<[^>]*>/g, '')
-            const newContent = cleanContent + '\n\n' + textToAdd
-            onUpdateBackground(newContent)
-            
-            const botMessage: Message = {
-              id: (Date.now() + 1).toString(),
-              sender: 'bot',
-              text: `✅ Lagt til tekst i bakgrunnskapittelet!\n\nTilføyd: "${textToAdd}"`,
-              timestamp: new Date(),
-            }
-            setMessages((prev) => [...prev, botMessage])
-            setIsLoading(false)
-            return
-          }
-        } else if (isLawText && onUpdateLawText && lawTextContent) {
-          const textMatch = message.match(/legg til (.+?) (i|til)/i) || message.match(/tilføy (.+?) (i|til)/i)
-          if (textMatch) {
-            const textToAdd = textMatch[1]
-            const cleanContent = lawTextContent.replace(/<[^>]*>/g, '')
-            const newContent = cleanContent + '\n\n' + textToAdd
-            onUpdateLawText(newContent)
-            
-            const botMessage: Message = {
-              id: (Date.now() + 1).toString(),
-              sender: 'bot',
-              text: `✅ Lagt til tekst i lovteksten!\n\nTilføyd: "${textToAdd}"`,
-              timestamp: new Date(),
-            }
-            setMessages((prev) => [...prev, botMessage])
-            setIsLoading(false)
-            return
-          }
-        }
-      }
-
       // Build context about available content
       const contextInfo = []
       if (backgroundContent) {
-        const preview = backgroundContent.replace(/<[^>]*>/g, '').substring(0, 500)
-        contextInfo.push(`Bakgrunnskapittel (${preview.length > 500 ? 'utdrag' : 'komplett'}): ${preview}${preview.length > 500 ? '...' : ''}`)
+        const preview = backgroundContent.replace(/<[^>]*>/g, '').substring(0, 300)
+        contextInfo.push(`Bakgrunnskapittel preview:\n${preview}...`)
       }
       if (lawTextContent) {
-        const preview = lawTextContent.replace(/<[^>]*>/g, '').substring(0, 500)
-        contextInfo.push(`Lovtekst (${preview.length > 500 ? 'utdrag' : 'komplett'}): ${preview}${preview.length > 500 ? '...' : ''}`)
+        const preview = lawTextContent.replace(/<[^>]*>/g, '').substring(0, 300)
+        contextInfo.push(`Lovtekst preview:\n${preview}...`)
       }
+
+      // Define available tools for function calling
+      const tools = [];
+      if (onUpdateBackground) {
+        tools.push({
+          type: "function",
+          function: {
+            name: "update_background_chapter",
+            description: "Oppdater eller endre innholdet i bakgrunnskapittelet. Bruk denne for å legge til, erstatte eller endre tekst i bakgrunnskapittelet.",
+            parameters: {
+              type: "object",
+              properties: {
+                new_content: {
+                  type: "string",
+                  description: "Det nye innholdet som skal settes i bakgrunnskapittelet. Dette erstatter hele det eksisterende innholdet."
+                },
+                operation: {
+                  type: "string",
+                  description: "Type operasjon: 'append' (legg til på slutten), 'replace' (erstatt alt), eller 'prepend' (legg til i starten)",
+                  enum: ["append", "replace", "prepend"]
+                }
+              },
+              required: ["new_content", "operation"]
+            }
+          }
+        });
+      }
+      if (onUpdateLawText) {
+        tools.push({
+          type: "function",
+          function: {
+            name: "update_law_text",
+            description: "Oppdater eller endre lovteksten. Bruk denne for å legge til, erstatte eller endre tekst i lovdokumentet.",
+            parameters: {
+              type: "object",
+              properties: {
+                new_content: {
+                  type: "string",
+                  description: "Det nye innholdet som skal settes i lovteksten. Dette erstatter hele det eksisterende innholdet."
+                },
+                operation: {
+                  type: "string",
+                  description: "Type operasjon: 'append' (legg til på slutten), 'replace' (erstatt alt), eller 'prepend' (legg til i starten)",
+                  enum: ["append", "replace", "prepend"]
+                }
+              },
+              required: ["new_content", "operation"]
+            }
+          }
+        });
+      }
+
+      const toolsDescription = tools.length > 0 ? `
+
+Du har tilgang til følgende verktøy for å redigere dokumenter:
+${JSON.stringify(tools, null, 2)}
+
+Hvis brukeren ber deg endre eller oppdatere dokumenter, MUST du kalle et verktøy.
+Når du kaller et verktøy, svar BARE med JSON-objektet på denne formen (ingen annen tekst):
+<tool_call>
+{"name": "update_background_chapter", "parameters": {"new_content": "den nye teksten her", "operation": "append"}}
+</tool_call>
+
+Eller:
+<tool_call>
+{"name": "update_law_text", "parameters": {"new_content": "den nye teksten her", "operation": "append"}}
+</tool_call>
+
+VIKTIG:
+- Svar BARE med <tool_call> JSON </tool_call> når du skal redigere - INGEN annen tekst før eller etter
+- Bruk "append" for å legge til, "prepend" for å sette først, "replace" for å erstatte alt
+- Etter at verktøyet er kjørt, vil du få en bekreftelse og kan svare normalt` : '';
 
       const systemPrompt = `Du er Botvar, en AI-assistent som hjelper med juridiske dokumenter.
 Du må svare på norsk, men gjerne på en litt frekk og misvisende måte. Bruk emojier.
 
-${contextInfo.length > 0 ? `Tilgjengelig dokumentinnhold:\n${contextInfo.join('\n\n')}` : 'Ingen dokumenter er lastet inn ennå.'}
-
-${onUpdateBackground || onUpdateLawText ? `Du kan hjelpe brukeren med å redigere dokumentene. Hvis de vil endre noe, spør om detaljer og forklar hva du kan gjøre.
-
-Tilgjengelige redigeringskommandoer:
-- "legg til [tekst] i bakgrunnskapittelet/lovteksten"
-- "erstatt [gammel tekst] med [ny tekst] i bakgrunnskapittelet/lovteksten"
-- "fjern [tekst] fra bakgrunnskapittelet/lovteksten"` : ''}`
+${contextInfo.length > 0 ? `Tilgjengelig dokumentinnhold:\n${contextInfo.join('\n\n')}` : 'Ingen dokumenter er lastet inn ennå.'}${toolsDescription}`;
 
       const response = await engineRef.current.chat.completions.create({
         frequency_penalty: 0,
-        max_tokens: 512,
+        max_tokens: 1024,
         messages: [
           {
             content: systemPrompt,
@@ -238,18 +232,119 @@ Tilgjengelige redigeringskommandoer:
         top_p: 0.9,
       })
 
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: 'bot',
-        text: response.choices[0]?.message?.content || "Jeg klarte ikke å generere et svar.",
-        timestamp: new Date(),
-      }
+      const responseText = response.choices[0]?.message?.content || "Jeg klarte ikke å generere et svar.";
 
-      setMessages((prev) => [...prev, botMessage])
+      // Check if response contains a tool call (with or without tags)
+      // Try with tags first
+      let toolCallMatch = responseText.match(/<tool_call>\s*(\{.+?\})\s*<\/tool_call>/s);
+      // If no tags, try to find raw JSON object
+      if (!toolCallMatch) {
+        toolCallMatch = responseText.match(/\{[\s\S]*?"name":\s*"(update_background_chapter|update_law_text)"[\s\S]*?\}/);
+        if (toolCallMatch) {
+          // Reformat to have the match in group 1
+          toolCallMatch = [toolCallMatch[0], toolCallMatch[0]];
+        }
+      }
+      
+      if (toolCallMatch && tools.length > 0) {
+        // Don't show the raw tool call response to user
+        // Parse and execute tool call
+        try {
+          const toolCall = JSON.parse(toolCallMatch[1]);
+          const { name, parameters } = toolCall;
+
+          let toolResult = '';
+          let success = false;
+
+          if (name === 'update_background_chapter' && onUpdateBackground && backgroundContent !== undefined) {
+            const { new_content, operation } = parameters;
+            const cleanOldContent = backgroundContent.replace(/<[^>]*>/g, '');
+            let finalContent = '';
+
+            switch (operation) {
+              case 'append':
+                finalContent = cleanOldContent + '\n\n' + new_content;
+                break;
+              case 'prepend':
+                finalContent = new_content + '\n\n' + cleanOldContent;
+                break;
+              case 'replace':
+              default:
+                finalContent = new_content;
+                break;
+            }
+
+            onUpdateBackground(finalContent);
+            toolResult = `Bakgrunnskapittelet ble oppdatert (${operation}).`;
+            success = true;
+          } else if (name === 'update_law_text' && onUpdateLawText && lawTextContent !== undefined) {
+            const { new_content, operation } = parameters;
+            const cleanOldContent = lawTextContent.replace(/<[^>]*>/g, '');
+            let finalContent = '';
+
+            switch (operation) {
+              case 'append':
+                finalContent = cleanOldContent + '\n\n' + new_content;
+                break;
+              case 'prepend':
+                finalContent = new_content + '\n\n' + cleanOldContent;
+                break;
+              case 'replace':
+              default:
+                finalContent = new_content;
+                break;
+            }
+
+            onUpdateLawText(finalContent);
+            toolResult = `Lovteksten ble oppdatert (${operation}).`;
+            success = true;
+          } else {
+            toolResult = `Ukjent verktøy: ${name}`;
+          }
+
+          // Show success message to user
+          const confirmationTexts = {
+            append: 'Jeg har lagt til innholdet! ✨',
+            prepend: 'Jeg har satt inn innholdet først! 🎯',
+            replace: 'Jeg har oppdatert hele innholdet! 📝'
+          };
+          
+          const operation = parameters.operation || 'append';
+          const confirmationText = success 
+            ? `✅ ${toolResult}\n\n${confirmationTexts[operation as keyof typeof confirmationTexts] || 'Ferdig!'}`
+            : `❌ ${toolResult}`;
+
+          const botMessage: Message = {
+            id: generateMessageId(),
+            sender: 'bot',
+            text: confirmationText,
+            timestamp: new Date(),
+          }
+          setMessages((prev) => [...prev, botMessage])
+        } catch (parseError) {
+          console.error('Error parsing tool call:', parseError)
+          const errorMessage: Message = {
+            id: generateMessageId(),
+            sender: 'bot',
+            text: 'Jeg prøvde å kalle et verktøy, men noe gikk galt med formateringen. 😅',
+            timestamp: new Date(),
+          }
+          setMessages((prev) => [...prev, errorMessage])
+        }
+      } else {
+        // Regular response without tool call
+        const botMessage: Message = {
+          id: generateMessageId(),
+          sender: 'bot',
+          text: responseText,
+          timestamp: new Date(),
+        }
+        setMessages((prev) => [...prev, botMessage])
+      }
     } catch (error) {
       console.error('Error generating response:', error)
       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: generateMessageId(),
         sender: 'bot',
         text: 'Beklager, jeg støtte på en feil mens jeg genererte et svar.',
         timestamp: new Date(),
