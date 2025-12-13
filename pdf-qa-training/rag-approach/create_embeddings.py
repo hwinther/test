@@ -75,7 +75,7 @@ class RAGProcessor:
 
 def main():
     # Load processed chunks
-    with open('../pdf-processing/processed_chunks.json', 'r', encoding='utf-8') as f:
+    with open('processed_chunks.json', 'r', encoding='utf-8') as f:
         chunks = json.load(f)
     
     print(f"Loaded {len(chunks)} chunks")

@@ -1,21 +1,18 @@
 import { defineConfig } from "vite";
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+  plugins: [react()],
   base: "./",
   build: {
     outDir: "dist",
-    rollupOptions: {
-      input: {
-        main: "index.html",
-        advanced: "advanced.html",
-      },
-    },
   },
   server: {
     port: 3000,
     open: true,
   },
+  publicDir: 'public',
   optimizeDeps: {
-    include: ["@mlc-ai/web-llm"],
+    include: ["@mlc-ai/web-llm", "react", "react-dom"],
   },
 });
