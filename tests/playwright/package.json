@@ -24,22 +24,22 @@
     "@eslint/js": "9.39.0",
     "@playwright/test": "1.57.0",
     "@types/node": "25.0.2",
-    "@typescript-eslint/eslint-plugin": "8.50.0",
-    "@typescript-eslint/parser": "8.50.0",
+    "@typescript-eslint/eslint-plugin": "8.52.0",
+    "@typescript-eslint/parser": "8.52.0",
     "dotenv": "17.2.3",
     "eslint": "9.39.0",
-    "eslint-config-love": "140.0.0",
+    "eslint-config-love": "144.0.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-formatter-compact": "9.0.1",
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-n": "17.23.1",
-    "eslint-plugin-perfectionist": "5.0.0",
+    "eslint-plugin-perfectionist": "5.3.1",
     "eslint-plugin-prettier": "5.5.4",
     "eslint-plugin-promise": "7.2.1",
     "eslint-plugin-sonarjs": "3.0.5",
     "globals": "16.5.0",
     "prettier": "3.7.4",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.50.0"
+    "typescript-eslint": "8.52.0"
   }
 }
