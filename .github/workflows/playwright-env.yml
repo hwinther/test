@@ -2,15 +2,15 @@ name: "Playwright e2e tests - environment"
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
-      - "feature/*"
-      - "bugfix/*"
-    paths:
-      - "tests/playwright/**"
-      - ".github/workflows/playwright.yml"
-    types: [opened, reopened, labeled, synchronize, ready_for_review]
+  # pull_request:
+  #   branches:
+  #     - main
+  #     - "feature/*"
+  #     - "bugfix/*"
+  #   paths:
+  #     - "tests/playwright/**"
+  #     - ".github/workflows/playwright.yml"
+  #   types: [opened, reopened, labeled, synchronize, ready_for_review]
 
 permissions:
   contents: read
