@@ -46,7 +46,6 @@ export default [
       '@typescript-eslint/triple-slash-reference': 'off',
       'import/no-absolute-path': 'off',
       'sonarjs/todo-tag': 'off',
-      'sonarjs/cognitive-complexity': ['error', 50],
     },
   },
   eslintConfigPrettier,
