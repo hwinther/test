@@ -26,4 +26,4 @@ jobs:
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     secrets: inherit
     with:
-      node_source_path: "src/frontend/"
+      node_source_path: "src/frontend"
