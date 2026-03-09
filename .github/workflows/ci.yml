@@ -27,3 +27,6 @@ jobs:
     secrets: inherit
     with:
       node_source_path: "src/frontend"
+      dotnet_source_path: "src/backend"
+      dotnet_solution_file: "Backend.sln"
+      dotnet_test_root_path: "../../tests/backend"
