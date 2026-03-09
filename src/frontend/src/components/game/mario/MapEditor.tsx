@@ -25,12 +25,13 @@ type Tool =
   | 'player-spawn'
 
 /**
- *
- * @param root0
- * @param root0.initialLevel
- * @param root0.onClose
- * @param root0.onPlayTest
- * @param root0.onSave
+ * Renders the Mario-style map editor for creating and editing levels.
+ * @param {MapEditorProps} root0 - Props object for the MapEditor component
+ * @param {LevelData} [root0.initialLevel] - Optional initial level data to load into the editor
+ * @param {() => void} [root0.onClose] - Optional callback invoked when the editor is closed
+ * @param {(level: LevelData) => void} [root0.onPlayTest] - Optional callback invoked when play-testing, receives the current level
+ * @param {(level: LevelData) => void} [root0.onSave] - Optional callback invoked when saving, receives the current level
+ * @returns {JSX.Element} The MapEditor JSX element
  */
 export function MapEditor({ initialLevel, onClose, onPlayTest, onSave }: MapEditorProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null)
