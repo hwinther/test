@@ -12,6 +12,7 @@
     "build": "tsc && vike build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
+    "lint:ci": "eslint . --report-unused-disable-directives --max-warnings 0 --format compact",
     "lint/fix": "eslint . --fix",
     "format/check": "prettier . --check",
     "format/fix": "prettier . --write",
@@ -19,7 +20,8 @@
     "orval": "orval --config ./orval.config.cjs",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "coverage:ci": "vitest run --coverage"
   },
   "dependencies": {
     "@tanstack/react-query": "5.90.12",
