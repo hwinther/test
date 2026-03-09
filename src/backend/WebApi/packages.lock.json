@@ -62,15 +62,6 @@
           "OpenTelemetry": "1.15.0"
         }
       },
-      "OpenTelemetry.Exporter.Zipkin": {
-        "type": "Direct",
-        "requested": "[1.15.0, )",
-        "resolved": "1.15.0",
-        "contentHash": "jXbZebAMM9FMm+rPA0OH/S2pdn1dBsTevV5EVJ0Qiokq4bVVBhoEGy+zNessoBVv3+DHS1cFRDTgt4NpZUjWKg==",
-        "dependencies": {
-          "OpenTelemetry": "1.15.0"
-        }
-      },
       "OpenTelemetry.Extensions.Hosting": {
         "type": "Direct",
         "requested": "[1.15.0, )",

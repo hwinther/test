@@ -158,6 +158,7 @@ export class LevelLoader {
     }
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   static parseLevel(levelData: LevelData): Partial<MarioGameState> {
     const platforms: Platform[] = []
     const enemies: Enemy[] = []
