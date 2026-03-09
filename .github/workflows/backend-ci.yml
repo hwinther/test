@@ -2,22 +2,22 @@ name: "Backend CI"
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    tags:
-      - "v*"
-    paths:
-      - "src/backend/**"
-      - "tests/backend/**"
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "src/backend/**"
-      - "tests/backend/**"
-      - ".github/workflows/backend-ci.yml"
-    types: [opened, reopened, labeled, synchronize, ready_for_review]
+  # push:
+  #   branches:
+  #     - main
+  #   tags:
+  #     - "v*"
+  #   paths:
+  #     - "src/backend/**"
+  #     - "tests/backend/**"
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - "src/backend/**"
+  #     - "tests/backend/**"
+  #     - ".github/workflows/backend-ci.yml"
+  #   types: [opened, reopened, labeled, synchronize, ready_for_review]
 
 # Sets permissions of the GITHUB_TOKEN to allow creating checks and updating PR
 permissions:
