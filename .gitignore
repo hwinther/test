@@ -431,3 +431,6 @@ CoverageReport/
 
 # Docker container volumes
 **/docker-volumes/
+
+# Python virtual environment
+**/venv/
