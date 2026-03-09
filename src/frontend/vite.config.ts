@@ -26,8 +26,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './test/setupTests.ts',
     mockReset: true,
-    coverage: { enabled: true, provider: 'istanbul', reporter: ['cobertura', 'lcov', 'html'] },
-    reporters: ['verbose', 'github-actions', 'junit'],
+    coverage: { enabled: true, provider: 'istanbul', reporter: ['cobertura', 'lcov', 'html', 'json'] },
+    reporters: ['verbose', 'github-actions', 'junit', 'json'],
     outputFile: {
       junit: './coverage/junit-report.xml',
       json: './coverage/json-report.json',
