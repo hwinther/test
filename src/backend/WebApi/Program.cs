@@ -48,10 +48,11 @@ builder.Services.AddOpenTelemetry()
                                       .AddHttpClientInstrumentation()
                                       .AddSource(nameof(MessageSender))
                                       //.AddConsoleExporter()
-                                      .AddZipkinExporter(static options =>
+                                      .AddOtlpExporter(static options =>
                                       {
-                                          var zipkinHostName = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
-                                          options.Endpoint = new Uri($"http://{zipkinHostName}:9411/api/v2/spans");
+                                          var host = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
+                                          var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT") ?? $"http://{host}:4317";
+                                          options.Endpoint = new Uri(otlpEndpoint);
                                       }))
        .WithMetrics(static metrics => metrics
                                       .AddAspNetCoreInstrumentation()
