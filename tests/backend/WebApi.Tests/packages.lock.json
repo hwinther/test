@@ -40,15 +40,15 @@
       },
       "NUnit": {
         "type": "Direct",
-        "requested": "[4.5.0, )",
-        "resolved": "4.5.0",
-        "contentHash": "3AXYqXoll1CnWA+fNqMQemJO5qofh2r75bdrPyJqjCRCcZpwuCAgUnHxG1wKEbrGjtobrWWbwVrDhYcXcxRkjw=="
+        "requested": "[4.5.1, )",
+        "resolved": "4.5.1",
+        "contentHash": "x1sIqU9i0IkxqFayqthzmJs/75jTMbrfNMixj4vtfTi7rRzGbtuY27V+iAhfTY02u5k2qvW3QBGM414OG4q8Lw=="
       },
       "NUnit.Analyzers": {
         "type": "Direct",
-        "requested": "[4.11.2, )",
-        "resolved": "4.11.2",
-        "contentHash": "D9w1tsxMyBAsINY2yyIaS59V9W4iGtuPyHs+9enuhmDAaCsSOitJKha4TUPENCAd2LrylCawur0YhCJoLMHBJA=="
+        "requested": "[4.12.0, )",
+        "resolved": "4.12.0",
+        "contentHash": "QuEHoNlYPyjX+MUNLgj5WquT4MFFJIhIVjbZelP13z6hQP5eCl/7QgSCA0xxhTJLnrMkc7QcnEp2lTchx5pHYA=="
       },
       "NUnit3TestAdapter": {
         "type": "Direct",
@@ -720,14 +720,6 @@
           "OpenTelemetry": "1.15.0"
         }
       },
-      "OpenTelemetry.Exporter.Zipkin": {
-        "type": "Transitive",
-        "resolved": "1.15.0",
-        "contentHash": "jXbZebAMM9FMm+rPA0OH/S2pdn1dBsTevV5EVJ0Qiokq4bVVBhoEGy+zNessoBVv3+DHS1cFRDTgt4NpZUjWKg==",
-        "dependencies": {
-          "OpenTelemetry": "1.15.0"
-        }
-      },
       "OpenTelemetry.Extensions.Hosting": {
         "type": "Transitive",
         "resolved": "1.15.0",
@@ -894,7 +886,6 @@
           "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": "[1.23.0, )",
           "OpenTelemetry.Exporter.Console": "[1.15.0, )",
           "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.15.0, )",
-          "OpenTelemetry.Exporter.Zipkin": "[1.15.0, )",
           "OpenTelemetry.Extensions.Hosting": "[1.15.0, )",
           "OpenTelemetry.Instrumentation.AspNetCore": "[1.15.0, )",
           "OpenTelemetry.Instrumentation.Http": "[1.15.0, )",
