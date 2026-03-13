@@ -134,7 +134,7 @@ jobs:
       #     sudo cat ${{ env.WORKFLOW_AGENT_PATH }}super-linter.out >> $GITHUB_STEP_SUMMARY
 
       - name: WebApi Tests
-        run: dotnet test ../../tests/backend/WebApi.Tests --no-restore --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput="../../tests/backend/WebApi.Tests/TestResults/" /p:CoverletOutputFormat=cobertura
+        run: dotnet test ../../tests/backend/WebApi.Tests --no-restore --logger "trx;LogFileName=test-results.trx" -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
         continue-on-error: true
 
       #- uses: hwinther/test-reporter@dotnet-nunit # TODO: set back to original once nunit is supported: dorny/test-reporter@v2
