@@ -25,6 +25,24 @@ public class BloggingContextTests : IAsyncLifetime, IAsyncDisposable
                       .Options;
 
         _context = new BloggingContext(options);
+        await _context.Database.MigrateAsync(CancellationToken.None);
+
+        var blogEntity = await _context.Blogs.AddAsync(new Blog
+        {
+            BlogId = 0,
+            Title = "test blog",
+            Url = "test://url"
+        }, CancellationToken.None);
+        await _context.SaveChangesAsync(CancellationToken.None);
+
+        await _context.Posts.AddAsync(new Post
+        {
+            PostId = 0,
+            BlogId = blogEntity.Entity.BlogId,
+            Title = "test post",
+            Content = "test content"
+        }, CancellationToken.None);
+        await _context.SaveChangesAsync(CancellationToken.None);
     }
 
     public async ValueTask DisposeAsync()
@@ -47,31 +65,9 @@ public class BloggingContextTests : IAsyncLifetime, IAsyncDisposable
     }
 
     [Fact]
-    public async Task BloggingContextMigrate_CreatesTablesAndCanStoreData()
+    public void BloggingContextMigrate_CreatesTablesAndCanStoreData()
     {
-        // Act
-        await _context.Database.MigrateAsync(TestContext.Current.CancellationToken);
-
-        var blogEntity = await _context.Blogs.AddAsync(new Blog
-        {
-            BlogId = 0,
-            Title = "test blog",
-            Url = "test://url"
-        }, TestContext.Current.CancellationToken);
-
-        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-        await _context.Posts.AddAsync(new Post
-        {
-            PostId = 0,
-            BlogId = blogEntity.Entity.BlogId,
-            Title = "test post",
-            Content = "test content"
-        }, TestContext.Current.CancellationToken);
-
-        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-        // Assert
+        // Assert: schema and seeded data from InitializeAsync
         Assert.Equal(1, _context.Blogs.Count());
         var blog = _context.Blogs.First();
         Assert.Single(blog.Posts);
@@ -82,7 +78,6 @@ public class BloggingContextTests : IAsyncLifetime, IAsyncDisposable
         Assert.Equal("test post", post.Title);
         Assert.Equal("test content", post.Content);
         Assert.NotNull(post.Blog);
-
         Assert.Equal(blog.BlogId, post.Blog.BlogId);
     }
 
