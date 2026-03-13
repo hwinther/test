@@ -1,11 +1,10 @@
-﻿using WebApi.Entities;
+using WebApi.Entities;
 
 namespace WebApi.Tests.Entities;
 
-[TestFixture]
 public class PostDtoTests : BaseDtoValidationTests<PostDto>
 {
-    [Test]
+    [Fact]
     public void Validate_WhenTitleIsEmpty_ReturnsValidationError() =>
         Validate_ReturnsValidationError(MockPost with
                                         {
@@ -13,7 +12,7 @@ public class PostDtoTests : BaseDtoValidationTests<PostDto>
                                         },
                                         "Title must be set");
 
-    [Test]
+    [Fact]
     public void Validate_WhenTitleIsTooLong_ReturnsValidationError() =>
         Validate_ReturnsValidationError(MockPost with
                                         {
@@ -21,7 +20,7 @@ public class PostDtoTests : BaseDtoValidationTests<PostDto>
                                         },
                                         "Title is longer than the maximum amount of characters (2000)");
 
-    [Test]
+    [Fact]
     public void Validate_WhenContentIsEmpty_ReturnsValidationError() =>
         Validate_ReturnsValidationError(MockPost with
                                         {
@@ -29,7 +28,7 @@ public class PostDtoTests : BaseDtoValidationTests<PostDto>
                                         },
                                         "Content must be set");
 
-    [Test]
+    [Fact]
     public void Validate_WhenContentIsTooLong_ReturnsValidationError() =>
         Validate_ReturnsValidationError(MockPost with
                                         {
@@ -37,7 +36,7 @@ public class PostDtoTests : BaseDtoValidationTests<PostDto>
                                         },
                                         "Content is longer than the maximum amount of characters (8000)");
 
-    [Test]
+    [Fact]
     public void Validate_WhenBlogIdIsZero_ReturnsValidationError() =>
         Validate_ReturnsValidationError(MockPost with
                                         {

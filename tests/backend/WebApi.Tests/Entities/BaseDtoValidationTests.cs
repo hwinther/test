@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebApi.Tests.Entities;
 
@@ -15,7 +15,7 @@ public class BaseDtoValidationTests<T>
                          .ToList();
 
         // Assert
-        Assert.That(results, Has.Count.EqualTo(1));
-        Assert.That(results[0].ErrorMessage, Is.EqualTo(expectedErrorMessage));
+        var single = Assert.Single(results);
+        Assert.Equal(expectedErrorMessage, single.ErrorMessage);
     }
 }

@@ -1,38 +1,32 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace WebApi.Tests;
 
-[TestFixture]
-public class ProgramTests
+public class ProgramTests : IAsyncDisposable
 {
-    [SetUp]
-    public void SetUp()
+    private readonly CustomWebApplicationFactory<Program> _factory;
+    private readonly HttpClient _client;
+
+    public ProgramTests()
     {
         _factory = new CustomWebApplicationFactory<Program>();
         _client = _factory.CreateClient();
     }
 
-    [TearDown]
-    public async Task TearDown()
-    {
-        await _factory.DisposeAsync();
-        _client.Dispose();
-    }
-    private CustomWebApplicationFactory<Program> _factory;
-    private HttpClient _client;
+    public async ValueTask DisposeAsync() => await _factory.DisposeAsync();
 
-    [Test]
+    [Fact]
     public async Task GetSwaggerIndex_ReturnsOkResult()
     {
         // Act
-        var response = await _client.GetAsync("/swagger/index.html");
+        var response = await _client.GetAsync("/swagger/index.html", TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.That(response, Is.Not.Null);
+        Assert.NotNull(response);
         response.EnsureSuccessStatusCode();
-        Assert.That(response.Content.Headers.ContentType, Is.Not.Null);
-        Assert.That(response.Content.Headers.ContentType.ToString(), Is.EqualTo("text/html; charset=utf-8"));
+        Assert.NotNull(response.Content.Headers.ContentType);
+        Assert.Equal("text/html; charset=utf-8", response.Content.Headers.ContentType.ToString());
     }
 }
 

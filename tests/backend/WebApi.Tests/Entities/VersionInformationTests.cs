@@ -5,7 +5,6 @@ using WebApi.Entities;
 
 namespace WebApi.Tests.Entities;
 
-[TestFixture]
 public class VersionInformationTests
 {
     private static Assembly CreateFakeAssembly<T>(params object[] constructorArgs)
@@ -27,7 +26,7 @@ public class VersionInformationTests
         return assemblyFake;
     }
 
-    [Test]
+    [Fact]
     public void ConstantsProperty_ExtractsConstantsCorrectly()
     {
         // Arrange
@@ -42,10 +41,10 @@ public class VersionInformationTests
         var versionInformation = new VersionInformation(assemblyFake);
 
         // Assert
-        Assert.That(versionInformation.Constants, Is.EqualTo(expectedConstants));
+        Assert.Equal(expectedConstants, versionInformation.Constants);
     }
 
-    [Test]
+    [Fact]
     public void VersionProperty_ExtractsVersionCorrectly()
     {
         // Arrange
@@ -56,10 +55,10 @@ public class VersionInformationTests
         var versionInformation = new VersionInformation(assemblyFake);
 
         // Assert
-        Assert.That(versionInformation.Version, Is.EqualTo(expectedVersion));
+        Assert.Equal(expectedVersion, versionInformation.Version);
     }
 
-    [Test]
+    [Fact]
     public void InformationalVersionProperty_ExtractsInformationalVersionCorrectly()
     {
         // Arrange
@@ -70,10 +69,10 @@ public class VersionInformationTests
         var versionInformation = new VersionInformation(assemblyFake);
 
         // Assert
-        Assert.That(versionInformation.InformationalVersion, Is.EqualTo(expectedInformationalVersion));
+        Assert.Equal(expectedInformationalVersion, versionInformation.InformationalVersion);
     }
 
-    [Test]
+    [Fact]
     public void EnvironmentNameProperty_FallbacksToUnknownWhenNoEnvironmentVariablesSet()
     {
         // Arrange
@@ -84,6 +83,6 @@ public class VersionInformationTests
         var versionInformation = new VersionInformation(typeof(VersionInformationTests).Assembly);
 
         // Assert
-        Assert.That(versionInformation.EnvironmentName, Is.EqualTo("Unknown"));
+        Assert.Equal("Unknown", versionInformation.EnvironmentName);
     }
 }
