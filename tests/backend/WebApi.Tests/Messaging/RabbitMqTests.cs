@@ -26,7 +26,7 @@ public class RabbitMqTests
         _unitTestActivity.Dispose();
     }
 
-    private readonly RabbitMqContainer _rabbitMqContainer = new RabbitMqBuilder("4.2-management-alpine").Build();
+    private readonly RabbitMqContainer _rabbitMqContainer = new RabbitMqBuilder("rabbitmq:4.2-management-alpine").Build();
     private Activity _unitTestActivity;
 
     [Test]
