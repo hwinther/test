@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Moq;
 using RabbitMQ.Client;
@@ -8,29 +8,26 @@ using WebApi.Messaging;
 
 namespace WebApi.Tests.Messaging;
 
-[TestFixture]
-public class RabbitMqTests
+[Collection("RabbitMq")]
+public class RabbitMqTests : IAsyncLifetime, IAsyncDisposable
 {
-    [OneTimeSetUp]
-    public async Task InitializeAsync()
+    private readonly RabbitMqContainer _rabbitMqContainer = new RabbitMqBuilder("rabbitmq:4.2-management-alpine").Build();
+    private Activity _unitTestActivity = null!;
+
+    public async ValueTask InitializeAsync()
     {
         await _rabbitMqContainer.StartAsync();
         _unitTestActivity = new Activity(nameof(RabbitMqTests));
     }
 
-    [OneTimeTearDown]
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _rabbitMqContainer.DisposeAsync();
         _unitTestActivity.Stop();
         _unitTestActivity.Dispose();
     }
 
-    private readonly RabbitMqContainer _rabbitMqContainer = new RabbitMqBuilder().Build();
-    private Activity _unitTestActivity;
-
-    [Test]
-    [Order(1)]
+    [Fact]
     public async Task IsOpen_ReturnsTrue()
     {
         // Given
@@ -40,14 +37,13 @@ public class RabbitMqTests
         };
 
         // When
-        await using var connection = await connectionFactory.CreateConnectionAsync();
+        await using var connection = await connectionFactory.CreateConnectionAsync(TestContext.Current.CancellationToken);
 
         // Then
-        Assert.That(connection.IsOpen);
+        Assert.True(connection.IsOpen);
     }
 
-    [Test]
-    [Order(2)]
+    [Fact]
     public async Task MessageSender_SendsMessage()
     {
         // Given

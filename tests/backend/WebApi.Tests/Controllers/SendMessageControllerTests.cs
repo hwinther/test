@@ -6,19 +6,18 @@ using WebApi.Messaging;
 
 namespace WebApi.Tests.Controllers;
 
-[TestFixture]
 public class SendMessageControllerTests
 {
-    [SetUp]
-    public void SetUp()
+    private readonly Mock<IMessageSender> _messageSenderMock;
+    private readonly SendMessageController _controller;
+
+    public SendMessageControllerTests()
     {
         _messageSenderMock = new Mock<IMessageSender>();
         _controller = new SendMessageController(_messageSenderMock.Object);
     }
-    private Mock<IMessageSender> _messageSenderMock;
-    private SendMessageController _controller;
 
-    [Test]
+    [Fact]
     public async Task Get_ReturnsOkResult()
     {
         // Arrange
@@ -29,11 +28,11 @@ public class SendMessageControllerTests
         var result = await _controller.Get();
 
         // Assert
-        Assert.That(result, Is.InstanceOf<ActionResult<GenericValue<string>>>());
-        Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
+        Assert.IsType<ActionResult<GenericValue<string>>>(result);
+        Assert.IsType<OkObjectResult>(result.Result);
         var okResult = (OkObjectResult) result.Result;
-        Assert.That(okResult.Value, Is.Not.Null);
-        Assert.That(okResult.Value, Is.AssignableFrom<GenericValue<string>>());
-        Assert.That(okResult.Value is GenericValue<string> {Value: "Message sent"});
+        Assert.NotNull(okResult.Value);
+        var value = Assert.IsAssignableFrom<GenericValue<string>>(okResult.Value);
+        Assert.Equal("Message sent", value.Value);
     }
 }

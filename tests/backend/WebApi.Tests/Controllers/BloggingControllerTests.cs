@@ -7,21 +7,20 @@ using WebApi.Repository;
 
 namespace WebApi.Tests.Controllers;
 
-[TestFixture]
 public class BloggingControllerTests
 {
-    [SetUp]
-    public void SetUp()
+    private readonly Mock<ILogger<BloggingController>> _loggerMock;
+    private readonly Mock<IBloggingRepository> _bloggingRepositoryMock;
+    private readonly BloggingController _controller;
+
+    public BloggingControllerTests()
     {
         _loggerMock = new Mock<ILogger<BloggingController>>();
         _bloggingRepositoryMock = new Mock<IBloggingRepository>();
         _controller = new BloggingController(_loggerMock.Object, _bloggingRepositoryMock.Object);
     }
-    private Mock<ILogger<BloggingController>> _loggerMock;
-    private Mock<IBloggingRepository> _bloggingRepositoryMock;
-    private BloggingController _controller;
 
-    [Test]
+    [Fact]
     public async Task GetBlogs_ReturnsListOfBlogs()
     {
         // Arrange
@@ -38,17 +37,17 @@ public class BloggingControllerTests
         var result = await _controller.GetBlogs(CancellationToken.None);
 
         // Assert
-        Assert.That(result, Is.InstanceOf<ActionResult<IEnumerable<BlogDto>>>());
+        Assert.IsType<ActionResult<IEnumerable<BlogDto>>>(result);
         var okResult = result.Result as OkObjectResult;
-        Assert.That(okResult, Is.Not.Null);
+        Assert.NotNull(okResult);
         var returnedBlogs = okResult.Value as IEnumerable<BlogDto>;
-        Assert.That(returnedBlogs, Is.Not.Null);
-        Assert.That(returnedBlogs.Count(), Is.EqualTo(2));
+        Assert.NotNull(returnedBlogs);
+        Assert.Equal(2, returnedBlogs.Count());
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetBlogs was called");
         _loggerMock.VerifyNoError();
     }
 
-    [Test]
+    [Fact]
     public async Task GetBlog_ValidId_ReturnsBlog()
     {
         // Arrange
@@ -59,21 +58,18 @@ public class BloggingControllerTests
         var result = await _controller.GetBlog(1, CancellationToken.None);
 
         // Assert
-        Assert.That(result, Is.InstanceOf<ActionResult<BlogDto>>());
+        Assert.IsType<ActionResult<BlogDto>>(result);
         var returnedBlog = result.Value;
-        Assert.That(returnedBlog, Is.Not.Null);
-        Assert.Multiple(() =>
-        {
-            Assert.That(returnedBlog.BlogId, Is.EqualTo(MockBlog.BlogId));
-            Assert.That(returnedBlog.Title, Is.EqualTo(MockBlog.Title));
-            Assert.That(returnedBlog.Url, Is.EqualTo(MockBlog.Url));
-        });
+        Assert.NotNull(returnedBlog);
+        Assert.Equal(MockBlog.BlogId, returnedBlog.BlogId);
+        Assert.Equal(MockBlog.Title, returnedBlog.Title);
+        Assert.Equal(MockBlog.Url, returnedBlog.Url);
 
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetBlog was called with id 1");
         _loggerMock.VerifyNoError();
     }
 
-    [Test]
+    [Fact]
     public async Task GetBlog_InvalidId_ReturnsNotFound()
     {
         // Arrange
@@ -84,12 +80,12 @@ public class BloggingControllerTests
         var result = await _controller.GetBlog(1, CancellationToken.None);
 
         // Assert
-        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+        Assert.IsType<NotFoundResult>(result.Result);
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetBlog was called with id 1");
         _loggerMock.VerifyNoError();
     }
 
-    [Test]
+    [Fact]
     public async Task PostBlog_NoId_StoresBlog()
     {
         // Arrange
@@ -111,21 +107,18 @@ public class BloggingControllerTests
                                                 CancellationToken.None);
 
         // Assert
-        Assert.That(result, Is.InstanceOf<ActionResult<BlogDto>>());
+        Assert.IsType<ActionResult<BlogDto>>(result);
         var returnedBlog = result.Value;
-        Assert.That(returnedBlog, Is.Not.Null);
-        Assert.Multiple(() =>
-        {
-            Assert.That(returnedBlog.BlogId, Is.EqualTo(blogId));
-            Assert.That(returnedBlog.Title, Is.EqualTo(MockBlog.Title));
-            Assert.That(returnedBlog.Url, Is.EqualTo(MockBlog.Url));
-        });
+        Assert.NotNull(returnedBlog);
+        Assert.Equal(blogId, returnedBlog.BlogId);
+        Assert.Equal(MockBlog.Title, returnedBlog.Title);
+        Assert.Equal(MockBlog.Url, returnedBlog.Url);
 
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "PostBlog was called");
         _loggerMock.VerifyNoError();
     }
 
-    [Test]
+    [Fact]
     public async Task PostBlog_InvalidId_ReturnsNotFound()
     {
         // Arrange
@@ -136,12 +129,12 @@ public class BloggingControllerTests
         var result = await _controller.PostBlog(MockBlog, CancellationToken.None);
 
         // Assert
-        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+        Assert.IsType<NotFoundResult>(result.Result);
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "PostBlog was called");
         _loggerMock.VerifyNoError();
     }
 
-    [Test]
+    [Fact]
     public async Task GetPosts_ReturnsListOfPosts()
     {
         // Arrange
@@ -158,17 +151,17 @@ public class BloggingControllerTests
         var result = await _controller.GetPosts(1, CancellationToken.None);
 
         // Assert
-        Assert.That(result, Is.InstanceOf<ActionResult<IEnumerable<PostDto>>>());
+        Assert.IsType<ActionResult<IEnumerable<PostDto>>>(result);
         var okResult = result.Result as OkObjectResult;
-        Assert.That(okResult, Is.Not.Null);
+        Assert.NotNull(okResult);
         var returnedPosts = okResult.Value as IEnumerable<PostDto>;
-        Assert.That(returnedPosts, Is.Not.Null);
-        Assert.That(returnedPosts.Count(), Is.EqualTo(2));
+        Assert.NotNull(returnedPosts);
+        Assert.Equal(2, returnedPosts.Count());
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetPosts was called with id 1");
         _loggerMock.VerifyNoError();
     }
 
-    [Test]
+    [Fact]
     public async Task GetPost_ValidId_ReturnsPost()
     {
         // Arrange
@@ -179,22 +172,19 @@ public class BloggingControllerTests
         var result = await _controller.GetPost(1, CancellationToken.None);
 
         // Assert
-        Assert.That(result, Is.InstanceOf<ActionResult<PostDto>>());
+        Assert.IsType<ActionResult<PostDto>>(result);
         var returnedPost = result.Value;
-        Assert.That(returnedPost, Is.Not.Null);
-        Assert.Multiple(() =>
-        {
-            Assert.That(returnedPost.PostId, Is.EqualTo(MockPost.PostId));
-            Assert.That(returnedPost.Title, Is.EqualTo(MockPost.Title));
-            Assert.That(returnedPost.BlogId, Is.EqualTo(MockPost.BlogId));
-            Assert.That(returnedPost.Content, Is.EqualTo(MockPost.Content));
-        });
+        Assert.NotNull(returnedPost);
+        Assert.Equal(MockPost.PostId, returnedPost.PostId);
+        Assert.Equal(MockPost.Title, returnedPost.Title);
+        Assert.Equal(MockPost.BlogId, returnedPost.BlogId);
+        Assert.Equal(MockPost.Content, returnedPost.Content);
 
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetPost was called with id 1");
         _loggerMock.VerifyNoError();
     }
 
-    [Test]
+    [Fact]
     public async Task GetPost_InvalidId_ReturnsNotFound()
     {
         // Arrange
@@ -205,12 +195,12 @@ public class BloggingControllerTests
         var result = await _controller.GetPost(1, CancellationToken.None);
 
         // Assert
-        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+        Assert.IsType<NotFoundResult>(result.Result);
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetPost was called with id 1");
         _loggerMock.VerifyNoError();
     }
 
-    [Test]
+    [Fact]
     public async Task PostPost_NoId_StoresPost()
     {
         // Arrange
@@ -232,22 +222,19 @@ public class BloggingControllerTests
                                                 CancellationToken.None);
 
         // Assert
-        Assert.That(result, Is.InstanceOf<ActionResult<PostDto>>());
+        Assert.IsType<ActionResult<PostDto>>(result);
         var returnedPost = result.Value;
-        Assert.That(returnedPost, Is.Not.Null);
-        Assert.Multiple(() =>
-        {
-            Assert.That(returnedPost.PostId, Is.EqualTo(postId));
-            Assert.That(returnedPost.Title, Is.EqualTo(MockPost.Title));
-            Assert.That(returnedPost.BlogId, Is.EqualTo(MockPost.BlogId));
-            Assert.That(returnedPost.Content, Is.EqualTo(MockPost.Content));
-        });
+        Assert.NotNull(returnedPost);
+        Assert.Equal(postId, returnedPost.PostId);
+        Assert.Equal(MockPost.Title, returnedPost.Title);
+        Assert.Equal(MockPost.BlogId, returnedPost.BlogId);
+        Assert.Equal(MockPost.Content, returnedPost.Content);
 
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "PostPost was called");
         _loggerMock.VerifyNoError();
     }
 
-    [Test]
+    [Fact]
     public async Task PostPost_InvalidId_ReturnsNotFound()
     {
         // Arrange
@@ -258,7 +245,7 @@ public class BloggingControllerTests
         var result = await _controller.PostPost(MockPost, CancellationToken.None);
 
         // Assert
-        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+        Assert.IsType<NotFoundResult>(result.Result);
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "PostPost was called");
         _loggerMock.VerifyNoError();
     }

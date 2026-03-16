@@ -2,10 +2,9 @@ using WebApi.Attributes;
 
 namespace WebApi.Tests.Attributes;
 
-[TestFixture]
 public class DefineConstantsAttributeTests
 {
-    [Test]
+    [Fact]
     public void AttributeInstantiation_WithConstantsString_IsNotNull()
     {
         // Arrange
@@ -15,10 +14,10 @@ public class DefineConstantsAttributeTests
         var attribute = new DefineConstantsAttribute(constantsString);
 
         // Assert
-        Assert.That(attribute, Is.Not.Null);
+        Assert.NotNull(attribute);
     }
 
-    [Test]
+    [Fact]
     public void ConstantsProperty_WithValidConstantsString_ParsesCorrectly()
     {
         // Arrange
@@ -34,6 +33,6 @@ public class DefineConstantsAttributeTests
         var actualConstants = attribute.Constants;
 
         // Assert
-        Assert.That(expectedConstants, Is.EqualTo(actualConstants));
+        Assert.Equal(expectedConstants, actualConstants);
     }
 }

@@ -462,7 +462,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "Represents version information for an assembly, including constants, environment name, version, and informational\r\nversion."
+        "description": "Represents version information for an assembly, including constants, environment name, version, and informational\nversion."
       },
       "WeatherForecast": {
         "type": "object",

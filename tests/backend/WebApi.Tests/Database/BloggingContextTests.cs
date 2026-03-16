@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -7,11 +7,14 @@ using WebApi.Repository;
 
 namespace WebApi.Tests.Database;
 
-[TestFixture]
-public class BloggingContextTests
+[Collection("BloggingContext")]
+public class BloggingContextTests : IAsyncLifetime, IAsyncDisposable
 {
-    [OneTimeSetUp]
-    public async Task SetUp()
+    private BloggingContext _context = null!;
+    private MsSqlDefaultConfiguration _msSqlContainer = null!;
+    private string _connectionString = null!;
+
+    public async ValueTask InitializeAsync()
     {
         _msSqlContainer = new MsSqlDefaultConfiguration();
         await _msSqlContainer.InitializeAsync();
@@ -22,21 +25,33 @@ public class BloggingContextTests
                       .Options;
 
         _context = new BloggingContext(options);
+        await _context.Database.MigrateAsync(CancellationToken.None);
+
+        var blogEntity = await _context.Blogs.AddAsync(new Blog
+        {
+            BlogId = 0,
+            Title = "test blog",
+            Url = "test://url"
+        }, CancellationToken.None);
+        await _context.SaveChangesAsync(CancellationToken.None);
+
+        await _context.Posts.AddAsync(new Post
+        {
+            PostId = 0,
+            BlogId = blogEntity.Entity.BlogId,
+            Title = "test post",
+            Content = "test content"
+        }, CancellationToken.None);
+        await _context.SaveChangesAsync(CancellationToken.None);
     }
 
-    [OneTimeTearDown]
-    public async Task Cleanup()
+    public async ValueTask DisposeAsync()
     {
-        await _msSqlContainer.DisposeAsync();
         await _context.DisposeAsync();
+        await _msSqlContainer.DisposeAsync();
     }
 
-    private BloggingContext _context;
-    private MsSqlDefaultConfiguration _msSqlContainer;
-    private string _connectionString;
-
-    [Test]
-    [Order(1)]
+    [Fact]
     public void ConnectionState_ReturnsOpen()
     {
         // Given
@@ -46,82 +61,53 @@ public class BloggingContextTests
         connection.Open();
 
         // Then
-        Assert.That(connection.State, Is.EqualTo(ConnectionState.Open));
+        Assert.Equal(ConnectionState.Open, connection.State);
     }
 
-    [Test]
-    [Order(2)]
-    public async Task BloggingContextMigrate_CreatesTablesAndCanStoreData()
+    [Fact]
+    public void BloggingContextMigrate_CreatesTablesAndCanStoreData()
     {
-        // Act
-        await _context.Database.MigrateAsync();
-
-        var blogEntity = await _context.Blogs.AddAsync(new Blog
-        {
-            BlogId = 0,
-            Title = "test blog",
-            Url = "test://url"
-        });
-
-        await _context.SaveChangesAsync();
-
-        await _context.Posts.AddAsync(new Post
-        {
-            PostId = 0,
-            BlogId = blogEntity.Entity.BlogId,
-            Title = "test post",
-            Content = "test content"
-        });
-
-        await _context.SaveChangesAsync();
-
-        // Assert
-        Assert.That(_context.Blogs.Count(), Is.EqualTo(1));
+        // Assert: schema and seeded data from InitializeAsync
+        Assert.Equal(1, _context.Blogs.Count());
         var blog = _context.Blogs.First();
-        Assert.That(blog.Posts, Has.Count.EqualTo(1));
+        Assert.Single(blog.Posts);
         var post = blog.Posts[0];
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(blog.Title, Is.EqualTo("test blog"));
-            Assert.That(blog.Url, Is.EqualTo("test://url"));
-            Assert.That(post.Title, Is.EqualTo("test post"));
-            Assert.That(post.Content, Is.EqualTo("test content"));
-            Assert.That(post.Blog, Is.Not.Null);
-        });
-
-        Assert.That(post.Blog.BlogId, Is.EqualTo(blog.BlogId));
+        Assert.Equal("test blog", blog.Title);
+        Assert.Equal("test://url", blog.Url);
+        Assert.Equal("test post", post.Title);
+        Assert.Equal("test content", post.Content);
+        Assert.NotNull(post.Blog);
+        Assert.Equal(blog.BlogId, post.Blog.BlogId);
     }
 
-    [Test]
-    [Order(3)]
+    [Fact]
     public async Task BloggingRepository_ReturnsSeededBlogsAndPosts()
     {
         // Arrange
         var bloggingRepository = new BloggingRepository(_context);
 
         // Act and Assert
-        var blogs = (await bloggingRepository.ListBlogsAsync(CancellationToken.None)).ToList();
-        Assert.That(blogs, Has.Count.EqualTo(1));
+        var ct = TestContext.Current.CancellationToken;
+        var blogs = (await bloggingRepository.ListBlogsAsync(ct)).ToList();
+        Assert.Single(blogs);
         var blog = blogs[0];
 
-        var blogAgain = await bloggingRepository.GetBlogAsync(blog.BlogId, CancellationToken.None);
-        Assert.That(blogAgain, Is.Not.Null);
+        var blogAgain = await bloggingRepository.GetBlogAsync(blog.BlogId, ct);
+        Assert.NotNull(blogAgain);
 
-        var posts = (await bloggingRepository.ListPostsAsync(blog.BlogId,
-                                                             CancellationToken.None)).ToList();
+        var posts = (await bloggingRepository.ListPostsAsync(blog.BlogId, ct)).ToList();
 
-        Assert.That(posts, Has.Count.EqualTo(1));
+        Assert.Single(posts);
         var post = posts[0];
-        var postAgain = await bloggingRepository.GetPostAsync(post.PostId, CancellationToken.None);
-        Assert.That(postAgain, Is.Not.Null);
+        var postAgain = await bloggingRepository.GetPostAsync(post.PostId, ct);
+        Assert.NotNull(postAgain);
 
-        Assert.That(await bloggingRepository.GetBlogAsync(100, CancellationToken.None), Is.Null);
-        Assert.That(await bloggingRepository.GetPostAsync(100, CancellationToken.None), Is.Null);
+        Assert.Null(await bloggingRepository.GetBlogAsync(100, ct));
+        Assert.Null(await bloggingRepository.GetPostAsync(100, ct));
     }
 
-    [Test]
-    [Order(4)]
+    [Fact]
     public async Task BloggingRepository_CanAddBlog()
     {
         // Arrange
@@ -132,25 +118,22 @@ public class BloggingContextTests
                                                                  {
                                                                      BlogId = 0
                                                                  },
-                                                                 CancellationToken.None);
+                                                                 TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.That(blog, Is.Not.Null);
-        Assert.Multiple(() =>
-        {
-            Assert.That(blog.BlogId, Is.Not.Zero);
-            Assert.That(blog.Title, Is.EqualTo(MockBlog.Title));
-            Assert.That(blog.Url, Is.EqualTo(MockBlog.Url));
-        });
+        Assert.NotNull(blog);
+        Assert.NotEqual(0, blog.BlogId);
+        Assert.Equal(MockBlog.Title, blog.Title);
+        Assert.Equal(MockBlog.Url, blog.Url);
     }
 
-    [Test]
-    [Order(5)]
+    [Fact]
     public async Task BloggingRepository_CanAddPost()
     {
         // Arrange
         var bloggingRepository = new BloggingRepository(_context);
-        var blog = (await bloggingRepository.ListBlogsAsync(CancellationToken.None)).First();
+        var ct = TestContext.Current.CancellationToken;
+        var blog = (await bloggingRepository.ListBlogsAsync(ct)).First();
 
         // Act
         var post = await bloggingRepository.AddOrUpdatePostAsync(MockPost with
@@ -158,72 +141,69 @@ public class BloggingContextTests
                                                                      BlogId = blog.BlogId,
                                                                      PostId = 0
                                                                  },
-                                                                 CancellationToken.None);
+                                                                 ct);
 
         // Assert
-        Assert.That(post, Is.Not.Null);
-        Assert.Multiple(() =>
-        {
-            Assert.That(post.PostId, Is.Not.Zero);
-            Assert.That(post.Title, Is.EqualTo(MockPost.Title));
-            Assert.That(post.Content, Is.EqualTo(MockPost.Content));
-        });
+        Assert.NotNull(post);
+        Assert.NotEqual(0, post.PostId);
+        Assert.Equal(MockPost.Title, post.Title);
+        Assert.Equal(MockPost.Content, post.Content);
     }
 
-    [Test]
-    [Order(6)]
+    [Fact]
     public async Task BloggingRepository_CanUpdateBlogs()
     {
         // Arrange
+        var ct = TestContext.Current.CancellationToken;
         var bloggingRepository = new BloggingRepository(_context);
-        var blog = (await bloggingRepository.ListBlogsAsync(CancellationToken.None)).First();
+        var blog = (await bloggingRepository.ListBlogsAsync(ct)).First();
 
         // Act
         var blogResult = await bloggingRepository.AddOrUpdateBlogAsync(blog with
                                                                        {
                                                                            Title = "changed"
                                                                        },
-                                                                       CancellationToken.None);
+                                                                       ct);
 
         var blogDoesNotExistResult = await bloggingRepository.AddOrUpdateBlogAsync(blog with
                                                                                    {
                                                                                        BlogId = 100,
                                                                                        Title = "changed"
                                                                                    },
-                                                                                   CancellationToken.None);
+                                                                                   ct);
 
         // Assert
-        Assert.That(blogResult, Is.Not.Null);
-        Assert.That(blogResult.Title, Is.EqualTo("changed"));
-        Assert.That(blogDoesNotExistResult, Is.Null);
+        Assert.NotNull(blogResult);
+        Assert.Equal("changed", blogResult.Title);
+        Assert.Null(blogDoesNotExistResult);
     }
 
-    [Test]
-    [Order(7)]
+    [Fact]
     public async Task BloggingRepository_CanUpdatePosts()
     {
         // Arrange
+        var ct = TestContext.Current.CancellationToken;
         var bloggingRepository = new BloggingRepository(_context);
-        var blog = (await bloggingRepository.ListBlogsAsync(CancellationToken.None)).First();
-        var post = (await bloggingRepository.ListPostsAsync(blog.BlogId, CancellationToken.None)).First();
+        var blog = (await bloggingRepository.ListBlogsAsync(ct)).First();
+        var post = (await bloggingRepository.ListPostsAsync(blog.BlogId, ct)).First();
 
         // Act
         var postResult = await bloggingRepository.AddOrUpdatePostAsync(post with
                                                                        {
                                                                            Title = "changed"
                                                                        },
-                                                                       CancellationToken.None);
+                                                                       ct);
 
         var postDoesNotExistResult = await bloggingRepository.AddOrUpdatePostAsync(post with
                                                                                    {
                                                                                        PostId = 100,
                                                                                        Title = "changed"
                                                                                    },
-                                                                                   CancellationToken.None);
+                                                                                   ct);
 
         // Assert
-        Assert.That(postResult, Is.Not.Null);
-        Assert.That(postResult.Title, Is.EqualTo("changed"));
-        Assert.That(postDoesNotExistResult, Is.Null);
+        Assert.NotNull(postResult);
+        Assert.Equal("changed", postResult.Title);
+        Assert.Null(postDoesNotExistResult);
     }
 }
