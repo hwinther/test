@@ -1,0 +1,26 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="../../.gitignore" />
+    <File Path="../../README.md" />
+    <File Path=".runsettings" />
+  </Folder>
+  <Folder Name="/Solution Items/src/">
+    <File Path=".config/dotnet-tools.json" />
+    <File Path=".runsettings" />
+    <File Path="Directory.Build.props" />
+    <File Path="global.json" />
+  </Folder>
+  <Folder Name="/Solution Items/src/log/">
+    <File Path="log/placeholder.md" />
+  </Folder>
+  <Folder Name="/Solution Items/tests/">
+    <File Path="../../tests/backend/Directory.Build.props" />
+  </Folder>
+  <Project Path="../../shared/NugetDistSample/NugetDistSample.csproj" />
+  <Project Path="../../tests/backend/WebApi.Tests/WebApi.Tests.csproj" />
+  <Project Path="ApiClient/ApiClient.csproj" />
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+  <Project Path="WebApi/WebApi.csproj" />
+</Solution>
