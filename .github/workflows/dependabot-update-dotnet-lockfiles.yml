@@ -6,8 +6,8 @@ on:
 
 env:
   SOLUTION_PATH: "src/backend"
-  SOLUTION_NAME: "Backend.sln"
-  DOTNET_VERSION: "9.0.x"
+  SOLUTION_NAME: "Backend.slnx"
+  DOTNET_VERSION: "10.0.x"
 
 jobs:
   update-lockfiles:
