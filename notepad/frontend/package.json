@@ -1,0 +1,28 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.10.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "@platejs/basic-nodes": "^52.0.11",
+    "@platejs/code-block": "^52.0.11",
+    "@platejs/indent": "^52.0.11",
+    "@platejs/list": "^52.0.11",
+    "@tauri-apps/api": "^2.10.1",
+    "platejs": "^52.0.11",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "productName": "Plate Notepad",
+  "mainBinaryName": "Plate Notepad",
+  "version": "0.1.0",
+  "identifier": "com.example.plate-notepad",
+  "bundle": {
+    "targets": ["nsis"],
+    "windows": {
+      "nsis": {
+        "installerHooks": "./windows/hooks.nsi"
+      }
+    }
+  },
+  "build": {
+    "beforeDevCommand": "npm run dev --prefix frontend",
+    "beforeBuildCommand": "npm run build --prefix frontend",
+    "frontendDist": "../frontend/dist",
+    "devUrl": "http://localhost:5173"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Plate Notepad",
+        "label": "main",
+        "width": 900,
+        "height": 600,
+        "resizable": true,
+        "transparent": true,
+        "decorations": false,
+        "shadow": true
+      }
+    ]
+  }
+}
