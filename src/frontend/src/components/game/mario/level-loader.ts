@@ -1,5 +1,7 @@
 import type { LevelData, LevelTile } from './level-format'
-import type { Collectible, Enemy, FlagPole, MarioGameState, Platform } from './mario-types'
+import type { Collectible, Enemy, FlagPole, LevelTheme, MarioGameState, Platform } from './mario-types'
+
+type EnemySpawnKind = 'goomba' | 'koopa' | 'piranha'
 
 export class LevelLoader {
   static createDefaultLevel(): LevelData {
@@ -107,11 +109,15 @@ export class LevelLoader {
         description: 'The classic first level',
         difficulty: 1,
         theme: 'overworld',
+        timeLimit: 400,
       },
       name: 'World 1-1',
       objects: {
-        collectibles: [{ id: 'mushroom-1', type: 'mushroom', value: 1000, x: 26, y: 3 }],
-        enemies: [],
+        collectibles: [
+          { id: 'mushroom-1', type: 'mushroom', value: 1000, x: 26, y: 3 },
+          { id: 'flower-1', type: 'fireflower', value: 500, x: 28, y: 3 },
+        ],
+        enemies: [{ id: 'piranha-1', type: 'piranha', x: 31, y: 7 }],
         spawners: [],
       },
       startPosition: { x: 1, y: 9 },
@@ -158,7 +164,6 @@ export class LevelLoader {
     }
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   static parseLevel(levelData: LevelData): Partial<MarioGameState> {
     const platforms: Platform[] = []
     const enemies: Enemy[] = []
@@ -181,6 +186,7 @@ export class LevelLoader {
             platforms.push({
               breakable: tile.properties?.breakable ?? tile.type === 'brick',
               height: tile.properties?.pipeHeight ? tile.properties.pipeHeight * tileSize : tileSize,
+              id: `${tile.type}-${row}-${col}`,
               solid: true,
               type: tile.type,
               width: tileSize,
@@ -204,15 +210,19 @@ export class LevelLoader {
 
           case 'enemy-spawn':
             if (tile.properties?.enemyType) {
+              const et = tile.properties.enemyType as EnemySpawnKind
+              const isPiranha = et === 'piranha'
+              const m = LevelLoader.metricsForSpawnKind(et)
               enemies.push({
                 alive: true,
+                anchorY: isPiranha ? y + tileSize * 0.5 : undefined,
                 direction: 'left',
-                height: tile.properties.enemyType === 'koopa' ? 32 : 24,
+                height: m.height,
                 id: `enemy-${row}-${col}`,
-                type: tile.properties.enemyType,
-                velocityX: tile.properties.enemyType === 'koopa' ? -2.5 : -2,
+                type: et,
+                velocityX: m.velocityX,
                 velocityY: 0,
-                width: tile.properties.enemyType === 'koopa' ? 28 : 24,
+                width: m.width,
                 x,
                 y,
               })
@@ -224,28 +234,36 @@ export class LevelLoader {
 
     // Parse additional objects
     for (const enemyData of levelData.objects.enemies) {
+      const kind = enemyData.type as EnemySpawnKind
+      const isPiranha = kind === 'piranha'
+      const m = LevelLoader.metricsForSpawnKind(kind)
+      const px = enemyData.x * tileSize
+      const py = enemyData.y * tileSize
       enemies.push({
         alive: true,
+        anchorY: isPiranha ? py + tileSize * 0.5 : undefined,
         direction: 'left',
-        height: enemyData.type === 'koopa' ? 32 : 24,
+        height: m.height,
         id: enemyData.id,
-        type: enemyData.type as 'goomba' | 'koopa' | 'piranha',
-        velocityX: enemyData.type === 'koopa' ? -2.5 : -2,
+        type: kind,
+        velocityX: m.velocityX,
         velocityY: 0,
-        width: enemyData.type === 'koopa' ? 28 : 24,
-        x: enemyData.x * tileSize,
-        y: enemyData.y * tileSize,
+        width: m.width,
+        x: px,
+        y: py,
       })
     }
 
     for (const collectibleData of levelData.objects.collectibles) {
+      const large =
+        collectibleData.type === 'mushroom' || collectibleData.type === 'fireflower' || collectibleData.type === 'star'
       collectibles.push({
         collected: false,
-        height: collectibleData.type === 'mushroom' ? 24 : 16,
+        height: large ? 24 : 16,
         id: collectibleData.id,
         type: collectibleData.type as 'coin' | 'fireflower' | 'mushroom' | 'star',
         value: collectibleData.value,
-        width: collectibleData.type === 'mushroom' ? 24 : 16,
+        width: large ? 24 : 16,
         x: collectibleData.x * tileSize,
         y: collectibleData.y * tileSize,
       })
@@ -271,14 +289,18 @@ export class LevelLoader {
       }
     }
 
+    const theme = (levelData.metadata.theme || 'overworld') as LevelTheme
+
     return {
       collectibles,
       enemies,
       flagPole,
       levelHeight: levelData.dimensions.height * tileSize,
+      levelTheme: theme,
       levelWidth: levelData.dimensions.width * tileSize,
       platforms,
       player: {
+        coyoteFrames: 0,
         facing: 'right',
         height: 32,
         invulnerable: false,
@@ -293,6 +315,22 @@ export class LevelLoader {
         x: levelData.startPosition.x * tileSize,
         y: levelData.startPosition.y * tileSize,
       },
+    }
+  }
+
+  /**
+   * Hitbox size and horizontal speed for an enemy spawned from tiles or `objects.enemies`.
+   * @param {'goomba' | 'koopa' | 'piranha'} kind - Enemy variant from level JSON
+   * @returns {object} width, height, and initial velocityX
+   */
+  private static metricsForSpawnKind(kind: EnemySpawnKind): { height: number; velocityX: number; width: number } {
+    switch (kind) {
+      case 'koopa':
+        return { height: 32, velocityX: -2.5, width: 28 }
+      case 'piranha':
+        return { height: 28, velocityX: 0, width: 24 }
+      default:
+        return { height: 24, velocityX: -2, width: 24 }
     }
   }
 }

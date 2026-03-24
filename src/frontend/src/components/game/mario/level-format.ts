@@ -55,7 +55,7 @@ export interface LevelTile {
     [key: string]: any
     breakable?: boolean
     collectibleType?: 'coin' | 'mushroom'
-    enemyType?: 'goomba' | 'koopa'
+    enemyType?: 'goomba' | 'koopa' | 'piranha'
     pipeHeight?: number
   }
   type: 'air' | 'brick' | 'cloud' | 'coin' | 'enemy-spawn' | 'flag-pole' | 'ground' | 'pipe' | 'player-spawn'
