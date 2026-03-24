@@ -1,4 +1,4 @@
-import react from '@vitejs/plugin-react-swc'
+import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 import vike from 'vike/plugin'
 import mkcert from 'vite-plugin-mkcert'
@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     port: 5173,
   },
-  plugins: [react(), vike({ prerender: true }), mkcert()],
+  plugins: [react(), vike(), mkcert()],
   resolve: {
     alias: {
       '~': '/src',

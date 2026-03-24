@@ -1,3 +1,5 @@
+import type { Config } from 'vike/types'
+
 export default {
-  // Add settings here later
-}
+  prerender: true,
+} satisfies Config
