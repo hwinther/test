@@ -137,8 +137,8 @@ jobs:
         run: dotnet test ../../tests/backend/WebApi.Tests --no-restore -- --report-trx --report-trx-filename test-results.trx --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
         continue-on-error: true
 
-      #- uses: hwinther/test-reporter@dotnet-nunit # TODO: set back to original once nunit is supported: dorny/test-reporter@v2
-      - uses: dorny/test-reporter@v2
+      #- uses: hwinther/test-reporter@dotnet-nunit # TODO: set back to original once nunit is supported: dorny/test-reporter@v3
+      - uses: dorny/test-reporter@v3
         id: test-reporter
         with:
           name: "WebApi Tests"
