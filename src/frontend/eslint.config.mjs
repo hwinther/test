@@ -25,7 +25,7 @@ export default [
       jsDoc,
     },
   },
-  perfectionist.configs['recommended-natural'],
+  //perfectionist.configs['recommended-natural'],
   cspellESLintPluginRecommended,
   eslintPluginSonarJs.configs.recommended,
   jsDoc.configs['flat/recommended'],
