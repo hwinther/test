@@ -12,6 +12,11 @@ interface LeaderboardOverlayProps {
   readonly score: number
 }
 
+/**
+ * Full-screen flow after game over: enter initials, submit score, view top scores.
+ * @param {LeaderboardOverlayProps} props - Parent callbacks and final score
+ * @returns {JSX.Element} Name entry or high-score table overlay
+ */
 export function LeaderboardOverlay({ onDone, score }: LeaderboardOverlayProps): JSX.Element {
   const [phase, setPhase] = useState<Phase>('entering-name')
   const [name, setName] = useState('')

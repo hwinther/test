@@ -24,7 +24,13 @@
     "vike",
     "visualstudio",
     "vsmarketplacebadge",
-    "wasd"
+    "wasd",
+    "WITHSCORES",
+    "zadd",
+    "zcard",
+    "zremrangebyrank",
+    "zrevrank",
+    "zrevrange"
   ],
   "ignorePaths": ["node_modules/**", "*.lock"]
 }
