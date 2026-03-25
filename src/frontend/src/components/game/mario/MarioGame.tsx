@@ -238,6 +238,12 @@ export function MarioGame({
         <p>E: Open Map Editor</p>
         <p>ESC: Exit Game</p>
         <p>R: Restart or next level (when game over / complete)</p>
+        {levelSequence && levelSequence.length > 1 ? (
+          <p>
+            Campaign: {levelSequence.length} levels (1-1 → 1-2 → 1-3) — after the flag, press R to continue (score
+            and lives carry over).
+          </p>
+        ) : null}
       </div>
     </div>
   )
