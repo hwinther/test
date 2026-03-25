@@ -31,7 +31,7 @@ export interface MarioGameProps {
  * Mario-style side-scrolling platform game (fixed-step sim, canvas render, optional editor).
  * @param {MarioGameProps} props - Root component props
  * @param {LevelData} [props.customLevel] - Level JSON to load instead of the default world
- * @param {LevelData[]} [props.levelSequence] - Ordered levels; R after complete advances with carried score/lives
+ * @param {LevelData[]} [props.levelSequence] - Ordered levels; Enter after complete advances with carried score/lives
  * @param {() => void} [props.onClose] - Invoked when the player presses Escape outside the editor
  * @param {(result: MarioGameResult) => void} [props.onLevelComplete] - Fires once when the level completes
  * @param {boolean} [props.showEditor] - Start in the map editor when true
@@ -63,6 +63,8 @@ export function MarioGame({
   const gamepadJumpPrevRef = useRef(false)
   const gamepadFirePrevRef = useRef(false)
   const sequenceIndexRef = useRef(0)
+  const levelSequenceRef = useRef(levelSequence)
+  levelSequenceRef.current = levelSequence
   const completeNotifiedRef = useRef(false)
   const onLevelCompleteRef = useRef(onLevelComplete)
   onLevelCompleteRef.current = onLevelComplete
@@ -170,7 +172,12 @@ export function MarioGame({
         }
       }
 
-      drawGame(canvas, gameStateRef.current)
+      const seq = levelSequenceRef.current
+      const hasNextCampaignLevel =
+        gameStateRef.current.gameStatus === 'complete' &&
+        seq !== undefined &&
+        sequenceIndexRef.current < seq.length - 1
+      drawGame(canvas, gameStateRef.current, { hasNextCampaignLevel })
       rafRef.current = requestAnimationFrame(loop)
     }
 
@@ -256,12 +263,10 @@ export function MarioGame({
         <p>Gamepad: stick / d-pad, A jump, B fire, shoulder buttons run.</p>
         <p>E: Open Map Editor</p>
         <p>ESC: Exit Game</p>
-        <p>R: Restart or next level (when game over / complete)</p>
+        <p>R: Restart after game over</p>
+        <p>Enter: Continue after you clear a level (score and lives carry over in campaign)</p>
         {levelSequence && levelSequence.length > 1 ? (
-          <p>
-            Campaign: {levelSequence.length} levels (1-1 → 1-2 → 1-3) — after the flag, press R to continue (score
-            and lives carry over).
-          </p>
+          <p>Campaign: {levelSequence.length} levels (press Enter at the level-clear screen to go on).</p>
         ) : null}
       </div>
     </div>

@@ -22,13 +22,20 @@ export function buildMarioGameResult(state: MarioGameState): MarioGameResult {
   }
 }
 
+/** Optional copy for campaign-aware overlays on the canvas. */
+export interface DrawGameOptions {
+  /** When set, level-complete hint mentions another stage vs. starting a new run */
+  readonly hasNextCampaignLevel?: boolean
+}
+
 /**
  * Draw the full game frame (world, entities, HUD, overlays) to a canvas.
  * @param {HTMLCanvasElement} canvas - Target element (2d context required)
  * @param {import('./mario-types').MarioGameState} state - Current simulation snapshot from the game ref
+ * @param {DrawGameOptions} [drawOptions] - Campaign hints for level-complete messaging
  * @returns {void}
  */
-export function drawGame(canvas: HTMLCanvasElement, state: MarioGameState): void {
+export function drawGame(canvas: HTMLCanvasElement, state: MarioGameState, drawOptions?: DrawGameOptions): void {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
 
@@ -248,6 +255,17 @@ export function drawGame(canvas: HTMLCanvasElement, state: MarioGameState): void
         ctx.fillStyle = '#FFA500'
         ctx.fillRect(particle.x - 2, particle.y - 2, 4, 4)
         break
+      case 'score': {
+        const n = particle.value ?? 0
+        ctx.fillStyle = '#FFFFFF'
+        ctx.font = 'bold 14px Arial'
+        ctx.strokeStyle = '#000000'
+        ctx.lineWidth = 3
+        const text = `+${n}`
+        ctx.strokeText(text, particle.x, particle.y)
+        ctx.fillText(text, particle.x, particle.y)
+        break
+      }
       default:
         break
     }
@@ -296,7 +314,11 @@ export function drawGame(canvas: HTMLCanvasElement, state: MarioGameState): void
     ctx.font = '18px Arial'
     ctx.fillText(`Final Score: ${state.score}`, MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 + 20)
     ctx.fillText(`Time: ${Math.floor(state.gameTime)}s`, MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 + 50)
-    ctx.fillText('Press R to restart or ESC to exit', MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 + 80)
+    const completeHint =
+      drawOptions?.hasNextCampaignLevel === true
+        ? 'Press Enter to continue to the next level — Esc to exit'
+        : 'Press Enter to continue — Esc to exit'
+    ctx.fillText(completeHint, MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 + 80)
     ctx.textAlign = 'left'
   }
 

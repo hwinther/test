@@ -26,7 +26,15 @@ export function handleMarioKeyDown(event: KeyboardEvent, d: MarioGameKeyboardDep
 
   const status = d.gameStateRef.current.gameStatus
 
-  if (event.code === 'KeyR' && (status === 'gameOver' || status === 'complete')) {
+  const continueLevel =
+    (event.code === 'Enter' || event.code === 'NumpadEnter') && status === 'complete'
+  if (continueLevel) {
+    event.preventDefault()
+    d.restartOrAdvance()
+    return
+  }
+
+  if (event.code === 'KeyR' && status === 'gameOver') {
     d.restartOrAdvance()
     return
   }

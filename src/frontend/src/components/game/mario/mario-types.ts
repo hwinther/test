@@ -111,7 +111,9 @@ export interface Particle {
   id: string
   life: number
   maxLife: number
-  type: 'brick' | 'coin' | 'explosion'
+  type: 'brick' | 'coin' | 'explosion' | 'score'
+  /** Pop-up points when `type` is `'score'` */
+  value?: number
   velocityX: number
   velocityY: number
   x: number

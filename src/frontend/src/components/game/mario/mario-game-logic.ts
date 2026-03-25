@@ -28,6 +28,61 @@ const PLAYER_W = 32
 const SMALL_H = 32
 const BIG_H = 48
 
+/** Points for jumping on a walkable enemy (Goomba / Koopa). */
+const SCORE_STOMP_ENEMY = 200
+/** Points for defeating an enemy with a fireball or while invincible (star). */
+const SCORE_FIRE_OR_STAR_ENEMY = 200
+
+/**
+ * True when the player is coming down onto the enemy’s head (not rising through or side-bumping).
+ * @param {import('./mario-types').Player} player - Mario after movement this tick
+ * @param {import('./mario-types').Enemy} enemy - Grounded enemy hitbox
+ * @returns {boolean} Whether to treat contact as a stomp
+ */
+function isStompFromAbove(player: Player, enemy: Enemy): boolean {
+  if (player.velocityY < -0.5) return false
+  const feet = player.y + player.height
+  const penetration = feet - enemy.y
+  const maxPen = Math.min(22, enemy.height * 0.65)
+  if (penetration < 0 || penetration > maxPen) return false
+  if (player.velocityY > 0) return true
+  return penetration <= 14
+}
+
+/**
+ * Award score and floating “+pts” for an enemy defeat; increments `enemiesDefeated`.
+ * @param {import('./mario-types').MarioGameState} state - Game state to mutate
+ * @param {number} points - Amount to add to `score`
+ * @param {number} popupX - World X for the pop-up text
+ * @param {number} popupY - World Y for the pop-up text
+ * @param {number} now - Timestamp for particle id
+ * @param {string} idSuffix - Disambiguates particle ids
+ * @returns {void}
+ */
+function awardEnemyScore(
+  state: MarioGameState,
+  points: number,
+  popupX: number,
+  popupY: number,
+  now: number,
+  idSuffix: string,
+): void {
+  state.score += points
+  state.enemiesDefeated++
+  playMarioSound('stomp')
+  state.particles.push({
+    id: `score-${idSuffix}-${now}`,
+    life: 32,
+    maxLife: 32,
+    type: 'score',
+    value: points,
+    velocityX: (Math.random() - 0.5) * 0.8,
+    velocityY: -1.5,
+    x: popupX,
+    y: popupY,
+  })
+}
+
 /**
  * Advance simulation by one fixed tick: input, movement, collisions, entities, timers.
  * @param {import('./mario-types').MarioGameState} prev - State at the start of the tick
@@ -209,7 +264,7 @@ export function advanceGameState(prev: MarioGameState, input: GameInputSnapshot,
     playMarioSound('fire')
   }
 
-  newState.fireballs = updateFireballs(newState)
+  newState.fireballs = updateFireballs(newState, now)
 
   newState.enemies = updateEnemies(newState, player, now, starActive)
 
@@ -536,9 +591,14 @@ function updateEnemies(state: MarioGameState, player: Player, now: number, starA
         if (checkCollision(player, updatedEnemy)) {
           if (starKills) {
             updatedEnemy.alive = false
-            state.score += 200
-            state.enemiesDefeated++
-            playMarioSound('stomp')
+            awardEnemyScore(
+              state,
+              SCORE_FIRE_OR_STAR_ENEMY,
+              updatedEnemy.x + updatedEnemy.width / 2,
+              updatedEnemy.y,
+              now,
+              'star-piranha',
+            )
           } else if (now >= state.invulnerableUntil) {
             applyPlayerDamage(state, player, now)
           }
@@ -610,9 +670,14 @@ function updateEnemies(state: MarioGameState, player: Player, now: number, starA
       if (checkCollision(player, updatedEnemy)) {
         if (starKills) {
           updatedEnemy.alive = false
-          state.score += 200
-          state.enemiesDefeated++
-          playMarioSound('stomp')
+          awardEnemyScore(
+            state,
+            SCORE_FIRE_OR_STAR_ENEMY,
+            updatedEnemy.x + updatedEnemy.width / 2,
+            updatedEnemy.y,
+            now,
+            `star-${updatedEnemy.id}`,
+          )
           state.particles.push({
             id: `particle-${now}`,
             life: 30,
@@ -623,12 +688,17 @@ function updateEnemies(state: MarioGameState, player: Player, now: number, starA
             x: updatedEnemy.x,
             y: updatedEnemy.y,
           })
-        } else if (player.velocityY > 0 && player.y < updatedEnemy.y) {
+        } else if (isStompFromAbove(player, updatedEnemy)) {
           updatedEnemy.alive = false
           player.velocityY = -JUMP_FORCE / 2
-          state.score += 200
-          state.enemiesDefeated++
-          playMarioSound('stomp')
+          awardEnemyScore(
+            state,
+            SCORE_STOMP_ENEMY,
+            updatedEnemy.x + updatedEnemy.width / 2,
+            updatedEnemy.y,
+            now,
+            `stomp-${updatedEnemy.id}`,
+          )
           state.particles.push({
             id: `particle-${now}-stomp`,
             life: 30,
@@ -654,9 +724,10 @@ function updateEnemies(state: MarioGameState, player: Player, now: number, starA
 /**
  * Integrate fireball motion, platform hits, and enemy kills for this tick.
  * @param {import('./mario-types').MarioGameState} state - Mutable game state (also mutates enemy alive flags)
+ * @param {number} now - Tick time for score particle ids
  * @returns {import('./mario-types').Fireball[]} Projectiles that remain in play
  */
-function updateFireballs(state: MarioGameState): Fireball[] {
+function updateFireballs(state: MarioGameState, now: number): Fireball[] {
   const next: Fireball[] = []
   for (const fb of state.fireballs) {
     const moved = {
@@ -681,9 +752,14 @@ function updateFireballs(state: MarioGameState): Fireball[] {
       if (!enemy.alive) continue
       if (checkCollision(moved, enemy)) {
         enemy.alive = false
-        state.score += 200
-        state.enemiesDefeated++
-        playMarioSound('stomp')
+        awardEnemyScore(
+          state,
+          SCORE_FIRE_OR_STAR_ENEMY,
+          enemy.x + enemy.width / 2,
+          enemy.y,
+          now,
+          `fb-${moved.id}-${enemy.id}`,
+        )
         state.particles.push({
           id: `ex-${moved.id}`,
           life: 25,
