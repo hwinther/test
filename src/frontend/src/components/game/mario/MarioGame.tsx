@@ -3,6 +3,7 @@ import { type JSX, useCallback, useEffect, useRef, useState } from 'react'
 import type { LevelData } from './level-format'
 import type { GameInputSnapshot, KeyState, MarioGameResult, MarioGameState } from './mario-types'
 
+import { LeaderboardOverlay } from './LeaderboardOverlay'
 import { LevelLoader } from './level-loader'
 import { MapEditor } from './MapEditor'
 import { buildMarioGameResult, drawGame } from './mario-game-canvas'
@@ -66,6 +67,10 @@ export function MarioGame({
   const onLevelCompleteRef = useRef(onLevelComplete)
   onLevelCompleteRef.current = onLevelComplete
 
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const showLeaderboardRef = useRef(false)
+  const gameOverHandledRef = useRef(false)
+
   const lastTimeRef = useRef(performance.now())
   const accRef = useRef(0)
   const rafRef = useRef(0)
@@ -109,6 +114,9 @@ export function MarioGame({
       })
     }
     completeNotifiedRef.current = false
+    gameOverHandledRef.current = false
+    setShowLeaderboard(false)
+    showLeaderboardRef.current = false
   }, [currentLevel, customLevel, levelSequence])
 
   const handlePlayTestLevel = useCallback((level: LevelData) => {
@@ -154,6 +162,12 @@ export function MarioGame({
           completeNotifiedRef.current = true
           onLevelCompleteRef.current?.(buildMarioGameResult(gameStateRef.current))
         }
+
+        if (before !== 'gameOver' && after === 'gameOver' && !gameOverHandledRef.current) {
+          gameOverHandledRef.current = true
+          showLeaderboardRef.current = true
+          setShowLeaderboard(true)
+        }
       }
 
       drawGame(canvas, gameStateRef.current)
@@ -181,9 +195,11 @@ export function MarioGame({
       setEditorMode,
     }
     const onKeyDown = (event: KeyboardEvent) => {
+      if (showLeaderboardRef.current) return
       handleMarioKeyDown(event, deps)
     }
     const onKeyUp = (event: KeyboardEvent) => {
+      if (showLeaderboardRef.current) return
       handleMarioKeyUp(event, keyStateRef)
     }
 
@@ -215,7 +231,7 @@ export function MarioGame({
         </button>
       </div>
 
-      <div className="mario-game-canvas-container">
+      <div className="mario-game-canvas-container" style={{ position: 'relative' }}>
         <canvas
           className="mario-game-canvas"
           height={MARIO_CANVAS_HEIGHT}
@@ -223,6 +239,9 @@ export function MarioGame({
           tabIndex={0}
           width={MARIO_CANVAS_WIDTH}
         />
+        {showLeaderboard && (
+          <LeaderboardOverlay onDone={restartOrAdvance} score={gameStateRef.current.score} />
+        )}
       </div>
 
       <div className="mario-game-controls">
