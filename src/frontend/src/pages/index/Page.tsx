@@ -15,10 +15,6 @@ import './Page.css'
 
 import viteLogo from '/vite.svg'
 
-/**
- * This is the main component of the application.
- * @returns {JSX.Element} The rendered Page component.
- */
 function Page(): JSX.Element {
   const [count, setCount] = useState(0)
   const [showGame, setShowGame] = useState(false)

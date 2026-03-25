@@ -1,6 +1,5 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
-import vike from 'vike/plugin'
 import mkcert from 'vite-plugin-mkcert'
 
 import { leaderboardPlugin } from './server/vite-plugin-leaderboard'
@@ -10,7 +9,7 @@ export default defineConfig({
   server: {
     port: 5173,
   },
-  plugins: [react(), vike(), mkcert(), leaderboardPlugin()],
+  plugins: [react(), mkcert(), leaderboardPlugin()],
   resolve: {
     alias: {
       '~': '/src',

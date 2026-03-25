@@ -1,14 +1,13 @@
 import React from 'react'
-import { usePageContext } from 'vike-react/usePageContext'
+import { Link, useParams } from 'react-router'
 
 import { useGetBlog, useGetPosts } from '~/api/endpoints/blogging/blogging'
-import { Link } from '~/renderer/Link'
 
-const BlogListView: React.FC = () => {
-  const pageContext = usePageContext()
-  const id = pageContext.routeParams.id ?? window.location.pathname.split('/').at(-1)
-  const { data: blog, error: blogError, isLoading: blogIsLoading } = useGetBlog(parseInt(id))
-  const { data: posts, error: postsError, isLoading: postsIsLoading } = useGetPosts(parseInt(id))
+const BlogDetailView: React.FC = () => {
+  const { id } = useParams<{ id: string }>()
+  const numericId = Number.parseInt(id ?? '')
+  const { data: blog, error: blogError, isLoading: blogIsLoading } = useGetBlog(numericId)
+  const { data: posts, error: postsError, isLoading: postsIsLoading } = useGetPosts(numericId)
 
   if (blogIsLoading || postsIsLoading) return <div>Loading...</div>
   if (blogError != null || blog === undefined || postsError != null || posts === undefined)
@@ -24,7 +23,7 @@ const BlogListView: React.FC = () => {
         {posts?.map((post) => (
           <li key={post.postId}>
             <p>
-              <Link className="is-active" href={`/blog/${blog?.blogId}/post/${post.postId}`}>
+              <Link to={`/blog/${blog?.blogId}/post/${post.postId}`}>
                 {post.title} - ({post.content})
               </Link>
             </p>
@@ -35,4 +34,4 @@ const BlogListView: React.FC = () => {
   )
 }
 
-export default BlogListView
+export default BlogDetailView
