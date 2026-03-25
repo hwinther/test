@@ -38,6 +38,13 @@ services:
     depends_on:
       - webapi
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./docker-volumes/redis/data:/data
+
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:

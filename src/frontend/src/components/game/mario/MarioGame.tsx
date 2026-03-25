@@ -1,53 +1,56 @@
-/* eslint-disable sonarjs/cognitive-complexity */
-/* eslint-disable sonarjs/pseudo-random */
 import { type JSX, useCallback, useEffect, useRef, useState } from 'react'
 
 import type { LevelData } from './level-format'
-import type { KeyState, MarioGameState } from './mario-types'
+import type { GameInputSnapshot, KeyState, MarioGameResult, MarioGameState } from './mario-types'
 
+import { LeaderboardOverlay } from './LeaderboardOverlay'
 import { LevelLoader } from './level-loader'
 import { MapEditor } from './MapEditor'
+import { buildMarioGameResult, drawGame } from './mario-game-canvas'
+import {
+  advanceGameState,
+  createInitialGameState,
+  FIXED_DT,
+  MARIO_CANVAS_HEIGHT,
+  MARIO_CANVAS_WIDTH,
+} from './mario-game-logic'
+import { buildGameInputSnapshot } from './mario-input-helpers'
+import { handleMarioKeyDown, handleMarioKeyUp } from './mario-keyboard'
 import './MarioGame.css'
 
-interface MarioGameProps {
+/** Props for the Mario canvas game shell (play, editor, level chain, callbacks). */
+export interface MarioGameProps {
   readonly customLevel?: LevelData
+  readonly levelSequence?: LevelData[]
   readonly onClose?: () => void
+  readonly onLevelComplete?: (result: MarioGameResult) => void
   readonly showEditor?: boolean
 }
 
-const CANVAS_WIDTH = 800
-const CANVAS_HEIGHT = 400
-const GRAVITY = 0.5
-const PLAYER_SPEED = 3
-const JUMP_FORCE = 12
-const RUN_MULTIPLIER = 1.5
-
-// Initialize game state from level data
-const createInitialGameState = (levelData?: LevelData): MarioGameState => {
-  const level = levelData || LevelLoader.createDefaultLevel()
-  const levelState = LevelLoader.parseLevel(level)
-
-  return {
-    cameraX: 0,
-    gameStatus: 'playing',
-    gameTime: 0,
-    level: 1,
-    particles: [],
-    score: 0,
-    ...levelState,
-  } as MarioGameState
-}
-
 /**
- * Mario-style side-scrolling platform game
- * @param {MarioGameProps} props - Component properties
- * @returns {JSX.Element} The game interface
+ * Mario-style side-scrolling platform game (fixed-step sim, canvas render, optional editor).
+ * @param {MarioGameProps} props - Root component props
+ * @param {LevelData} [props.customLevel] - Level JSON to load instead of the default world
+ * @param {LevelData[]} [props.levelSequence] - Ordered levels; Enter after complete advances with carried score/lives
+ * @param {() => void} [props.onClose] - Invoked when the player presses Escape outside the editor
+ * @param {(result: MarioGameResult) => void} [props.onLevelComplete] - Fires once when the level completes
+ * @param {boolean} [props.showEditor] - Start in the map editor when true
+ * @returns {JSX.Element} Game UI with canvas and control hints
  */
-export function MarioGame({ customLevel, onClose, showEditor }: MarioGameProps): JSX.Element {
+export function MarioGame({
+  customLevel,
+  levelSequence,
+  onClose,
+  onLevelComplete,
+  showEditor,
+}: MarioGameProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [currentLevel, setCurrentLevel] = useState<LevelData | undefined>(customLevel)
-  const [gameState, setGameState] = useState<MarioGameState>(() => createInitialGameState(customLevel))
-  const [keyState, setKeyState] = useState<KeyState>({
+  const resolvedLevel = customLevel ?? levelSequence?.[0] ?? LevelLoader.createDefaultLevel()
+  const [currentLevel, setCurrentLevel] = useState<LevelData>(() => resolvedLevel)
+  const [editorMode, setEditorMode] = useState(Boolean(showEditor))
+
+  const gameStateRef = useRef<MarioGameState>(createInitialGameState(currentLevel))
+  const keyStateRef = useRef<KeyState>({
     down: false,
     jump: false,
     left: false,
@@ -55,683 +58,166 @@ export function MarioGame({ customLevel, onClose, showEditor }: MarioGameProps):
     run: false,
     up: false,
   })
-  const [editorMode, setEditorMode] = useState(showEditor || false)
-  const gameLoopRef = useRef<number>(0)
+  const jumpLatchedRef = useRef(false)
+  const fireLatchedRef = useRef(false)
+  const gamepadJumpPrevRef = useRef(false)
+  const gamepadFirePrevRef = useRef(false)
+  const sequenceIndexRef = useRef(0)
+  const levelSequenceRef = useRef(levelSequence)
+  levelSequenceRef.current = levelSequence
+  const completeNotifiedRef = useRef(false)
+  const onLevelCompleteRef = useRef(onLevelComplete)
+  onLevelCompleteRef.current = onLevelComplete
 
-  // Handle keyboard input
-  const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    switch (event.code) {
-      case 'ArrowDown':
-      case 'KeyS':
-        setKeyState((prev) => ({ ...prev, down: true }))
-        break
-      case 'ArrowLeft':
-      case 'KeyA':
-        setKeyState((prev) => ({ ...prev, left: true }))
-        break
-      case 'ArrowRight':
-      case 'KeyD':
-        setKeyState((prev) => ({ ...prev, right: true }))
-        break
-      case 'ArrowUp':
-      case 'KeyW':
-      case 'Space':
-        setKeyState((prev) => ({ ...prev, jump: true, up: true }))
-        event.preventDefault()
-        break
-      case 'ShiftLeft':
-      case 'ShiftRight':
-        setKeyState((prev) => ({ ...prev, run: true }))
-        break
-    }
-  }, [])
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const showLeaderboardRef = useRef(false)
+  const gameOverHandledRef = useRef(false)
 
-  const handleKeyUp = useCallback((event: KeyboardEvent) => {
-    switch (event.code) {
-      case 'ArrowDown':
-      case 'KeyS':
-        setKeyState((prev) => ({ ...prev, down: false }))
-        break
-      case 'ArrowLeft':
-      case 'KeyA':
-        setKeyState((prev) => ({ ...prev, left: false }))
-        break
-      case 'ArrowRight':
-      case 'KeyD':
-        setKeyState((prev) => ({ ...prev, right: false }))
-        break
-      case 'ArrowUp':
-      case 'KeyW':
-      case 'Space':
-        setKeyState((prev) => ({ ...prev, jump: false, up: false }))
-        break
-      case 'ShiftLeft':
-      case 'ShiftRight':
-        setKeyState((prev) => ({ ...prev, run: false }))
-        break
-    }
-  }, [])
+  const lastTimeRef = useRef(performance.now())
+  const accRef = useRef(0)
+  const rafRef = useRef(0)
 
-  // Check collision between two rectangles
-  const checkCollision = (
-    rect1: { height: number; width: number; x: number; y: number },
-    rect2: { height: number; width: number; x: number; y: number },
-  ): boolean => {
-    return (
-      rect1.x < rect2.x + rect2.width &&
-      rect1.x + rect1.width > rect2.x &&
-      rect1.y < rect2.y + rect2.height &&
-      rect1.y + rect1.height > rect2.y
+  const syncKeysToInput = useCallback((): GameInputSnapshot => {
+    return buildGameInputSnapshot(
+      keyStateRef.current,
+      jumpLatchedRef,
+      fireLatchedRef,
+      gamepadJumpPrevRef,
+      gamepadFirePrevRef,
     )
-  }
+  }, [])
 
-  // Game update logic
-  const updateGame = useCallback(() => {
-    setGameState((prevState) => {
-      if (prevState.gameStatus !== 'playing') return prevState
+  const restartOrAdvance = useCallback(() => {
+    const st = gameStateRef.current
+    const seq = levelSequence
+    const canNext =
+      seq !== undefined &&
+      st.gameStatus === 'complete' &&
+      sequenceIndexRef.current < seq.length - 1
 
-      const newState = { ...prevState }
-      const player = { ...newState.player }
-
-      // Update player movement
-      player.isRunning = keyState.run
-      const speed = player.isRunning ? PLAYER_SPEED * RUN_MULTIPLIER : PLAYER_SPEED
-
-      if (keyState.left) {
-        player.velocityX = -speed
-        player.facing = 'left'
-      } else if (keyState.right) {
-        player.velocityX = speed
-        player.facing = 'right'
-      } else {
-        player.velocityX *= 0.8 // Friction
-      }
-
-      // Jump
-      if (keyState.jump && player.onGround) {
-        player.velocityY = -JUMP_FORCE
-        player.isJumping = true
-        player.onGround = false
-      }
-
-      // Apply gravity
-      player.velocityY += GRAVITY
-
-      // Update player position
-      player.x += player.velocityX
-      player.y += player.velocityY
-
-      // Platform collision
-      player.onGround = false
-      for (const platform of newState.platforms) {
-        if (checkCollision(player, platform) && platform.solid) {
-          // Landing on top
-          if (player.velocityY > 0 && player.y < platform.y) {
-            player.y = platform.y - player.height
-            player.velocityY = 0
-            player.onGround = true
-            player.isJumping = false
-          }
-          // Hitting from below
-          else if (player.velocityY < 0 && player.y > platform.y) {
-            player.y = platform.y + platform.height
-            player.velocityY = 0
-          }
-          // Side collision
-          else if (player.velocityX > 0 && player.x < platform.x) {
-            player.x = platform.x - player.width
-          } else if (player.velocityX < 0 && player.x > platform.x) {
-            player.x = platform.x + platform.width
-          }
-        }
-      }
-
-      // Keep player in bounds
-      if (player.x < 0) player.x = 0
-      if (player.x > newState.levelWidth - player.width) {
-        player.x = newState.levelWidth - player.width
-      }
-      if (player.y > newState.levelHeight) {
-        // Player fell off the level
-        player.lives--
-        if (player.lives <= 0) {
-          newState.gameStatus = 'gameOver'
-        } else {
-          // Reset player position
-          player.x = 50
-          player.y = 200
-          player.velocityX = 0
-          player.velocityY = 0
-        }
-      }
-
-      // Update camera
-      const targetCameraX = player.x - CANVAS_WIDTH / 2
-      newState.cameraX = Math.max(0, Math.min(targetCameraX, newState.levelWidth - CANVAS_WIDTH))
-
-      // Update enemies
-      newState.enemies = newState.enemies
-        .map((enemy) => {
-          if (!enemy.alive) return enemy
-
-          const updatedEnemy = { ...enemy }
-
-          // Apply gravity to enemies
-          updatedEnemy.velocityY += GRAVITY * 0.5 // Lighter gravity for enemies
-
-          // Update position
-          updatedEnemy.x += updatedEnemy.velocityX
-          updatedEnemy.y += updatedEnemy.velocityY
-
-          // Platform collision for enemies
-          let onGround = false
-          for (const platform of newState.platforms) {
-            if (checkCollision(updatedEnemy, platform) && platform.solid) {
-              // Landing on top
-              if (updatedEnemy.velocityY > 0 && updatedEnemy.y < platform.y) {
-                updatedEnemy.y = platform.y - updatedEnemy.height
-                updatedEnemy.velocityY = 0
-                onGround = true
-              }
-              // Side collision - bounce off walls
-              else if (updatedEnemy.velocityX > 0 && updatedEnemy.x < platform.x) {
-                updatedEnemy.x = platform.x - updatedEnemy.width
-                updatedEnemy.velocityX *= -1
-                updatedEnemy.direction = updatedEnemy.direction === 'left' ? 'right' : 'left'
-              } else if (updatedEnemy.velocityX < 0 && updatedEnemy.x > platform.x) {
-                updatedEnemy.x = platform.x + platform.width
-                updatedEnemy.velocityX *= -1
-                updatedEnemy.direction = updatedEnemy.direction === 'left' ? 'right' : 'left'
-              }
-            }
-          }
-
-          // Check if enemy is approaching a platform edge (look ahead)
-          if (onGround) {
-            const lookAheadDistance = updatedEnemy.width
-            const lookAheadX =
-              updatedEnemy.velocityX > 0
-                ? updatedEnemy.x + updatedEnemy.width + lookAheadDistance
-                : updatedEnemy.x - lookAheadDistance
-
-            let foundPlatform = false
-            for (const platform of newState.platforms) {
-              if (
-                checkCollision(
-                  { height: 1, width: 1, x: lookAheadX, y: updatedEnemy.y + updatedEnemy.height },
-                  platform,
-                ) &&
-                platform.solid
-              ) {
-                foundPlatform = true
-                break
-              }
-            }
-
-            // Turn around at platform edges
-            if (!foundPlatform) {
-              updatedEnemy.velocityX *= -1
-              updatedEnemy.direction = updatedEnemy.direction === 'left' ? 'right' : 'left'
-            }
-          }
-
-          // Boundary checking
-          if (updatedEnemy.x < 0) {
-            updatedEnemy.x = 0
-            updatedEnemy.velocityX *= -1
-            updatedEnemy.direction = 'right'
-          } else if (updatedEnemy.x > newState.levelWidth - updatedEnemy.width) {
-            updatedEnemy.x = newState.levelWidth - updatedEnemy.width
-            updatedEnemy.velocityX *= -1
-            updatedEnemy.direction = 'left'
-          }
-
-          // Remove enemies that fall off the level
-          if (updatedEnemy.y > newState.levelHeight) {
-            updatedEnemy.alive = false
-          }
-
-          // Check collision with player
-          if (checkCollision(player, updatedEnemy) && !player.invulnerable) {
-            // Player stomps enemy
-            if (player.velocityY > 0 && player.y < updatedEnemy.y) {
-              updatedEnemy.alive = false
-              player.velocityY = -JUMP_FORCE / 2 // Small bounce
-              newState.score += 200
-
-              // Add particle effect
-              newState.particles.push({
-                id: `particle-${Date.now()}`,
-                life: 30,
-                maxLife: 30,
-                type: 'explosion',
-                velocityX: (Math.random() - 0.5) * 4,
-                velocityY: -2,
-                x: updatedEnemy.x,
-                y: updatedEnemy.y,
-              })
-            } else {
-              // Player gets hurt
-              player.lives--
-              player.invulnerable = true
-              // eslint-disable-next-line sonarjs/no-nested-functions
-              setTimeout(() => {
-                setGameState((prev) => ({
-                  ...prev,
-                  player: { ...prev.player, invulnerable: false },
-                }))
-              }, 2000)
-
-              if (player.lives <= 0) {
-                newState.gameStatus = 'gameOver'
-              }
-            }
-          }
-
-          return updatedEnemy
-        })
-        .filter((enemy) => enemy.alive)
-
-      // Update collectibles
-      newState.collectibles = newState.collectibles.map((collectible) => {
-        if (collectible.collected) return collectible
-
-        if (checkCollision(player, collectible)) {
-          const updatedCollectible = { ...collectible, collected: true }
-          newState.score += collectible.value
-
-          // Add particle effect
-          newState.particles.push({
-            id: `coin-particle-${Date.now()}`,
-            life: 20,
-            maxLife: 20,
-            type: 'coin',
-            velocityX: 0,
-            velocityY: -2,
-            x: collectible.x,
-            y: collectible.y,
-          })
-
-          return updatedCollectible
-        }
-
-        return collectible
+    if (canNext && seq) {
+      sequenceIndexRef.current++
+      const next = seq[sequenceIndexRef.current]
+      setCurrentLevel(next)
+      gameStateRef.current = createInitialGameState(next, {
+        levelNumber: sequenceIndexRef.current + 1,
+        lives: st.player.lives,
+        score: st.score,
       })
-
-      // Update particles
-      newState.particles = newState.particles
-        .map((particle) => ({
-          ...particle,
-          life: particle.life - 1,
-          x: particle.x + particle.velocityX,
-          y: particle.y + particle.velocityY,
-        }))
-        .filter((particle) => particle.life > 0)
-
-      // Check flag pole collision
-      if (!newState.flagPole.reached && checkCollision(player, newState.flagPole)) {
-        newState.flagPole.reached = true
-
-        // Calculate score based on height reached on the flag pole
-        const flagPoleHeight = newState.flagPole.height
-        const playerHeightOnPole = newState.flagPole.y + flagPoleHeight - player.y
-        const heightRatio = Math.max(0, Math.min(1, playerHeightOnPole / flagPoleHeight))
-
-        // Score based on height: 100-5000 points
-        const flagScore = Math.floor(100 + heightRatio * 4900)
-        newState.score += flagScore
-
-        // Add particle effect for flag score
-        newState.particles.push({
-          id: `flag-score-${Date.now()}`,
-          life: 120,
-          maxLife: 120,
-          type: 'coin',
-          velocityX: 0,
-          velocityY: -1,
-          x: newState.flagPole.x,
-          y: player.y,
-        })
-
-        // Move flag down to player height
-        newState.flagPole.flag.y = player.y
-
-        // Start level complete sequence after short delay
-        setTimeout(() => {
-          // eslint-disable-next-line sonarjs/no-nested-functions
-          setGameState((prev) => ({
-            ...prev,
-            gameStatus: 'complete',
-          }))
-        }, 500)
-      }
-
-      // Update game time
-      newState.gameTime += 1 / 60 // Assuming 60 FPS
-
-      newState.player = player
-      return newState
-    })
-  }, [keyState])
-
-  // Render the game
-  const render = useCallback(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    // Clear canvas
-    ctx.fillStyle = '#87CEEB' // Sky blue
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-
-    // Translate for camera
-    ctx.save()
-    ctx.translate(-gameState.cameraX, 0)
-
-    // Draw platforms
-    gameState.platforms.forEach((platform) => {
-      switch (platform.type) {
-        case 'brick':
-          ctx.fillStyle = '#CD853F'
-          break
-        case 'cloud':
-          ctx.fillStyle = '#F0F8FF'
-          break
-        case 'ground':
-          ctx.fillStyle = '#8B4513'
-          break
-        case 'pipe':
-          ctx.fillStyle = '#228B22'
-          break
-        default:
-          ctx.fillStyle = '#808080'
-      }
-      ctx.fillRect(platform.x, platform.y, platform.width, platform.height)
-
-      // Add border for visibility
-      ctx.strokeStyle = '#000000'
-      ctx.lineWidth = 1
-      ctx.strokeRect(platform.x, platform.y, platform.width, platform.height)
-    })
-
-    // Draw flag pole
-    const flagPole = gameState.flagPole
-    // Flag pole
-    ctx.fillStyle = '#8B4513'
-    ctx.fillRect(flagPole.x, flagPole.y, flagPole.width, flagPole.height)
-
-    // Flag
-    if (flagPole.reached) {
-      // Flag moves down when reached
-      ctx.fillStyle = '#32CD32'
     } else {
-      // Normal flag color
-      ctx.fillStyle = '#FF0000'
-    }
-    ctx.fillRect(flagPole.flag.x, flagPole.flag.y, flagPole.flag.width, flagPole.flag.height)
-
-    // Flag pole ornament at top
-    ctx.fillStyle = '#FFD700'
-    ctx.beginPath()
-    ctx.arc(flagPole.x + flagPole.width / 2, flagPole.y, 8, 0, 2 * Math.PI)
-    ctx.fill()
-
-    // Draw collectibles
-    gameState.collectibles.forEach((collectible) => {
-      if (!collectible.collected) {
-        switch (collectible.type) {
-          case 'coin':
-            ctx.fillStyle = '#FFD700'
-            ctx.beginPath()
-            ctx.arc(
-              collectible.x + collectible.width / 2,
-              collectible.y + collectible.height / 2,
-              collectible.width / 2,
-              0,
-              2 * Math.PI,
-            )
-            ctx.fill()
-            break
-          case 'mushroom':
-            ctx.fillStyle = '#FF6B6B'
-            ctx.fillRect(collectible.x, collectible.y, collectible.width, collectible.height)
-            ctx.fillStyle = '#FFFFFF'
-            ctx.fillRect(collectible.x + 4, collectible.y + 4, 4, 4)
-            ctx.fillRect(collectible.x + 12, collectible.y + 4, 4, 4)
-            break
-        }
+      if (st.gameStatus === 'complete' && levelSequence && sequenceIndexRef.current >= levelSequence.length - 1) {
+        sequenceIndexRef.current = 0
       }
-    })
-
-    // Draw enemies
-    gameState.enemies.forEach((enemy) => {
-      if (enemy.alive) {
-        switch (enemy.type) {
-          case 'goomba': {
-            // Body (with slight bounce animation)
-            ctx.fillStyle = '#8B4513'
-            const bounceOffset = Math.sin(gameState.gameTime * 10 + enemy.x * 0.1) * 1
-            ctx.fillRect(enemy.x, enemy.y + bounceOffset, enemy.width, enemy.height)
-
-            // Eyes
-            ctx.fillStyle = '#000000'
-            if (enemy.direction === 'left') {
-              ctx.fillRect(enemy.x + 2, enemy.y + 4 + bounceOffset, 3, 3)
-              ctx.fillRect(enemy.x + 12, enemy.y + 4 + bounceOffset, 3, 3)
-            } else {
-              ctx.fillRect(enemy.x + 9, enemy.y + 4 + bounceOffset, 3, 3)
-              ctx.fillRect(enemy.x + 19, enemy.y + 4 + bounceOffset, 3, 3)
-            }
-
-            // Angry eyebrows
-            ctx.fillStyle = '#000000'
-            ctx.fillRect(enemy.x + 4, enemy.y + 2 + bounceOffset, 6, 2)
-            ctx.fillRect(enemy.x + 14, enemy.y + 2 + bounceOffset, 6, 2)
-
-            // Feet (simple animation based on position)
-            ctx.fillStyle = '#654321'
-            const footOffset = Math.floor(enemy.x / 10) % 2
-            ctx.fillRect(enemy.x + 2 + footOffset, enemy.y + enemy.height - 2 + bounceOffset, 4, 2)
-            ctx.fillRect(enemy.x + enemy.width - 6 + footOffset, enemy.y + enemy.height - 2 + bounceOffset, 4, 2)
-            break
-          }
-
-          case 'koopa': {
-            // Shell
-            ctx.fillStyle = '#228B22'
-            ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height)
-
-            // Shell pattern
-            ctx.fillStyle = '#FFFF00'
-            ctx.fillRect(enemy.x + 4, enemy.y + 8, enemy.width - 8, 8)
-
-            // Head (shows direction)
-            ctx.fillStyle = '#90EE90'
-            if (enemy.direction === 'left') {
-              ctx.fillRect(enemy.x - 4, enemy.y + 4, 8, 12)
-              // Eye
-              ctx.fillStyle = '#000000'
-              ctx.fillRect(enemy.x - 2, enemy.y + 6, 2, 2)
-            } else {
-              ctx.fillRect(enemy.x + enemy.width - 4, enemy.y + 4, 8, 12)
-              // Eye
-              ctx.fillStyle = '#000000'
-              ctx.fillRect(enemy.x + enemy.width, enemy.y + 6, 2, 2)
-            }
-
-            // Legs (simple animation)
-            ctx.fillStyle = '#90EE90'
-            const legOffset = Math.floor(enemy.x / 8) % 2
-            ctx.fillRect(enemy.x + 6 + legOffset, enemy.y + enemy.height - 4, 3, 4)
-            ctx.fillRect(enemy.x + enemy.width - 9 + legOffset, enemy.y + enemy.height - 4, 3, 4)
-            break
-          }
-        }
-      }
-    })
-
-    // Draw player
-    ctx.fillStyle = gameState.player.invulnerable ? '#FF69B4' : '#FF0000'
-    ctx.fillRect(gameState.player.x, gameState.player.y, gameState.player.width, gameState.player.height)
-
-    // Player details (simple Mario-like appearance)
-    ctx.fillStyle = '#FFE4C4' // Skin color for face
-    ctx.fillRect(gameState.player.x + 8, gameState.player.y + 8, 16, 16)
-
-    // Hat
-    ctx.fillStyle = '#FF0000'
-    ctx.fillRect(gameState.player.x + 4, gameState.player.y + 4, 24, 8)
-
-    // Mustache
-    ctx.fillStyle = '#000000'
-    ctx.fillRect(gameState.player.x + 12, gameState.player.y + 16, 8, 4)
-
-    // Draw particles
-    gameState.particles.forEach((particle) => {
-      const alpha = particle.life / particle.maxLife
-      ctx.globalAlpha = alpha
-
-      switch (particle.type) {
-        case 'coin':
-          ctx.fillStyle = '#FFD700'
-          ctx.font = '12px Arial'
-          // Check if this is a flag score particle by checking if it's near the flag pole
-          if (Math.abs(particle.x - gameState.flagPole.x) < 50) {
-            // This is the flag score particle
-            const flagPoleHeight = gameState.flagPole.height
-            const playerHeightOnPole = gameState.flagPole.y + flagPoleHeight - particle.y
-            const heightRatio = Math.max(0, Math.min(1, playerHeightOnPole / flagPoleHeight))
-            const flagScore = Math.floor(100 + heightRatio * 4900)
-            ctx.fillText(`+${flagScore}`, particle.x, particle.y)
-          } else {
-            // Regular coin particle
-            ctx.fillText(
-              '+' + (gameState.collectibles.find((c) => c.type === 'coin')?.value || 100),
-              particle.x,
-              particle.y,
-            )
-          }
-          break
-        case 'explosion':
-          ctx.fillStyle = '#FFA500'
-          ctx.fillRect(particle.x - 2, particle.y - 2, 4, 4)
-          break
-      }
-      ctx.globalAlpha = 1
-    })
-
-    ctx.restore()
-
-    // Draw UI
-    ctx.fillStyle = '#000000'
-    ctx.font = '20px Arial'
-    ctx.fillText(`Score: ${gameState.score}`, 10, 30)
-    ctx.fillText(`Lives: ${gameState.player.lives}`, 10, 55)
-    ctx.fillText(`Level: ${gameState.level}`, 10, 80)
-
-    // Game over screen
-    if (gameState.gameStatus === 'gameOver') {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
-      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-
-      ctx.fillStyle = '#FFFFFF'
-      ctx.font = '36px Arial'
-      ctx.textAlign = 'center'
-      ctx.fillText('GAME OVER', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20)
-      ctx.font = '18px Arial'
-      ctx.fillText(`Final Score: ${gameState.score}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20)
-      ctx.fillText('Press R to restart or ESC to exit', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50)
-      ctx.textAlign = 'left'
+      const level =
+        customLevel ?? levelSequence?.[sequenceIndexRef.current] ?? currentLevel ?? LevelLoader.createDefaultLevel()
+      setCurrentLevel(level)
+      gameStateRef.current = createInitialGameState(level, {
+        levelNumber: levelSequence ? sequenceIndexRef.current + 1 : 1,
+      })
     }
+    completeNotifiedRef.current = false
+    gameOverHandledRef.current = false
+    setShowLeaderboard(false)
+    showLeaderboardRef.current = false
+  }, [currentLevel, customLevel, levelSequence])
 
-    // Level complete screen
-    if (gameState.gameStatus === 'complete') {
-      ctx.fillStyle = 'rgba(0, 100, 0, 0.8)'
-      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-
-      ctx.fillStyle = '#FFFF00'
-      ctx.font = '36px Arial'
-      ctx.textAlign = 'center'
-      ctx.fillText('LEVEL COMPLETE!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60)
-      ctx.fillStyle = '#FFFFFF'
-      ctx.font = '24px Arial'
-      ctx.fillText('🏁 Flag Captured! 🏁', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20)
-      ctx.font = '18px Arial'
-      ctx.fillText(`Final Score: ${gameState.score}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20)
-      ctx.fillText(`Time: ${Math.floor(gameState.gameTime)}s`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50)
-      ctx.fillText('Press R to restart or ESC to exit', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 80)
-      ctx.textAlign = 'left'
-    }
-  }, [gameState])
-
-  // Add restart and editor functions
-  const restartGame = useCallback(() => {
-    setGameState(createInitialGameState(currentLevel))
-  }, [currentLevel])
+  const handlePlayTestLevel = useCallback((level: LevelData) => {
+    setCurrentLevel(level)
+    gameStateRef.current = createInitialGameState(level)
+    sequenceIndexRef.current = 0
+    completeNotifiedRef.current = false
+    setEditorMode(false)
+  }, [])
 
   const handleSaveLevel = useCallback((level: LevelData) => {
     setCurrentLevel(level)
     console.log('Level saved:', level.name)
   }, [])
 
-  const handlePlayTestLevel = useCallback((level: LevelData) => {
-    setCurrentLevel(level)
-    setGameState(createInitialGameState(level))
-    setEditorMode(false)
-  }, [])
-
-  // Game loop
   useEffect(() => {
     if (editorMode) return
+    canvasRef.current?.focus()
+  }, [editorMode])
 
-    const gameLoop = () => {
-      updateGame()
-      render()
-      gameLoopRef.current = requestAnimationFrame(gameLoop)
-    }
-
-    gameLoopRef.current = requestAnimationFrame(gameLoop)
-
-    return () => {
-      if (gameLoopRef.current) {
-        cancelAnimationFrame(gameLoopRef.current)
-      }
-    }
-  }, [updateGame, render, editorMode])
-
-  // Keyboard event listeners
   useEffect(() => {
-    const handleGameKeyDown = (event: KeyboardEvent) => {
-      if (event.code === 'Escape') {
-        if (editorMode) {
-          setEditorMode(false)
-        } else {
-          onClose?.()
-        }
-      } else if (
-        event.code === 'KeyR' &&
-        (gameState.gameStatus === 'gameOver' || gameState.gameStatus === 'complete')
-      ) {
-        restartGame()
-      } else if (event.code === 'KeyE' && gameState.gameStatus === 'playing') {
-        setEditorMode(true)
-      } else if (!editorMode) {
-        handleKeyDown(event)
-      }
+    if (editorMode) {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      return
     }
 
-    globalThis.addEventListener('keydown', handleGameKeyDown)
-    globalThis.addEventListener('keyup', handleKeyUp)
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const loop = (t: number) => {
+      const dt = Math.min((t - lastTimeRef.current) / 1000, 0.12)
+      lastTimeRef.current = t
+      accRef.current += dt
+
+      while (accRef.current >= FIXED_DT) {
+        const before = gameStateRef.current.gameStatus
+        const input = syncKeysToInput()
+        gameStateRef.current = advanceGameState(gameStateRef.current, input, performance.now())
+        accRef.current -= FIXED_DT
+
+        const after = gameStateRef.current.gameStatus
+        if (before !== 'complete' && after === 'complete' && !completeNotifiedRef.current) {
+          completeNotifiedRef.current = true
+          onLevelCompleteRef.current?.(buildMarioGameResult(gameStateRef.current))
+        }
+
+        if (before !== 'gameOver' && after === 'gameOver' && !gameOverHandledRef.current) {
+          gameOverHandledRef.current = true
+          showLeaderboardRef.current = true
+          setShowLeaderboard(true)
+        }
+      }
+
+      const seq = levelSequenceRef.current
+      const hasNextCampaignLevel =
+        gameStateRef.current.gameStatus === 'complete' &&
+        seq !== undefined &&
+        sequenceIndexRef.current < seq.length - 1
+      drawGame(canvas, gameStateRef.current, { hasNextCampaignLevel })
+      rafRef.current = requestAnimationFrame(loop)
+    }
+
+    lastTimeRef.current = performance.now()
+    accRef.current = 0
+    rafRef.current = requestAnimationFrame(loop)
 
     return () => {
-      globalThis.removeEventListener('keydown', handleGameKeyDown)
-      globalThis.removeEventListener('keyup', handleKeyUp)
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
     }
-  }, [handleKeyDown, handleKeyUp, onClose, gameState.gameStatus, editorMode, restartGame])
+  }, [editorMode, syncKeysToInput])
 
-  // Render editor mode
+  useEffect(() => {
+    const deps = {
+      editorMode,
+      fireLatchedRef,
+      gameStateRef,
+      jumpLatchedRef,
+      keyStateRef,
+      onClose,
+      restartOrAdvance,
+      setEditorMode,
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (showLeaderboardRef.current) return
+      handleMarioKeyDown(event, deps)
+    }
+    const onKeyUp = (event: KeyboardEvent) => {
+      if (showLeaderboardRef.current) return
+      handleMarioKeyUp(event, keyStateRef)
+    }
+
+    globalThis.addEventListener('keydown', onKeyDown)
+    globalThis.addEventListener('keyup', onKeyUp)
+    return () => {
+      globalThis.removeEventListener('keydown', onKeyDown)
+      globalThis.removeEventListener('keyup', onKeyUp)
+    }
+  }, [editorMode, onClose, restartOrAdvance])
+
   if (editorMode) {
     return (
       <MapEditor
@@ -747,13 +233,22 @@ export function MarioGame({ customLevel, onClose, showEditor }: MarioGameProps):
     <div className="mario-game">
       <div className="mario-game-header">
         <h1>Super Mario Bros Clone</h1>
-        <button className="close-button" onClick={onClose}>
+        <button className="close-button" onClick={onClose} type="button">
           ✕
         </button>
       </div>
 
-      <div className="mario-game-canvas-container">
-        <canvas className="mario-game-canvas" height={CANVAS_HEIGHT} ref={canvasRef} width={CANVAS_WIDTH} />
+      <div className="mario-game-canvas-container" style={{ position: 'relative' }}>
+        <canvas
+          className="mario-game-canvas"
+          height={MARIO_CANVAS_HEIGHT}
+          ref={canvasRef}
+          tabIndex={0}
+          width={MARIO_CANVAS_WIDTH}
+        />
+        {showLeaderboard && (
+          <LeaderboardOverlay onDone={restartOrAdvance} score={gameStateRef.current.score} />
+        )}
       </div>
 
       <div className="mario-game-controls">
@@ -761,11 +256,18 @@ export function MarioGame({ customLevel, onClose, showEditor }: MarioGameProps):
         <p>Arrow Keys / WASD: Move</p>
         <p>Space / Up Arrow: Jump</p>
         <p>Shift: Run</p>
-        <p>🏁 Goal: Reach the flag pole at the end!</p>
-        <p>💰 Higher on the pole = More points (100-5000)</p>
+        <p>Z / F: Fireball (with fire flower)</p>
+        <p>P: Pause / resume</p>
+        <p>Goal: Reach the flag pole at the end.</p>
+        <p>Higher on the pole = more points (100–5000).</p>
+        <p>Gamepad: stick / d-pad, A jump, B fire, shoulder buttons run.</p>
         <p>E: Open Map Editor</p>
         <p>ESC: Exit Game</p>
-        <p>R: Restart (when game over/complete)</p>
+        <p>R: Restart after game over</p>
+        <p>Enter: Continue after you clear a level (score and lives carry over in campaign)</p>
+        {levelSequence && levelSequence.length > 1 ? (
+          <p>Campaign: {levelSequence.length} levels (press Enter at the level-clear screen to go on).</p>
+        ) : null}
       </div>
     </div>
   )

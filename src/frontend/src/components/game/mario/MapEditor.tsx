@@ -132,7 +132,6 @@ export function MapEditor({ initialLevel, onClose, onPlayTest, onSave }: MapEdit
     setIsDrawing(false)
   }, [])
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   const render = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return

@@ -3,12 +3,14 @@ import { defineConfig } from 'vitest/config'
 import vike from 'vike/plugin'
 import mkcert from 'vite-plugin-mkcert'
 
+import { leaderboardPlugin } from './server/vite-plugin-leaderboard'
+
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
     port: 5173,
   },
-  plugins: [react(), vike(), mkcert()],
+  plugins: [react(), vike(), mkcert(), leaderboardPlugin()],
   resolve: {
     alias: {
       '~': '/src',

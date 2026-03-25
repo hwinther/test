@@ -6,6 +6,7 @@ import { useVersion } from '~/api/endpoints/service/service'
 import { useGetWeatherForecast } from '~/api/endpoints/weather-forecast/weather-forecast'
 import reactLogo from '~/assets/react.svg'
 import { useAuthDispatch } from '~/auth.context'
+import { LevelLoader } from '~/components/game/mario/level-loader'
 import { MarioGame } from '~/components/game/mario/MarioGame'
 import { MaritimeVentures } from '~/components/game/maritime-ventures/MaritimeVentures'
 // import { useKonamiCode } from '~/hooks/useKonamiCode'
@@ -44,7 +45,9 @@ function Page(): JSX.Element {
   }
 
   if (showMarioGame) {
-    return <MarioGame onClose={() => setShowMarioGame(false)} />
+    return (
+      <MarioGame levelSequence={LevelLoader.createDefaultLevelSequence()} onClose={() => setShowMarioGame(false)} />
+    )
   }
 
   return (

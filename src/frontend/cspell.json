@@ -2,15 +2,20 @@
   "version": "0.2",
   "language": "en",
   "words": [
+    "cooldown",
     "fireflower",
     "githubusercontent",
     "goomba",
+    "hitbox",
+    "invuln",
     "koopa",
+    "piranha",
     "mkdirp",
     "nocheck",
     "precached",
     "sonarjs",
     "overworld",
+    "powerup",
     "streetsidesoftware",
     "tsmerge",
     "undock",
@@ -19,7 +24,13 @@
     "vike",
     "visualstudio",
     "vsmarketplacebadge",
-    "wasd"
+    "wasd",
+    "WITHSCORES",
+    "zadd",
+    "zcard",
+    "zremrangebyrank",
+    "zrevrank",
+    "zrevrange"
   ],
   "ignorePaths": ["node_modules/**", "*.lock"]
 }

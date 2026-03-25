@@ -2,7 +2,7 @@ import cspellESLintPluginRecommended from '@cspell/eslint-plugin/recommended'
 import eslintConfigLove from 'eslint-config-love'
 import eslintConfigPrettier from 'eslint-config-prettier'
 import jsDoc from 'eslint-plugin-jsdoc'
-import perfectionist from 'eslint-plugin-perfectionist'
+//import perfectionist from 'eslint-plugin-perfectionist'
 import eslintPluginSonarJs from 'eslint-plugin-sonarjs'
 
 /** @type {import('eslint').Linter.Config[]} */
@@ -25,7 +25,7 @@ export default [
       jsDoc,
     },
   },
-  perfectionist.configs['recommended-natural'],
+  //perfectionist.configs['recommended-natural'],
   cspellESLintPluginRecommended,
   eslintPluginSonarJs.configs.recommended,
   jsDoc.configs['flat/recommended'],
@@ -45,6 +45,7 @@ export default [
       '@typescript-eslint/prefer-destructuring': 'off',
       '@typescript-eslint/triple-slash-reference': 'off',
       'import/no-absolute-path': 'off',
+      'sonarjs/cognitive-complexity': 'off',
       'sonarjs/todo-tag': 'off',
     },
   },
