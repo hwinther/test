@@ -33,7 +33,8 @@
     "zrevrange",
     "otel",
     "OTEL",
-    "OTLP"
+    "OTLP",
+    "tailwindcss"
   ],
   "ignorePaths": ["node_modules/**", "*.lock"]
 }

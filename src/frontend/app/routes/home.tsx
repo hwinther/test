@@ -4,27 +4,23 @@ import type { WeatherForecast } from '~/api/models'
 
 import { useVersion } from '~/api/endpoints/service/service'
 import { useGetWeatherForecast } from '~/api/endpoints/weather-forecast/weather-forecast'
-import reactLogo from '~/assets/react.svg'
 import { useAuthDispatch } from '~/auth.context'
 import { LevelLoader } from '~/components/game/mario/level-loader'
 import { MarioGame } from '~/components/game/mario/MarioGame'
 import { MaritimeVentures } from '~/components/game/maritime-ventures/MaritimeVentures'
-// import { useKonamiCode } from '~/hooks/useKonamiCode'
-
-import './home.css'
+import { useKonamiCode } from '~/hooks/useKonamiCode'
 
 /**
  * Home page with weather data, version info, and game launchers.
  * @returns {JSX.Element} The home page content.
  */
 function Page(): JSX.Element {
-  const [count, setCount] = useState(0)
   const [showGame, setShowGame] = useState(false)
   const [showMarioGame, setShowMarioGame] = useState(false)
   const dispatch = useAuthDispatch()
   const { data: weatherForecasts, refetch } = useGetWeatherForecast()
   const { data: version } = useVersion()
-  // const isKonamiActivated = useKonamiCode()
+  const isKonamiActivated = useKonamiCode()
 
   useEffect(() => {
     dispatch('token')
@@ -33,11 +29,10 @@ function Page(): JSX.Element {
     }, 2000)
   }, [refetch, dispatch])
 
-  // Show the Easter egg game if manually activated
-  // if (isKonamiActivated) {
-  //   return <MaritimeVentures />
-  // }
-  
+  if (isKonamiActivated) {
+    return <MaritimeVentures />
+  }
+
   if (showGame) {
     return <MaritimeVentures onClose={() => setShowGame(false)} />
   }
@@ -49,74 +44,41 @@ function Page(): JSX.Element {
   }
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img alt="Vite logo" className="logo" src="/vite.svg" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img alt="React logo" className="logo react" src={reactLogo} />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button
-          onClick={() => {
-            setCount((count) => count + 1)
-          }}
-        >
-          count is {count}
-        </button>
-        <button
-          onClick={() => {
-            setShowGame(true)
-          }}
-          style={{ 
-            background: '#4a90e2',
-            border: 'none',
-            borderRadius: '5px',
-            color: 'white',
-            cursor: 'pointer',
-            marginLeft: '10px',
-            padding: '10px 20px'
-          }}
-        >
-          🚢 Play Maritime Ventures
-        </button>
-        <button
-          onClick={() => {
-            setShowMarioGame(true)
-          }}
-          style={{ 
-            background: '#e24a4a',
-            border: 'none',
-            borderRadius: '5px',
-            color: 'white',
-            cursor: 'pointer',
-            marginLeft: '10px',
-            padding: '10px 20px'
-          }}
-        >
-          🍄 Play Mario Clone
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">Home</h1>
 
-      {weatherForecasts?.map((wf: WeatherForecast) => (
-        <p key={wf.date}>
-          {wf.date}: {wf.summary} - {wf.temperatureC}
-        </p>
-      ))}
+      <div className="flex flex-wrap gap-3">
+        <button
+          className="rounded-lg bg-blue-600 px-5 py-2.5 text-white font-medium hover:bg-blue-700 transition-colors cursor-pointer"
+          onClick={() => setShowGame(true)}
+        >
+          Play Maritime Ventures
+        </button>
+        <button
+          className="rounded-lg bg-red-600 px-5 py-2.5 text-white font-medium hover:bg-red-700 transition-colors cursor-pointer"
+          onClick={() => setShowMarioGame(true)}
+        >
+          Play Mario Clone
+        </button>
+      </div>
+
+      {weatherForecasts && weatherForecasts.length > 0 && (
+        <section className="space-y-1">
+          <h2 className="text-xl font-semibold">Weather Forecast</h2>
+          {weatherForecasts.map((wf: WeatherForecast) => (
+            <p key={wf.date} className="text-sm text-neutral-600 dark:text-neutral-400">
+              {wf.date}: {wf.summary} – {wf.temperatureC}°C
+            </p>
+          ))}
+        </section>
+      )}
 
       {version !== undefined && (
-        <p style={{ fontSize: '0.7em' }}>
-          Version: {version?.informationalVersion} Env: {version?.environmentName} Mode: {import.meta.env.MODE}
+        <p className="text-xs text-neutral-500 dark:text-neutral-400">
+          Version: {version?.informationalVersion} · Env: {version?.environmentName} · Mode: {import.meta.env.MODE}
         </p>
       )}
-    </>
+    </div>
   )
 }
 
