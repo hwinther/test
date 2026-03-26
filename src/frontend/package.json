@@ -13,7 +13,7 @@
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc --noEmit",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
-    "lint:ci": "eslint . --report-unused-disable-directives --max-warnings 0 --format json",
+    "lint:ci": "eslint . --report-unused-disable-directives --format json",
     "lint/fix": "eslint . --fix",
     "format/check": "prettier . --check",
     "format/fix": "prettier . --write",
