@@ -72,6 +72,7 @@ export function MarioGame({
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const showLeaderboardRef = useRef(false)
   const gameOverHandledRef = useRef(false)
+  const leaderboardVariantRef = useRef<'complete' | 'gameOver'>('gameOver')
 
   const lastTimeRef = useRef(performance.now())
   const accRef = useRef(0)
@@ -105,7 +106,7 @@ export function MarioGame({
         score: st.score,
       })
     } else {
-      if (st.gameStatus === 'complete' && levelSequence && sequenceIndexRef.current >= levelSequence.length - 1) {
+      if (levelSequence && (st.gameStatus === 'gameOver' || sequenceIndexRef.current >= levelSequence.length - 1)) {
         sequenceIndexRef.current = 0
       }
       const level =
@@ -163,10 +164,19 @@ export function MarioGame({
         if (before !== 'complete' && after === 'complete' && !completeNotifiedRef.current) {
           completeNotifiedRef.current = true
           onLevelCompleteRef.current?.(buildMarioGameResult(gameStateRef.current))
+
+          const seq = levelSequenceRef.current
+          const isLastLevel = seq !== undefined && sequenceIndexRef.current >= seq.length - 1
+          if (isLastLevel) {
+            leaderboardVariantRef.current = 'complete'
+            showLeaderboardRef.current = true
+            setShowLeaderboard(true)
+          }
         }
 
         if (before !== 'gameOver' && after === 'gameOver' && !gameOverHandledRef.current) {
           gameOverHandledRef.current = true
+          leaderboardVariantRef.current = 'gameOver'
           showLeaderboardRef.current = true
           setShowLeaderboard(true)
         }
@@ -247,7 +257,7 @@ export function MarioGame({
           width={MARIO_CANVAS_WIDTH}
         />
         {showLeaderboard && (
-          <LeaderboardOverlay onDone={restartOrAdvance} score={gameStateRef.current.score} />
+          <LeaderboardOverlay onDone={restartOrAdvance} score={gameStateRef.current.score} variant={leaderboardVariantRef.current} />
         )}
       </div>
 
