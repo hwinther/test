@@ -30,7 +30,10 @@
     "zcard",
     "zremrangebyrank",
     "zrevrank",
-    "zrevrange"
+    "zrevrange",
+    "otel",
+    "OTEL",
+    "OTLP"
   ],
   "ignorePaths": ["node_modules/**", "*.lock"]
 }
