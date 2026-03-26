@@ -5,5 +5,5 @@ import Page from '~/routes/home'
 
 it('renders welcome message', () => {
   render(<Page />, { mockAuthContext: true, withQueryProvider: true })
-  expect(screen.getByText('Vite + React')).toBeInTheDocument()
+  expect(screen.getByText('Home')).toBeInTheDocument()
 })

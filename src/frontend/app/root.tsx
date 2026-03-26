@@ -13,6 +13,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AuthProvider } from '~/auth.context'
 import { PageLayout } from '~/components/PageLayout'
+import { SiteFooter } from '~/components/SiteFooter'
 import type { PublicRuntimeConfig } from '~/public-runtime-config'
 import '~/components/PageLayout.css'
 
@@ -85,8 +86,9 @@ export function Layout({ children }: { readonly children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
-        {children}
+      <body className="min-h-screen flex flex-col bg-white text-gray-900 dark:bg-neutral-900 dark:text-gray-100">
+        <div className="flex-1 flex flex-col">{children}</div>
+        <SiteFooter />
         <PublicRuntimeConfigScript />
         <ScrollRestoration />
         <Scripts />
