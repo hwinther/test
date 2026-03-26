@@ -1,9 +1,13 @@
 import React from 'react'
+import { Link } from 'react-router'
 
 import { useGetBlogs } from '~/api/endpoints/blogging/blogging'
-import { Link } from '~/renderer/Link'
 
-const BlogListView: React.FC = () => {
+/**
+ * Blog listing page displaying all available blogs.
+ * @returns {React.JSX.Element} The blog listing view.
+ */
+export default function Blogs(): React.JSX.Element {
   const { data: blogs, error, isLoading } = useGetBlogs()
 
   if (isLoading) return <div>Loading...</div>
@@ -16,7 +20,7 @@ const BlogListView: React.FC = () => {
         {blogs?.map((blog) => (
           <li key={blog.blogId}>
             <p>
-              <Link className="is-active" href={`/blogs/${blog.blogId}`}>
+              <Link to={`/blogs/${blog.blogId}`}>
                 {blog.title} - ({blog.url})
               </Link>
             </p>
@@ -26,5 +30,3 @@ const BlogListView: React.FC = () => {
     </div>
   )
 }
-
-export default BlogListView

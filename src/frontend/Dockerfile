@@ -1,18 +1,26 @@
-FROM node:24-alpine AS npm
+FROM node:24-alpine AS development-dependencies-env
+COPY . /app
 WORKDIR /app
-COPY package.json package-lock.json /app/
 RUN npm ci
 
-FROM npm AS build
+FROM node:24-alpine AS production-dependencies-env
+COPY ./package.json package-lock.json /app/
+WORKDIR /app
+RUN npm ci --omit=dev
+
+FROM node:24-alpine AS build-env
+ARG APP_VERSION=unknown
+ARG GIT_SHA=unknown
 COPY . /app/
-COPY --from=npm /app/node_modules /app/node_modules
+COPY --from=development-dependencies-env /app/node_modules /app/node_modules
+WORKDIR /app
+ENV VITE_APP_VERSION=${APP_VERSION}
+ENV VITE_GIT_SHA=${GIT_SHA}
 RUN npm run build
 
-FROM nginx:alpine-otel AS final
-RUN apk update && apk upgrade
-COPY --from=build /app/dist/client /usr/share/nginx/html/
-COPY ssl/localhost.crt /etc/ssl/certs/localhost.crt
-COPY ssl/localhost.key /etc/ssl/private/localhost.key
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
-EXPOSE 8080 8443
-CMD ["nginx", "-g", "daemon off;"]
+FROM node:24-alpine
+COPY ./package.json package-lock.json /app/
+COPY --from=production-dependencies-env /app/node_modules /app/node_modules
+COPY --from=build-env /app/build /app/build
+WORKDIR /app
+CMD ["npm", "run", "start"]

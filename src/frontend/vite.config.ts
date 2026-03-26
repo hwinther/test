@@ -1,26 +1,15 @@
-import react from '@vitejs/plugin-react'
+import { reactRouter } from '@react-router/dev/vite'
 import { defineConfig } from 'vitest/config'
-import vike from 'vike/plugin'
 import mkcert from 'vite-plugin-mkcert'
-
-import { leaderboardPlugin } from './server/vite-plugin-leaderboard'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
     port: 5173,
   },
-  plugins: [react(), vike(), mkcert(), leaderboardPlugin()],
-  resolve: {
-    alias: {
-      '~': '/src',
-      //'~components': '/src/components',
-      //'~pages': '/src/pages',
-      '~test': '/test',
-    },
-  },
+  plugins: [mkcert(), ...(process.env.VITEST ? [] : [reactRouter()]), tsconfigPaths()],
   build: {
-    outDir: 'dist',
     sourcemap: true,
   },
   test: {
@@ -28,6 +17,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './test/setupTests.ts',
     mockReset: true,
+    include: ['app/**/*.{test,spec}.{ts,tsx}', 'test/**/*.{test,spec}.{ts,tsx}'],
     coverage: { enabled: true, provider: 'istanbul', reporter: ['cobertura', 'lcov', 'html', 'json'] },
     reporters: ['verbose', 'github-actions', 'junit', 'json'],
     outputFile: {

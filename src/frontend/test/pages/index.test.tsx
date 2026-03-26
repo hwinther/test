@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 import { render, screen } from '~test/testUtils'
 
-import Page from '~/pages/index/+Page'
+import Page from '~/routes/home'
 
 it('renders welcome message', () => {
   render(<Page />, { mockAuthContext: true, withQueryProvider: true })

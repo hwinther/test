@@ -21,15 +21,15 @@ export default {
         header: () => '//@ts-nocheck\n',
         mutator: {
           name: 'customInstance',
-          path: './src/api/mutators/custom-instance.ts',
+          path: './app/api/mutators/custom-instance.ts',
         },
         query: {
           useQuery: true,
         },
       },
       prettier: true,
-      schemas: './src/api/models',
-      target: './src/api/endpoints/api.ts',
+      schemas: './app/api/models',
+      target: './app/api/endpoints/api.ts',
     },
   },
 }
