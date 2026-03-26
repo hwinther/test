@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/pseudo-random */
 import type { LevelData } from './level-format'
-import type { Enemy, Fireball, GameInputSnapshot, LevelTheme, MarioGameState, Player } from './mario-types'
+import type { Enemy, Fireball, GameInputSnapshot, LevelTheme, MarioGameState, Player, SpriteTheme } from './mario-types'
 
 import { LevelLoader } from './level-loader'
 import { playMarioSound } from './mario-sounds'
@@ -317,11 +317,12 @@ export function advanceGameState(prev: MarioGameState, input: GameInputSnapshot,
  * @param {number} [options.levelNumber] - Shown “world” number in the HUD
  * @param {number} [options.lives] - Starting lives (sequence progression)
  * @param {number} [options.score] - Starting score (sequence progression)
+ * @param {import('./mario-types').SpriteTheme} [options.spriteTheme] - Visual theme for sprites ('classic' | 'botvar')
  * @returns {import('./mario-types').MarioGameState} Initial playing state
  */
 export function createInitialGameState(
   levelData: LevelData,
-  options?: { levelNumber?: number; lives?: number; score?: number },
+  options?: { levelNumber?: number; lives?: number; score?: number; spriteTheme?: SpriteTheme },
 ): MarioGameState {
   const parsed = LevelLoader.parseLevel(levelData)
   const tileSize = levelData.dimensions.tileSize
@@ -358,6 +359,7 @@ export function createInitialGameState(
     platforms: parsed.platforms!,
     player,
     score: options?.score ?? 0,
+    spriteTheme: options?.spriteTheme ?? 'classic',
     starPowerUntil: 0,
     timeLimitMax: timeLimit,
     timeRemaining: timeLimit,

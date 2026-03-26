@@ -1,10 +1,192 @@
-import type { MarioGameResult, MarioGameState } from './mario-types'
+import type { Enemy, MarioGameResult, MarioGameState, Player } from './mario-types'
 
 import {
   MARIO_CANVAS_HEIGHT,
   MARIO_CANVAS_WIDTH,
   themeColors,
 } from './mario-game-logic'
+import { type SpriteSet, getSprites } from './mario-sprites'
+
+/**
+ * Draw a single enemy on the canvas, using sprite images when available.
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+ * @param {Enemy} enemy - Enemy entity to draw
+ * @param {SpriteSet} sprites - Loaded sprite images (may be null for classic theme)
+ * @param {number} gameTime - Elapsed game time for animation
+ * @returns {void}
+ */
+function drawEnemy(ctx: CanvasRenderingContext2D, enemy: Enemy, sprites: SpriteSet, gameTime: number): void {
+  if (!enemy.alive) return
+  switch (enemy.type) {
+    case 'goomba': {
+      const bounceOffset = Math.sin(gameTime * 10 + enemy.x * 0.1) * 1
+      if (sprites.goomba) {
+        const img = sprites.goomba
+        const iw = img.naturalWidth || img.width
+        const ih = img.naturalHeight || img.height
+        const tw = enemy.width
+        const th = enemy.height
+        const scale = Math.min(tw / iw, th / ih)
+        const dw = iw * scale
+        const dh = ih * scale
+        const dx = enemy.x + (tw - dw) / 2
+        const dy = enemy.y + th - dh + bounceOffset
+        ctx.save()
+        if (enemy.direction === 'right') {
+          const cx = enemy.x + tw / 2
+          ctx.translate(cx, 0)
+          ctx.scale(-1, 1)
+          ctx.translate(-cx, 0)
+        }
+        ctx.drawImage(img, dx, dy, dw, dh)
+        ctx.restore()
+      } else {
+        ctx.fillStyle = '#8B4513'
+        ctx.fillRect(enemy.x, enemy.y + bounceOffset, enemy.width, enemy.height)
+        ctx.fillStyle = '#000000'
+        if (enemy.direction === 'left') {
+          ctx.fillRect(enemy.x + 2, enemy.y + 4 + bounceOffset, 3, 3)
+          ctx.fillRect(enemy.x + 12, enemy.y + 4 + bounceOffset, 3, 3)
+        } else {
+          ctx.fillRect(enemy.x + 9, enemy.y + 4 + bounceOffset, 3, 3)
+          ctx.fillRect(enemy.x + 19, enemy.y + 4 + bounceOffset, 3, 3)
+        }
+        ctx.fillRect(enemy.x + 4, enemy.y + 2 + bounceOffset, 6, 2)
+        ctx.fillRect(enemy.x + 14, enemy.y + 2 + bounceOffset, 6, 2)
+        ctx.fillStyle = '#654321'
+        const footOffset = Math.floor(enemy.x / 10) % 2
+        ctx.fillRect(enemy.x + 2 + footOffset, enemy.y + enemy.height - 2 + bounceOffset, 4, 2)
+        ctx.fillRect(enemy.x + enemy.width - 6 + footOffset, enemy.y + enemy.height - 2 + bounceOffset, 4, 2)
+      }
+      break
+    }
+    case 'koopa': {
+      if (sprites.koopa) {
+        const bob = Math.sin(gameTime * 6 + enemy.x * 0.08) * 0.5
+        ctx.save()
+        if (enemy.direction === 'right') {
+          ctx.translate(enemy.x + enemy.width, enemy.y + bob)
+          ctx.scale(-1, 1)
+          ctx.drawImage(sprites.koopa, 0, 0, enemy.width, enemy.height)
+        } else {
+          ctx.drawImage(sprites.koopa, enemy.x, enemy.y + bob, enemy.width, enemy.height)
+        }
+        ctx.restore()
+      } else {
+        ctx.fillStyle = '#228B22'
+        ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height)
+        ctx.fillStyle = '#FFFF00'
+        ctx.fillRect(enemy.x + 4, enemy.y + 8, enemy.width - 8, 8)
+        ctx.fillStyle = '#90EE90'
+        if (enemy.direction === 'left') {
+          ctx.fillRect(enemy.x - 4, enemy.y + 4, 8, 12)
+          ctx.fillStyle = '#000000'
+          ctx.fillRect(enemy.x - 2, enemy.y + 6, 2, 2)
+        } else {
+          ctx.fillRect(enemy.x + enemy.width - 4, enemy.y + 4, 8, 12)
+          ctx.fillStyle = '#000000'
+          ctx.fillRect(enemy.x + enemy.width, enemy.y + 6, 2, 2)
+        }
+        ctx.fillStyle = '#90EE90'
+        const legOffset = Math.floor(enemy.x / 8) % 2
+        ctx.fillRect(enemy.x + 6 + legOffset, enemy.y + enemy.height - 4, 3, 4)
+        ctx.fillRect(enemy.x + enemy.width - 9 + legOffset, enemy.y + enemy.height - 4, 3, 4)
+      }
+      break
+    }
+    case 'piranha': {
+      if (sprites.piranha) {
+        const bob = Math.sin(gameTime * 7 + enemy.x * 0.08) * 0.6
+        const img = sprites.piranha
+        const iw = img.naturalWidth || img.width
+        const ih = img.naturalHeight || img.height
+        const tw = enemy.width
+        const th = enemy.height
+        const scale = Math.min(tw / iw, th / ih)
+        const dw = iw * scale
+        const dh = ih * scale
+        const dx = enemy.x + (tw - dw) / 2
+        const dy = enemy.y + th - dh + bob
+        ctx.save()
+        if (enemy.direction === 'right') {
+          const cx = enemy.x + tw / 2
+          ctx.translate(cx, 0)
+          ctx.scale(-1, 1)
+          ctx.translate(-cx, 0)
+        }
+        ctx.drawImage(img, dx, dy, dw, dh)
+        ctx.restore()
+      } else {
+        ctx.fillStyle = '#228B22'
+        ctx.fillRect(enemy.x + 4, enemy.y + 8, enemy.width - 8, enemy.height - 8)
+        ctx.fillStyle = '#FFFFFF'
+        ctx.fillRect(enemy.x + 6, enemy.y + 12, 5, 5)
+        ctx.fillRect(enemy.x + enemy.width - 11, enemy.y + 12, 5, 5)
+        ctx.fillStyle = '#000000'
+        ctx.fillRect(enemy.x + 8, enemy.y + 14, 2, 2)
+        ctx.fillRect(enemy.x + enemy.width - 10, enemy.y + 14, 2, 2)
+        ctx.fillStyle = '#8B0000'
+        ctx.beginPath()
+        ctx.moveTo(enemy.x + enemy.width / 2, enemy.y + enemy.height)
+        ctx.lineTo(enemy.x + 4, enemy.y + 20)
+        ctx.lineTo(enemy.x + enemy.width - 4, enemy.y + 20)
+        ctx.fill()
+      }
+      break
+    }
+    default:
+      break
+  }
+}
+
+/**
+ * Draw the player character on the canvas, using a sprite image when available.
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+ * @param {Player} pl - Player entity
+ * @param {SpriteSet} sprites - Loaded sprite images (may be null for classic theme)
+ * @param {number} starPowerUntil - Timestamp until which star power is active
+ * @returns {void}
+ */
+function drawPlayer(ctx: CanvasRenderingContext2D, pl: Player, sprites: SpriteSet, starPowerUntil: number): void {
+  const starGlow = performance.now() < starPowerUntil
+
+  if (sprites.player) {
+    ctx.save()
+    if (starGlow) {
+      ctx.globalAlpha = 0.5 + 0.5 * Math.sin(performance.now() / 80)
+    } else if (pl.invulnerable) {
+      ctx.globalAlpha = 0.5 + 0.5 * Math.sin(performance.now() / 100)
+    }
+    if (pl.facing === 'left') {
+      ctx.translate(pl.x + pl.width, pl.y)
+      ctx.scale(-1, 1)
+      ctx.drawImage(sprites.player, 0, 0, pl.width, pl.height)
+    } else {
+      ctx.drawImage(sprites.player, pl.x, pl.y, pl.width, pl.height)
+    }
+    ctx.restore()
+  } else {
+    let bodyColor = '#FF0000'
+    if (starGlow) {
+      bodyColor = '#FFD700'
+    } else if (pl.invulnerable) {
+      bodyColor = '#FF69B4'
+    }
+    ctx.fillStyle = bodyColor
+    ctx.fillRect(pl.x, pl.y, pl.width, pl.height)
+
+    const faceScale = pl.height > 36 ? 1.15 : 1
+    const faceSize = Math.min(16 * faceScale, pl.width - 8)
+    const faceX = pl.x + (pl.width - faceSize) / 2
+    const faceY = pl.y + 8
+    ctx.fillStyle = '#FFE4C4'
+    ctx.fillRect(faceX, faceY, faceSize, faceSize)
+    ctx.fillStyle = '#FF0000'
+    ctx.fillRect(pl.x + 4, pl.y + 4, pl.width - 8, 8)
+    ctx.fillStyle = '#000000'
+    ctx.fillRect(pl.x + pl.width / 2 - 4, pl.y + 12 + (faceSize - 16) * 0.2, 8, 4)
+  }
+}
 
 /**
  * Build the result payload emitted when a level is completed.
@@ -138,93 +320,13 @@ export function drawGame(canvas: HTMLCanvasElement, state: MarioGameState, drawO
     ctx.fill()
   })
 
+  const sprites = getSprites(state.spriteTheme)
+
   state.enemies.forEach((enemy) => {
-    if (!enemy.alive) return
-    switch (enemy.type) {
-      case 'goomba': {
-        ctx.fillStyle = '#8B4513'
-        const bounceOffset = Math.sin(state.gameTime * 10 + enemy.x * 0.1) * 1
-        ctx.fillRect(enemy.x, enemy.y + bounceOffset, enemy.width, enemy.height)
-        ctx.fillStyle = '#000000'
-        if (enemy.direction === 'left') {
-          ctx.fillRect(enemy.x + 2, enemy.y + 4 + bounceOffset, 3, 3)
-          ctx.fillRect(enemy.x + 12, enemy.y + 4 + bounceOffset, 3, 3)
-        } else {
-          ctx.fillRect(enemy.x + 9, enemy.y + 4 + bounceOffset, 3, 3)
-          ctx.fillRect(enemy.x + 19, enemy.y + 4 + bounceOffset, 3, 3)
-        }
-        ctx.fillRect(enemy.x + 4, enemy.y + 2 + bounceOffset, 6, 2)
-        ctx.fillRect(enemy.x + 14, enemy.y + 2 + bounceOffset, 6, 2)
-        ctx.fillStyle = '#654321'
-        const footOffset = Math.floor(enemy.x / 10) % 2
-        ctx.fillRect(enemy.x + 2 + footOffset, enemy.y + enemy.height - 2 + bounceOffset, 4, 2)
-        ctx.fillRect(enemy.x + enemy.width - 6 + footOffset, enemy.y + enemy.height - 2 + bounceOffset, 4, 2)
-        break
-      }
-      case 'koopa': {
-        ctx.fillStyle = '#228B22'
-        ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height)
-        ctx.fillStyle = '#FFFF00'
-        ctx.fillRect(enemy.x + 4, enemy.y + 8, enemy.width - 8, 8)
-        ctx.fillStyle = '#90EE90'
-        if (enemy.direction === 'left') {
-          ctx.fillRect(enemy.x - 4, enemy.y + 4, 8, 12)
-          ctx.fillStyle = '#000000'
-          ctx.fillRect(enemy.x - 2, enemy.y + 6, 2, 2)
-        } else {
-          ctx.fillRect(enemy.x + enemy.width - 4, enemy.y + 4, 8, 12)
-          ctx.fillStyle = '#000000'
-          ctx.fillRect(enemy.x + enemy.width, enemy.y + 6, 2, 2)
-        }
-        ctx.fillStyle = '#90EE90'
-        const legOffset = Math.floor(enemy.x / 8) % 2
-        ctx.fillRect(enemy.x + 6 + legOffset, enemy.y + enemy.height - 4, 3, 4)
-        ctx.fillRect(enemy.x + enemy.width - 9 + legOffset, enemy.y + enemy.height - 4, 3, 4)
-        break
-      }
-      case 'piranha': {
-        ctx.fillStyle = '#228B22'
-        ctx.fillRect(enemy.x + 4, enemy.y + 8, enemy.width - 8, enemy.height - 8)
-        ctx.fillStyle = '#FFFFFF'
-        ctx.fillRect(enemy.x + 6, enemy.y + 12, 5, 5)
-        ctx.fillRect(enemy.x + enemy.width - 11, enemy.y + 12, 5, 5)
-        ctx.fillStyle = '#000000'
-        ctx.fillRect(enemy.x + 8, enemy.y + 14, 2, 2)
-        ctx.fillRect(enemy.x + enemy.width - 10, enemy.y + 14, 2, 2)
-        ctx.fillStyle = '#8B0000'
-        ctx.beginPath()
-        ctx.moveTo(enemy.x + enemy.width / 2, enemy.y + enemy.height)
-        ctx.lineTo(enemy.x + 4, enemy.y + 20)
-        ctx.lineTo(enemy.x + enemy.width - 4, enemy.y + 20)
-        ctx.fill()
-        break
-      }
-      default:
-        break
-    }
+    drawEnemy(ctx, enemy, sprites, state.gameTime)
   })
 
-  const pl = state.player
-  const starGlow = performance.now() < state.starPowerUntil
-  let bodyColor = '#FF0000'
-  if (starGlow) {
-    bodyColor = '#FFD700'
-  } else if (pl.invulnerable) {
-    bodyColor = '#FF69B4'
-  }
-  ctx.fillStyle = bodyColor
-  ctx.fillRect(pl.x, pl.y, pl.width, pl.height)
-
-  const faceScale = pl.height > 36 ? 1.15 : 1
-  const faceSize = Math.min(16 * faceScale, pl.width - 8)
-  const faceX = pl.x + (pl.width - faceSize) / 2
-  const faceY = pl.y + 8
-  ctx.fillStyle = '#FFE4C4'
-  ctx.fillRect(faceX, faceY, faceSize, faceSize)
-  ctx.fillStyle = '#FF0000'
-  ctx.fillRect(pl.x + 4, pl.y + 4, pl.width - 8, 8)
-  ctx.fillStyle = '#000000'
-  ctx.fillRect(pl.x + pl.width / 2 - 4, pl.y + 12 + (faceSize - 16) * 0.2, 8, 4)
+  drawPlayer(ctx, state.player, sprites, state.starPowerUntil)
 
   state.particles.forEach((particle) => {
     const alpha = particle.life / particle.maxLife

@@ -1,6 +1,7 @@
 import { type JSX, useEffect, useState } from 'react'
 
 import type { WeatherForecast } from '~/api/models'
+import type { SpriteTheme } from '~/components/game/mario/mario-types'
 
 import { useVersion } from '~/api/endpoints/service/service'
 import { useGetWeatherForecast } from '~/api/endpoints/weather-forecast/weather-forecast'
@@ -17,6 +18,7 @@ import { useKonamiCode } from '~/hooks/useKonamiCode'
 function Page(): JSX.Element {
   const [showGame, setShowGame] = useState(false)
   const [showMarioGame, setShowMarioGame] = useState(false)
+  const [marioTheme, setMarioTheme] = useState<SpriteTheme>('classic')
   const dispatch = useAuthDispatch()
   const { data: weatherForecasts, refetch } = useGetWeatherForecast()
   const { data: version } = useVersion()
@@ -39,7 +41,7 @@ function Page(): JSX.Element {
 
   if (showMarioGame) {
     return (
-      <MarioGame levelSequence={LevelLoader.createDefaultLevelSequence()} onClose={() => setShowMarioGame(false)} />
+      <MarioGame levelSequence={LevelLoader.createDefaultLevelSequence()} onClose={() => setShowMarioGame(false)} spriteTheme={marioTheme} />
     )
   }
 
@@ -56,9 +58,15 @@ function Page(): JSX.Element {
         </button>
         <button
           className="rounded-lg bg-red-600 px-5 py-2.5 text-white font-medium hover:bg-red-700 transition-colors cursor-pointer"
-          onClick={() => setShowMarioGame(true)}
+          onClick={() => { setMarioTheme('classic'); setShowMarioGame(true) }}
         >
           Play Mario Clone
+        </button>
+        <button
+          className="rounded-lg bg-purple-600 px-5 py-2.5 text-white font-medium hover:bg-purple-700 transition-colors cursor-pointer"
+          onClick={() => { setMarioTheme('botvar'); setShowMarioGame(true) }}
+        >
+          Play Botvar Theme
         </button>
       </div>
 

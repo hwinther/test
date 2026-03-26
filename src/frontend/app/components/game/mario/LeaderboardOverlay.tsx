@@ -10,6 +10,7 @@ type Phase = 'entering-name' | 'showing-scores'
 interface LeaderboardOverlayProps {
   readonly onDone: () => void
   readonly score: number
+  readonly variant?: 'complete' | 'gameOver'
 }
 
 /**
@@ -17,7 +18,7 @@ interface LeaderboardOverlayProps {
  * @param {LeaderboardOverlayProps} props - Parent callbacks and final score
  * @returns {JSX.Element} Name entry or high-score table overlay
  */
-export function LeaderboardOverlay({ onDone, score }: LeaderboardOverlayProps): JSX.Element {
+export function LeaderboardOverlay({ onDone, score, variant = 'gameOver' }: LeaderboardOverlayProps): JSX.Element {
   const [phase, setPhase] = useState<Phase>('entering-name')
   const [name, setName] = useState('')
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
@@ -86,7 +87,7 @@ export function LeaderboardOverlay({ onDone, score }: LeaderboardOverlayProps): 
     return (
       <div className="leaderboard-overlay">
         <div className="leaderboard-name-entry">
-          <h2>GAME OVER</h2>
+          <h2>{variant === 'complete' ? 'ALL LEVELS COMPLETE!' : 'GAME OVER'}</h2>
           <p className="leaderboard-final-score">SCORE: {score.toLocaleString()}</p>
           <p className="leaderboard-prompt">ENTER YOUR NAME</p>
           <input
@@ -134,7 +135,7 @@ export function LeaderboardOverlay({ onDone, score }: LeaderboardOverlayProps): 
         })}
 
         {error && <p className="leaderboard-error">{error}</p>}
-        <p className="leaderboard-continue">PRESS R TO RESTART</p>
+        <p className="leaderboard-continue">{variant === 'complete' ? 'PRESS ENTER TO PLAY AGAIN' : 'PRESS R TO RESTART'}</p>
       </div>
     </div>
   )

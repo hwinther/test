@@ -1,7 +1,7 @@
 import { type JSX, useCallback, useEffect, useRef, useState } from 'react'
 
 import type { LevelData } from './level-format'
-import type { GameInputSnapshot, KeyState, MarioGameResult, MarioGameState } from './mario-types'
+import type { GameInputSnapshot, KeyState, MarioGameResult, MarioGameState, SpriteTheme } from './mario-types'
 
 import { LeaderboardOverlay } from './LeaderboardOverlay'
 import { LevelLoader } from './level-loader'
@@ -25,6 +25,7 @@ export interface MarioGameProps {
   readonly onClose?: () => void
   readonly onLevelComplete?: (result: MarioGameResult) => void
   readonly showEditor?: boolean
+  readonly spriteTheme?: SpriteTheme
 }
 
 /**
@@ -43,13 +44,14 @@ export function MarioGame({
   onClose,
   onLevelComplete,
   showEditor,
+  spriteTheme = 'classic',
 }: MarioGameProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const resolvedLevel = customLevel ?? levelSequence?.[0] ?? LevelLoader.createDefaultLevel()
   const [currentLevel, setCurrentLevel] = useState<LevelData>(() => resolvedLevel)
   const [editorMode, setEditorMode] = useState(Boolean(showEditor))
 
-  const gameStateRef = useRef<MarioGameState>(createInitialGameState(currentLevel))
+  const gameStateRef = useRef<MarioGameState>(createInitialGameState(currentLevel, { spriteTheme }))
   const keyStateRef = useRef<KeyState>({
     down: false,
     jump: false,
@@ -72,6 +74,7 @@ export function MarioGame({
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const showLeaderboardRef = useRef(false)
   const gameOverHandledRef = useRef(false)
+  const leaderboardVariantRef = useRef<'complete' | 'gameOver'>('gameOver')
 
   const lastTimeRef = useRef(performance.now())
   const accRef = useRef(0)
@@ -103,9 +106,10 @@ export function MarioGame({
         levelNumber: sequenceIndexRef.current + 1,
         lives: st.player.lives,
         score: st.score,
+        spriteTheme,
       })
     } else {
-      if (st.gameStatus === 'complete' && levelSequence && sequenceIndexRef.current >= levelSequence.length - 1) {
+      if (levelSequence && (st.gameStatus === 'gameOver' || sequenceIndexRef.current >= levelSequence.length - 1)) {
         sequenceIndexRef.current = 0
       }
       const level =
@@ -113,21 +117,22 @@ export function MarioGame({
       setCurrentLevel(level)
       gameStateRef.current = createInitialGameState(level, {
         levelNumber: levelSequence ? sequenceIndexRef.current + 1 : 1,
+        spriteTheme,
       })
     }
     completeNotifiedRef.current = false
     gameOverHandledRef.current = false
     setShowLeaderboard(false)
     showLeaderboardRef.current = false
-  }, [currentLevel, customLevel, levelSequence])
+  }, [currentLevel, customLevel, levelSequence, spriteTheme])
 
   const handlePlayTestLevel = useCallback((level: LevelData) => {
     setCurrentLevel(level)
-    gameStateRef.current = createInitialGameState(level)
+    gameStateRef.current = createInitialGameState(level, { spriteTheme })
     sequenceIndexRef.current = 0
     completeNotifiedRef.current = false
     setEditorMode(false)
-  }, [])
+  }, [spriteTheme])
 
   const handleSaveLevel = useCallback((level: LevelData) => {
     setCurrentLevel(level)
@@ -163,10 +168,19 @@ export function MarioGame({
         if (before !== 'complete' && after === 'complete' && !completeNotifiedRef.current) {
           completeNotifiedRef.current = true
           onLevelCompleteRef.current?.(buildMarioGameResult(gameStateRef.current))
+
+          const seq = levelSequenceRef.current
+          const isLastLevel = seq !== undefined && sequenceIndexRef.current >= seq.length - 1
+          if (isLastLevel) {
+            leaderboardVariantRef.current = 'complete'
+            showLeaderboardRef.current = true
+            setShowLeaderboard(true)
+          }
         }
 
         if (before !== 'gameOver' && after === 'gameOver' && !gameOverHandledRef.current) {
           gameOverHandledRef.current = true
+          leaderboardVariantRef.current = 'gameOver'
           showLeaderboardRef.current = true
           setShowLeaderboard(true)
         }
@@ -247,7 +261,7 @@ export function MarioGame({
           width={MARIO_CANVAS_WIDTH}
         />
         {showLeaderboard && (
-          <LeaderboardOverlay onDone={restartOrAdvance} score={gameStateRef.current.score} />
+          <LeaderboardOverlay onDone={restartOrAdvance} score={gameStateRef.current.score} variant={leaderboardVariantRef.current} />
         )}
       </div>
 
