@@ -11,9 +11,7 @@ import { MarioGame } from '~/components/game/mario/MarioGame'
 import { MaritimeVentures } from '~/components/game/maritime-ventures/MaritimeVentures'
 // import { useKonamiCode } from '~/hooks/useKonamiCode'
 
-import './Page.css'
-
-import viteLogo from '/vite.svg'
+import './home.css'
 
 function Page(): JSX.Element {
   const [count, setCount] = useState(0)
@@ -50,7 +48,7 @@ function Page(): JSX.Element {
     <>
       <div>
         <a href="https://vitejs.dev" target="_blank">
-          <img alt="Vite logo" className="logo" src={viteLogo} />
+          <img alt="Vite logo" className="logo" src="/vite.svg" />
         </a>
         <a href="https://react.dev" target="_blank">
           <img alt="React logo" className="logo react" src={reactLogo} />

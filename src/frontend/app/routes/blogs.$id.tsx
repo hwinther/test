@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router'
 
 import { useGetBlog, useGetPosts } from '~/api/endpoints/blogging/blogging'
 
-const BlogDetailView: React.FC = () => {
+export default function BlogDetail(): React.JSX.Element {
   const { id } = useParams<{ id: string }>()
   const numericId = Number.parseInt(id ?? '')
   const { data: blog, error: blogError, isLoading: blogIsLoading } = useGetBlog(numericId)
@@ -33,5 +33,3 @@ const BlogDetailView: React.FC = () => {
     </div>
   )
 }
-
-export default BlogDetailView

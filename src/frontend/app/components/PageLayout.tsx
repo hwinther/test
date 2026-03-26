@@ -44,14 +44,14 @@ function Navigation({ children }: Readonly<{ children: React.ReactNode }>): Reac
  */
 function PageLayout({ children }: Readonly<{ children: React.ReactNode }>): React.JSX.Element {
   return (
-    <React.StrictMode>
+    <>
       <Navigation>
         <NavLink to="/" end>Home</NavLink>
         <NavLink to="/about">About</NavLink>
         <NavLink to="/blogs">Blogs</NavLink>
       </Navigation>
       <Content>{children}</Content>
-    </React.StrictMode>
+    </>
   )
 }
 

@@ -1,29 +1,27 @@
 {
+  "include": [
+    "**/*",
+    "**/.server/**/*",
+    "**/.client/**/*",
+    ".react-router/types/**/*"
+  ],
   "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "types": ["node", "vite/client", "vitest/globals"],
     "target": "ES2022",
-    "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-
-    /* Paths */
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "rootDirs": [".", "./.react-router/types"],
     "baseUrl": ".",
     "paths": {
-      "~/*": ["src/*"],
-      //"~components/*": ["src/components/*"],
-      //"~pages/*": ["src/pages/*"],
-      "~test/*": ["test/*"]
+      "~/*": ["./app/*"],
+      "~test/*": ["./test/*"]
     },
-
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
+    "esModuleInterop": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-
-    /* Linting */
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -31,7 +29,5 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "allowJs": true
-  },
-  "include": ["src", "test", "eslint.config.mjs", "orval.config.cjs"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  }
 }

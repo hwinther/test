@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 
 import { useGetBlogs } from '~/api/endpoints/blogging/blogging'
 
-const BlogListView: React.FC = () => {
+export default function Blogs(): React.JSX.Element {
   const { data: blogs, error, isLoading } = useGetBlogs()
 
   if (isLoading) return <div>Loading...</div>
@@ -26,5 +26,3 @@ const BlogListView: React.FC = () => {
     </div>
   )
 }
-
-export default BlogListView

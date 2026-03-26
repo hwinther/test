@@ -11,11 +11,13 @@ export default [
   {
     ignores: [
       'node_modules/*',
+      'build/*',
       'dist/*',
       'coverage/*',
+      '.react-router/*',
       '*.lock',
-      'src/api/endpoints/**',
-      'src/api/models/**',
+      'app/api/endpoints/**',
+      'app/api/models/**',
       'vite.config.ts',
     ],
   },
