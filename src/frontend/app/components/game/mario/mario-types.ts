@@ -71,6 +71,8 @@ export interface KeyState {
 
 export type LevelTheme = 'castle' | 'overworld' | 'underground' | 'underwater'
 
+export type SpriteTheme = 'botvar' | 'classic'
+
 export interface MarioGameResult {
   coinsCollected: number
   completed: boolean
@@ -102,6 +104,7 @@ export interface MarioGameState {
   platforms: Platform[]
   player: Player
   score: number
+  spriteTheme: SpriteTheme
   starPowerUntil: number
   timeLimitMax: null | number
   timeRemaining: null | number

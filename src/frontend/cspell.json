@@ -34,7 +34,10 @@
     "otel",
     "OTEL",
     "OTLP",
-    "tailwindcss"
+    "tailwindcss",
+    "botvar",
+    "bugvar",
+    "Botvar"
   ],
   "ignorePaths": ["node_modules/**", "*.lock"]
 }
