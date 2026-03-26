@@ -3,6 +3,10 @@ import { Link, useParams } from 'react-router'
 
 import { useGetBlog, useGetPosts } from '~/api/endpoints/blogging/blogging'
 
+/**
+ * Blog detail page showing a single blog and its posts.
+ * @returns {React.JSX.Element} The blog detail view with its list of posts.
+ */
 export default function BlogDetail(): React.JSX.Element {
   const { id } = useParams<{ id: string }>()
   const numericId = Number.parseInt(id ?? '')

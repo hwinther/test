@@ -13,6 +13,10 @@ import { MaritimeVentures } from '~/components/game/maritime-ventures/MaritimeVe
 
 import './home.css'
 
+/**
+ * Home page with weather data, version info, and game launchers.
+ * @returns {JSX.Element} The home page content.
+ */
 function Page(): JSX.Element {
   const [count, setCount] = useState(0)
   const [showGame, setShowGame] = useState(false)

@@ -3,6 +3,10 @@ import { Link } from 'react-router'
 
 import { useGetBlogs } from '~/api/endpoints/blogging/blogging'
 
+/**
+ * Blog listing page displaying all available blogs.
+ * @returns {React.JSX.Element} The blog listing view.
+ */
 export default function Blogs(): React.JSX.Element {
   const { data: blogs, error, isLoading } = useGetBlogs()
 

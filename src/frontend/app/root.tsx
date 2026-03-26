@@ -16,6 +16,12 @@ import '~/components/PageLayout.css'
 
 const queryClient = new QueryClient()
 
+/**
+ * Root layout wrapping all routes with common HTML structure.
+ * @param {object} root0 - The component props.
+ * @param {import('react').ReactNode} root0.children - The child elements to render within the layout.
+ * @returns {import('react').JSX.Element} The HTML document shell with children rendered in the body.
+ */
 export function Layout({ children }: { readonly children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -35,6 +41,10 @@ export function Layout({ children }: { readonly children: React.ReactNode }) {
   )
 }
 
+/**
+ * Top-level application component providing auth, query, and layout contexts.
+ * @returns {import('react').JSX.Element} The app wrapped in auth, query, and layout providers.
+ */
 export default function App() {
   return (
     <AuthProvider>
@@ -48,6 +58,12 @@ export default function App() {
   )
 }
 
+/**
+ * Global error boundary for unhandled route errors.
+ * @param {object} root0 - The error boundary props.
+ * @param {unknown} root0.error - The error that was thrown.
+ * @returns {import('react').JSX.Element} An error page displaying the error message and optional stack trace.
+ */
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = 'Oops!'
   let details = 'An unexpected error occurred.'
