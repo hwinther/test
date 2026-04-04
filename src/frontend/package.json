@@ -77,7 +77,7 @@
     "eslint-plugin-perfectionist": "5.0.0",
     "eslint-plugin-prettier": "5.5.4",
     "eslint-plugin-promise": "7.2.1",
-    "eslint-plugin-sonarjs": "3.0.5",
+    "eslint-plugin-sonarjs": "3.0.7",
     "jsdom": "29.0.1",
     "msw": "2.12.14",
     "openapi-types": "12.1.3",
