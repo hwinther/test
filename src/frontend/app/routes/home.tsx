@@ -1,6 +1,6 @@
 import { type JSX, useEffect, useState } from 'react'
 
-import type { WeatherForecast } from '~/api/models'
+import type { VersionInformation, WeatherForecast } from '~/api/models'
 import type { SpriteTheme } from '~/components/game/mario/mario-types'
 
 import { useVersion } from '~/api/endpoints/service/service'
@@ -12,6 +12,34 @@ import { MaritimeVentures } from '~/components/game/maritime-ventures/MaritimeVe
 import { useKonamiCode } from '~/hooks/useKonamiCode'
 
 /**
+ * Query payload may be a JSON array (actual axios body) or Orval's typed `{ status, data }` envelope.
+ * @param {unknown} data Raw react-query data from getWeatherForecast.
+ * @returns {WeatherForecast[] | undefined} Parsed rows or undefined.
+ */
+function weatherRowsFromQuery(data: unknown): WeatherForecast[] | undefined {
+  if (data == null) return undefined
+  if (Array.isArray(data)) return data as WeatherForecast[]
+  const o = data as unknown as { status?: number; data?: unknown }
+  if (o.status === 200 && Array.isArray(o.data)) return o.data as WeatherForecast[]
+  return undefined
+}
+
+/**
+ * Same shape mismatch as weather: mutator returns JSON body; Orval types may use `{ status, data }`.
+ * @param {unknown} data Raw react-query data from version().
+ * @returns {VersionInformation | undefined} Parsed version payload or undefined.
+ */
+function versionInfoFromQuery(data: unknown): VersionInformation | undefined {
+  if (data == null) return undefined
+  if (typeof data === 'object' && 'informationalVersion' in data) return data as VersionInformation
+  const o = data as unknown as { status?: number; data?: unknown }
+  if (o.status === 200 && o.data != null && typeof o.data === 'object' && 'informationalVersion' in o.data) {
+    return o.data as VersionInformation
+  }
+  return undefined
+}
+
+/**
  * Home page with weather data, version info, and game launchers.
  * @returns {JSX.Element} The home page content.
  */
@@ -21,7 +49,9 @@ function Page(): JSX.Element {
   const [marioTheme, setMarioTheme] = useState<SpriteTheme>('classic')
   const dispatch = useAuthDispatch()
   const { data: weatherForecasts, refetch } = useGetWeatherForecast()
-  const { data: version } = useVersion()
+  const forecastRows = weatherRowsFromQuery(weatherForecasts)
+  const { data: versionRaw } = useVersion()
+  const versionInfo = versionInfoFromQuery(versionRaw)
   const isKonamiActivated = useKonamiCode()
 
   useEffect(() => {
@@ -70,20 +100,20 @@ function Page(): JSX.Element {
         </button>
       </div>
 
-      {weatherForecasts && weatherForecasts.length > 0 && (
+      {forecastRows != null && forecastRows.length > 0 ? (
         <section className="space-y-1">
           <h2 className="text-xl font-semibold">Weather Forecast</h2>
-          {weatherForecasts.map((wf: WeatherForecast) => (
+          {forecastRows.map((wf: WeatherForecast) => (
             <p key={wf.date} className="text-sm text-neutral-600 dark:text-neutral-400">
               {wf.date}: {wf.summary} – {wf.temperatureC}°C
             </p>
           ))}
         </section>
-      )}
+      ) : null}
 
-      {version !== undefined && (
+      {versionInfo != null && (
         <p className="text-xs text-neutral-500 dark:text-neutral-400">
-          Version: {version?.informationalVersion} · Env: {version?.environmentName} · Mode: {import.meta.env.MODE}
+          Version: {versionInfo.informationalVersion} · Env: {versionInfo.environmentName} · Mode: {import.meta.env.MODE}
         </p>
       )}
     </div>

@@ -1,6 +1,7 @@
 ﻿// Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Entities;
 using WebApi.Messaging;
@@ -23,8 +24,8 @@ public class SendMessageController(IMessageSender messageSender) : ControllerBas
     /// </summary>
     /// <returns>A string indicating the result of the message sending operation.</returns>
     [HttpGet]
-    public async Task<ActionResult<GenericValue<string>>> Get() =>
-        Ok(new GenericValue<string>
+    public async Task<Ok<GenericValue<string>>> Get() =>
+        TypedResults.Ok(new GenericValue<string>
         {
             Value = await messageSender.SendMessageAsync()
         });

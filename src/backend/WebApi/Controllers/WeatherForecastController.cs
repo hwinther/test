@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Entities;
 
@@ -16,21 +17,21 @@ public class WeatherForecastController(ILogger<WeatherForecastController> logger
     ];
 
     /// <summary>
-    ///     Returns weather forecast
+    ///     Returns weather forecast 
     /// </summary>
     /// <returns></returns>
     [HttpGet(Name = "GetWeatherForecast")]
-    public Task<ActionResult<IEnumerable<WeatherForecast>>> Get()
+    public Ok<List<WeatherForecast>> Get()
     {
         logger.LogInformation("GetWeatherForecast was called");
 
-        return Task.FromResult<ActionResult<IEnumerable<WeatherForecast>>>(Ok(Enumerable.Range(1, 5)
-                                                                                        .Select(static index => new WeatherForecast
-                                                                                        {
-                                                                                            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                                                                                            TemperatureC = Random.Shared.Next(-20, 55),
-                                                                                            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-                                                                                        })
-                                                                                        .ToArray()));
+        return TypedResults.Ok(Enumerable.Range(1, 5)
+                                         .Select(static index => new WeatherForecast
+                                         {
+                                             Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                                             TemperatureC = Random.Shared.Next(-20, 55),
+                                             Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+                                         })
+                                         .ToList());
     }
 }

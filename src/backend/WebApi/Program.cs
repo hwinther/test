@@ -125,6 +125,8 @@ builder.Services.AddSwaggerGen(static options =>
     options.SwaggerGeneratorOptions.XmlCommentEndOfLine = "\n";
 });
 
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 if (!app.Environment.IsEnvironment("Swagger") && !EF.IsDesignTime)

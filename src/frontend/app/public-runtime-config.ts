@@ -8,6 +8,11 @@ export type PublicRuntimeConfig = {
 /** Default when no env override is set (local dev). */
 export const DEFAULT_PUBLIC_API_BASE_URL = 'https://localhost:7156/'
 
+/**
+ * Ensures the URL ends with `/` for consistent Axios baseURL merging.
+ * @param {string} url API origin, with or without a trailing slash.
+ * @returns {string} The same origin with a trailing slash.
+ */
 function withTrailingSlash(url: string): string {
   return url.endsWith('/') ? url : `${url}/`
 }
@@ -15,6 +20,7 @@ function withTrailingSlash(url: string): string {
 /**
  * Resolves the public API base URL from process env (Node / SSR / react-router-serve).
  * Prefer PUBLIC_* in production so the same image can target different backends without a rebuild.
+ * @returns {string} API origin with trailing slash, or {@link DEFAULT_PUBLIC_API_BASE_URL} when unset.
  */
 export function readApiBaseUrlFromProcessEnv(): string {
   const raw = process.env.PUBLIC_API_BASE_URL?.trim() || process.env.VITE_API_BASE_URL?.trim()
