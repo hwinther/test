@@ -44,15 +44,6 @@
         "resolved": "1.23.0",
         "contentHash": "2wDnb4umupJZ/1ikgWozFVpggH1mlHQFc0odXVv2ZagL3RYwXgW9zmC15fiqIBzmaC0vLZUnLGwDY+p8ZR7Syw=="
       },
-      "OpenTelemetry.Exporter.Console": {
-        "type": "Direct",
-        "requested": "[1.15.2, )",
-        "resolved": "1.15.2",
-        "contentHash": "25RBbplOlkSHyKF9qVAA5DhGm47v0ghI++75ZgrUqOQKoEJ5GLOww77q625Z0WEZoJE7XyrCRBXIE7ggKoH41g==",
-        "dependencies": {
-          "OpenTelemetry": "1.15.2"
-        }
-      },
       "OpenTelemetry.Exporter.OpenTelemetryProtocol": {
         "type": "Direct",
         "requested": "[1.15.2, )",

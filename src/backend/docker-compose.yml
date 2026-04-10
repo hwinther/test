@@ -9,24 +9,18 @@ services:
     entrypoint: "dotnet WebApi.dll --urls http://*:5000"
     ports:
      - "5000:5000"
-    env_file:
-      - otel-dotnet.env # enable OpenTelemetry .NET Automatic Instrumentation
     environment:
       DB_CONNECTION: "Server=sqlserver,1433;Initial Catalog=api;User=sa;Password=DevelopmentOnlyPassword1;TrustServerCertificate=True;"
-      # OpenTelemetry environmental variables:
-      OTEL_SERVICE_NAME: "service"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
-      OTEL_DOTNET_AUTO_TRACES_ADDITIONAL_SOURCES: "Examples.Service"
-      OTEL_DOTNET_AUTO_METRICS_ADDITIONAL_SOURCES: "Examples.Service"
+      # In-app OpenTelemetry SDK (Program.cs) → collector OTLP gRPC
+      OTEL_SERVICE_NAME: "WebApi"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
       RABBITMQ_HOSTNAME: rabbitmq
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
-      ZIPKIN_HOSTNAME: zipkin
     depends_on:
       - otel-collector
       - sqlserver
       - rabbitmq
-      - zipkin
 
   frontend:
     image: ${DOCKER_REGISTRY-}frontend
@@ -90,7 +84,6 @@ services:
       - jaeger
       - prometheus
       - loki
-      - zipkin
 
   jaeger:
     image: jaegertracing/all-in-one:1.50.0
@@ -120,8 +113,3 @@ services:
       GF_FEATURE_TOGGLES_ENABLE: traceqlEditor
     ports:
       - "3000:3000"
-
-  zipkin:
-    image: openzipkin/zipkin
-    ports:
-      - 9411:9411
