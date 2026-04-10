@@ -14,15 +14,19 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AuthProvider } from '~/auth.context'
 import { PageLayout } from '~/components/PageLayout'
 import { SiteFooter } from '~/components/SiteFooter'
-import type { PublicRuntimeConfig } from '~/public-runtime-config'
+import {
+  DEFAULT_PUBLIC_API_BASE_URL,
+  type PublicRuntimeConfig,
+  readApiBaseUrlFromProcessEnv,
+} from '~/public-runtime-config'
 import '~/components/PageLayout.css'
 
 const queryClient = new QueryClient()
 
 /**
- * Root loader that reads public runtime config (including OTEL endpoints)
+ * Root loader that reads public runtime config (API base URL, OTEL endpoints)
  * from env vars on the server and exposes them to the browser via window injection.
- * @returns {Promise<{publicRuntime: PublicRuntimeConfig}>} Public runtime config for OTEL browser telemetry.
+ * @returns {Promise<{publicRuntime: PublicRuntimeConfig}>} Public runtime config for the browser.
  */
 export async function loader(): Promise<{ publicRuntime: PublicRuntimeConfig }> {
   // eslint-disable-next-line sonarjs/different-types-comparison -- SSR: globalThis.window is undefined on the server
@@ -32,6 +36,7 @@ export async function loader(): Promise<{ publicRuntime: PublicRuntimeConfig }> 
     }
     return {
       publicRuntime: w.__TEST_PUBLIC__ ?? {
+        apiBaseUrl: DEFAULT_PUBLIC_API_BASE_URL,
         otelTracesEndpoint: '',
         otelServiceName: '',
       },
@@ -40,6 +45,7 @@ export async function loader(): Promise<{ publicRuntime: PublicRuntimeConfig }> 
 
   return {
     publicRuntime: {
+      apiBaseUrl: readApiBaseUrlFromProcessEnv(),
       otelTracesEndpoint:
         process.env.PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT?.trim() ||
         process.env.VITE_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT?.trim() ||
