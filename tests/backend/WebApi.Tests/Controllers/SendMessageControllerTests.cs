@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using WebApi.Controllers;
 using WebApi.Entities;
@@ -28,11 +28,8 @@ public class SendMessageControllerTests
         var result = await _controller.Get();
 
         // Assert
-        Assert.IsType<ActionResult<GenericValue<string>>>(result);
-        Assert.IsType<OkObjectResult>(result.Result);
-        var okResult = (OkObjectResult) result.Result;
-        Assert.NotNull(okResult.Value);
-        var value = Assert.IsAssignableFrom<GenericValue<string>>(okResult.Value);
-        Assert.Equal("Message sent", value.Value);
+        var ok = Assert.IsType<Ok<GenericValue<string>>>(result);
+        Assert.NotNull(ok.Value);
+        Assert.Equal("Message sent", ok.Value.Value);
     }
 }
