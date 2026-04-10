@@ -8,7 +8,7 @@ namespace WebApi.Controllers;
 ///     Blogging controller
 /// </summary>
 [ApiController]
-[Route("[controller]")]
+[Route("api/v1/[controller]")]
 public class BloggingController(ILogger<BloggingController> logger, IBloggingRepository bloggingRepository) : ControllerBase
 {
     /// <summary>

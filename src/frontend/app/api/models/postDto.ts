@@ -4,13 +4,6 @@
  * Post DTO
  */
 export interface PostDto {
-  /** Gets or sets the unique identifier of the blog to which the post belongs. */
-  blogId: number
-  /**
-   * Gets or sets the content of the post.
-   * @nullable
-   */
-  content: string | null
   /** Gets or sets the unique identifier for the post. */
   postId?: number
   /**
@@ -18,4 +11,11 @@ export interface PostDto {
    * @nullable
    */
   title: string | null
+  /**
+   * Gets or sets the content of the post.
+   * @nullable
+   */
+  content: string | null
+  /** Gets or sets the unique identifier of the blog to which the post belongs. */
+  blogId: number
 }

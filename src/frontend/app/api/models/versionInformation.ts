@@ -11,18 +11,18 @@ export interface VersionInformation {
    */
   readonly constants?: readonly string[] | null
   /**
-   * The name of the environment where the application is running.
+   * The version of the assembly.
    * @nullable
    */
-  readonly environmentName?: string | null
+  readonly version?: string | null
   /**
    * The informational version of the assembly, which may include additional details.
    * @nullable
    */
   readonly informationalVersion?: string | null
   /**
-   * The version of the assembly.
+   * The name of the environment where the application is running.
    * @nullable
    */
-  readonly version?: string | null
+  readonly environmentName?: string | null
 }

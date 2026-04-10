@@ -15,7 +15,7 @@ namespace WebApi.Controllers;
 /// </remarks>
 /// <param name="messageSender">The service used for sending messages.</param>
 [ApiController]
-[Route("[controller]")]
+[Route("api/v1/[controller]")]
 public class SendMessageController(IMessageSender messageSender) : ControllerBase
 {
     /// <summary>

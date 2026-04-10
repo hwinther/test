@@ -7,7 +7,7 @@ namespace WebApi.Controllers;
 ///     Weather forecast controller
 /// </summary>
 [ApiController]
-[Route("[controller]")]
+[Route("api/v1/[controller]")]
 public class WeatherForecastController(ILogger<WeatherForecastController> logger) : ControllerBase
 {
     private static readonly string[] Summaries =

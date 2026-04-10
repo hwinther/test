@@ -7,7 +7,7 @@ namespace WebApi.Controllers;
 ///     Service controller
 /// </summary>
 [ApiController]
-[Route("[controller]")]
+[Route("api/v1/[controller]")]
 public class ServiceController(ILogger<ServiceController> logger) : ControllerBase
 {
     /// <summary>

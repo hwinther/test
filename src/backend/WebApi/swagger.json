@@ -15,7 +15,7 @@
     "version": "v1"
   },
   "paths": {
-    "/Blogging/blog": {
+    "/api/v1/Blogging/blog": {
       "get": {
         "tags": [
           "Blogging"
@@ -84,7 +84,7 @@
         }
       }
     },
-    "/Blogging/blog/{id}": {
+    "/api/v1/Blogging/blog/{id}": {
       "get": {
         "tags": [
           "Blogging"
@@ -121,7 +121,7 @@
         }
       }
     },
-    "/Blogging/blog/{blogId}/posts": {
+    "/api/v1/Blogging/blog/{blogId}/posts": {
       "get": {
         "tags": [
           "Blogging"
@@ -161,7 +161,7 @@
         }
       }
     },
-    "/Blogging/post/{id}": {
+    "/api/v1/Blogging/post/{id}": {
       "get": {
         "tags": [
           "Blogging"
@@ -198,7 +198,7 @@
         }
       }
     },
-    "/Blogging/post": {
+    "/api/v1/Blogging/post": {
       "post": {
         "tags": [
           "Blogging"
@@ -242,7 +242,7 @@
         }
       }
     },
-    "/SendMessage": {
+    "/api/v1/SendMessage": {
       "get": {
         "tags": [
           "SendMessage"
@@ -265,7 +265,7 @@
         }
       }
     },
-    "/Service/ping": {
+    "/api/v1/Service/ping": {
       "get": {
         "tags": [
           "Service"
@@ -289,7 +289,7 @@
         }
       }
     },
-    "/Service/version": {
+    "/api/v1/Service/version": {
       "get": {
         "tags": [
           "Service"
@@ -313,7 +313,7 @@
         }
       }
     },
-    "/WeatherForecast": {
+    "/api/v1/WeatherForecast": {
       "get": {
         "tags": [
           "WeatherForecast"
