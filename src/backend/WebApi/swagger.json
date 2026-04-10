@@ -3,15 +3,6 @@
   "info": {
     "title": "Example API",
     "description": "An ASP.NET Core Web API example instance",
-    "termsOfService": "https://example.com/terms",
-    "contact": {
-      "name": "Example Contact",
-      "url": "https://example.com/contact"
-    },
-    "license": {
-      "name": "Example License",
-      "url": "https://example.com/license"
-    },
     "version": "v1"
   },
   "paths": {

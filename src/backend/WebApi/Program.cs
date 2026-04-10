@@ -42,16 +42,21 @@ var exportToOtlp = !builder.Environment.IsDevelopment()
 
 static void ConfigureOtlpExporter(OtlpExporterOptions options)
 {
-    var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")?.Trim()
+    var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
+                                  ?.Trim()
                        ?? "http://localhost:4317";
+
     options.Endpoint = new Uri(otlpEndpoint);
 }
 
 static void ConfigureOtlpLogExporter(OtlpExporterOptions options)
 {
-    var endpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT")?.Trim()
-                   ?? Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")?.Trim()
+    var endpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT")
+                              ?.Trim()
+                   ?? Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
+                                 ?.Trim()
                    ?? "http://localhost:4317";
+
     options.Endpoint = new Uri(endpoint);
 }
 
@@ -71,7 +76,11 @@ builder.Services.AddOpenTelemetry()
        {
            tracing.AddAspNetCoreInstrumentation()
                   .AddHttpClientInstrumentation()
-                  .AddSource(nameof(MessageSender));
+                  .AddEntityFrameworkCoreInstrumentation()
+                  .AddRabbitMQInstrumentation()
+                  .AddSource(nameof(MessageSender))
+                  .AddSource(nameof(MessageReceiver));
+
            if (exportToOtlp)
            {
                tracing.AddOtlpExporter(ConfigureOtlpExporter);
@@ -108,17 +117,6 @@ builder.Services.AddSwaggerGen(static options =>
                            Version = "v1",
                            Title = "Example API",
                            Description = "An ASP.NET Core Web API example instance",
-                           TermsOfService = new Uri("https://example.com/terms"),
-                           Contact = new OpenApiContact
-                           {
-                               Name = "Example Contact",
-                               Url = new Uri("https://example.com/contact")
-                           },
-                           License = new OpenApiLicense
-                           {
-                               Name = "Example License",
-                               Url = new Uri("https://example.com/license")
-                           }
                        });
 
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
