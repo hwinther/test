@@ -27,24 +27,6 @@ public static class RabbitMqHelper
     public const string TestQueueName = "TestQueue";
 
     /// <summary>
-    ///     A static instance of the RabbitMQ ConnectionFactory, configured with environment variables or default values.
-    /// </summary>
-    private static readonly ConnectionFactory ConnectionFactory = new()
-    {
-        HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOSTNAME") ?? "localhost",
-        Port = int.TryParse(Environment.GetEnvironmentVariable("RABBITMQ_PORT"), out var port) ? port : 5672,
-        UserName = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_USER") ?? "guest",
-        Password = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_PASS") ?? "guest",
-        RequestedConnectionTimeout = TimeSpan.FromMilliseconds(3000)
-    };
-
-    /// <summary>
-    ///     Creates and returns a new RabbitMQ connection using the configured ConnectionFactory.
-    /// </summary>
-    /// <returns>A new IConnection instance for interacting with RabbitMQ.</returns>
-    public static async Task<IConnection> CreateConnectionAsync() => await ConnectionFactory.CreateConnectionAsync();
-
-    /// <summary>
     ///     Creates a new channel from the given connection, and declares a test queue for message delivery.
     /// </summary>
     /// <param name="connection">The RabbitMQ connection to use for creating the channel and declaring the queue.</param>

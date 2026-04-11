@@ -10,13 +10,12 @@ services:
     ports:
      - "5000:5000"
     environment:
-      DB_CONNECTION: "Server=sqlserver,1433;Initial Catalog=api;User=sa;Password=DevelopmentOnlyPassword1;TrustServerCertificate=True;"
-      # In-app OpenTelemetry SDK (Program.cs) → collector OTLP gRPC
+      ConnectionStrings__Blogging: "Server=sqlserver,1433;Initial Catalog=api;User=sa;Password=DevelopmentOnlyPassword1;TrustServerCertificate=True;"
       OTEL_SERVICE_NAME: "WebApi"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      RABBITMQ_HOSTNAME: rabbitmq
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__UserName: guest
+      RabbitMq__Password: guest
     depends_on:
       - otel-collector
       - sqlserver
@@ -29,8 +28,12 @@ services:
       dockerfile: ../frontend/Dockerfile
     ports:
      - "8080:80"
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
     depends_on:
       - webapi
+      - redis
 
   redis:
     image: redis:7-alpine

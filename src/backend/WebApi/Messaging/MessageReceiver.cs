@@ -29,12 +29,13 @@ public sealed class MessageReceiver : IDisposable
     ///     and declaring a queue for message consumption.
     /// </summary>
     /// <param name="logger">The logger used for logging information and errors.</param>
-    public MessageReceiver(ILogger<MessageReceiver> logger)
+    /// <param name="connectionFactory">Factory used to open the broker connection.</param>
+    public MessageReceiver(ILogger<MessageReceiver> logger, IRabbitMqConnectionFactory connectionFactory)
     {
         _logger = logger;
-        _connection = RabbitMqHelper.CreateConnectionAsync()
-                                    .GetAwaiter()
-                                    .GetResult();
+        _connection = connectionFactory.CreateConnectionAsync()
+                                       .GetAwaiter()
+                                       .GetResult();
 
         _channel = RabbitMqHelper.CreateModelAndDeclareTestQueueAsync(_connection)
                                  .GetAwaiter()

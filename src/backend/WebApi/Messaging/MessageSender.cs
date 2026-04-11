@@ -28,12 +28,13 @@ public sealed class MessageSender : IMessageSender, IDisposable
     ///     RabbitMQ.
     /// </summary>
     /// <param name="logger">The logger used for logging information and errors.</param>
-    public MessageSender(ILogger<MessageSender> logger)
+    /// <param name="connectionFactory">Factory used to open the broker connection.</param>
+    public MessageSender(ILogger<MessageSender> logger, IRabbitMqConnectionFactory connectionFactory)
     {
         _logger = logger;
-        _connection = RabbitMqHelper.CreateConnectionAsync()
-                                    .GetAwaiter()
-                                    .GetResult();
+        _connection = connectionFactory.CreateConnectionAsync()
+                                       .GetAwaiter()
+                                       .GetResult();
 
         _channel = RabbitMqHelper.CreateModelAndDeclareTestQueueAsync(_connection)
                                  .GetAwaiter()

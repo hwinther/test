@@ -15,58 +15,76 @@ using WebApi.Database;
 using WebApi.Filters;
 using WebApi.Messaging;
 using WebApi.Middleware;
+using WebApi.Options;
 using WebApi.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<BloggingContext>(options =>
-                                                   options.UseSqlServer(Environment.GetEnvironmentVariable("DB_CONNECTION"),
-                                                                        static sqlOptions =>
-                                                                        {
-                                                                            sqlOptions.CommandTimeout(30);
-                                                                            sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-                                                                        })
-                                                          .EnableDetailedErrors(builder.Environment.IsDevelopment())
-                                                          .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
+var configuration = builder.Configuration;
 
-builder.Services.AddScoped<IBloggingRepository, BloggingRepository>();
+// OpenAPI generation (`dotnet swagger tofile` uses ASPNETCORE_ENVIRONMENT=Swagger) does not need SQL Server.
+var registerDataAccess = !builder.Environment.IsEnvironment("Swagger");
+if (registerDataAccess)
+{
+    var bloggingConnectionString = configuration.GetConnectionString("Blogging");
+    if (string.IsNullOrWhiteSpace(bloggingConnectionString))
+        throw new InvalidOperationException(
+            "Database connection string is required. Set ConnectionStrings:Blogging (for example in appsettings or user secrets, or the ConnectionStrings__Blogging environment variable).");
+
+    builder.Services.AddDbContext<BloggingContext>(options =>
+                                                       options.UseSqlServer(bloggingConnectionString,
+                                                                            static sqlOptions =>
+                                                                            {
+                                                                                sqlOptions.CommandTimeout(30);
+                                                                                sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                                                                            })
+                                                              .EnableDetailedErrors(builder.Environment.IsDevelopment())
+                                                              .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
+
+    builder.Services.AddScoped<IBloggingRepository, BloggingRepository>();
+}
 
 const string serviceName = "Test.WebApi";
 
+builder.Services.AddOptions<RabbitMqOptions>()
+       .Bind(configuration.GetSection(RabbitMqOptions.SectionName))
+       .PostConfigure(opts =>
+       {
+           var legacyHost = configuration["RABBITMQ_HOSTNAME"];
+           if (!string.IsNullOrEmpty(legacyHost))
+               opts.HostName = legacyHost;
+
+           if (int.TryParse(configuration["RABBITMQ_PORT"], out var legacyPort))
+               opts.Port = legacyPort;
+
+           var legacyUser = configuration["RABBITMQ_DEFAULT_USER"];
+           if (!string.IsNullOrEmpty(legacyUser))
+               opts.UserName = legacyUser;
+
+           var legacyPass = configuration["RABBITMQ_DEFAULT_PASS"];
+           if (!string.IsNullOrEmpty(legacyPass))
+               opts.Password = legacyPass;
+       })
+       .Validate(static o => !string.IsNullOrWhiteSpace(o.HostName), "RabbitMq:HostName is required.")
+       .Validate(static o => o.Port is > 0 and <= 65535, "RabbitMq:Port must be between 1 and 65535.")
+       .Validate(static o => !string.IsNullOrWhiteSpace(o.UserName), "RabbitMq:UserName is required.")
+       .Validate(static o => !string.IsNullOrWhiteSpace(o.Password), "RabbitMq:Password is required.")
+       .ValidateOnStart();
+
+builder.Services.AddSingleton<IRabbitMqConnectionFactory, RabbitMqConnectionFactory>();
 builder.Services.AddSingleton<IMessageSender, MessageSender>();
 
 // In Development, skip OTLP unless explicitly configured (avoids export errors when no collector on :4317).
 var exportToOtlp = !builder.Environment.IsDevelopment()
-                   || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT"))
-                   || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"));
-
-static void ConfigureOtlpExporter(OtlpExporterOptions options)
-{
-    var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
-                                  ?.Trim()
-                       ?? "http://localhost:4317";
-
-    options.Endpoint = new Uri(otlpEndpoint);
-}
-
-static void ConfigureOtlpLogExporter(OtlpExporterOptions options)
-{
-    var endpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT")
-                              ?.Trim()
-                   ?? Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
-                                 ?.Trim()
-                   ?? "http://localhost:4317";
-
-    options.Endpoint = new Uri(endpoint);
-}
+                   || OpenTelemetryEndpointResolver.HasExplicitOtlpConfiguration(configuration);
 
 if (exportToOtlp)
 {
-    builder.Logging.AddOpenTelemetry(static options =>
+    builder.Logging.AddOpenTelemetry(options =>
     {
         options.SetResourceBuilder(ResourceBuilder.CreateDefault()
                                                   .AddService(serviceName))
-               .AddOtlpExporter(ConfigureOtlpLogExporter);
+               .AddOtlpExporter(otlp => { otlp.Endpoint = new Uri(OpenTelemetryEndpointResolver.GetLogsEndpoint(configuration)); });
     });
 }
 
@@ -83,7 +101,7 @@ builder.Services.AddOpenTelemetry()
 
            if (exportToOtlp)
            {
-               tracing.AddOtlpExporter(ConfigureOtlpExporter);
+               tracing.AddOtlpExporter(otlp => { otlp.Endpoint = new Uri(OpenTelemetryEndpointResolver.GetTraceEndpoint(configuration)); });
            }
        })
        .WithMetrics(static metrics => metrics
