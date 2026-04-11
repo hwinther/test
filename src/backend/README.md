@@ -14,15 +14,9 @@ podman run --rm -e ACCEPT_EULA=Y -e SA_PASSWORD=DevelopmentOnlyPassword1 -p 1433
 
 ## Start local backend instance
 
+The SQL connection string for local development is in `WebApi/appsettings.Development.json` under `ConnectionStrings:Blogging`. Override with user secrets or the `ConnectionStrings__Blogging` environment variable if needed.
+
 ```bash
-# Windows
-set ASPNETCORE_ENVIRONMENT=Development
-set DB_CONNECTION="Server=127.0.0.1,1433;Initial Catalog=api;User=sa;Password=DevelopmentOnlyPassword1;TrustServerCertificate=True;"
-
-# Linux/mac
-ASPNETCORE_ENVIRONMENT=Development
-DB_CONNECTION="Server=127.0.0.1,1433;Initial Catalog=api;User=sa;Password=DevelopmentOnlyPassword1;TrustServerCertificate=True;"
-
 # TODO: broken due to docker compose solution file
 dotnet run WebApi
 

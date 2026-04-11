@@ -47,19 +47,19 @@ public class RabbitMqTests : IAsyncLifetime, IAsyncDisposable
     public async Task MessageSender_SendsMessage()
     {
         // Given
-        var connectionFactory = new ConnectionFactory
+        var innerFactory = new ConnectionFactory
         {
             Uri = new Uri(_rabbitMqContainer.GetConnectionString())
         };
+        var connectionFactoryMock = new Mock<IRabbitMqConnectionFactory>();
+        connectionFactoryMock
+            .Setup(f => f.CreateConnectionAsync())
+            .Returns(() => innerFactory.CreateConnectionAsync(TestContext.Current.CancellationToken));
 
-        Environment.SetEnvironmentVariable("RABBITMQ_HOSTNAME", connectionFactory.HostName);
-        Environment.SetEnvironmentVariable("RABBITMQ_PORT", connectionFactory.Port.ToString());
-        Environment.SetEnvironmentVariable("RABBITMQ_DEFAULT_USER", connectionFactory.UserName);
-        Environment.SetEnvironmentVariable("RABBITMQ_DEFAULT_PASS", connectionFactory.Password);
         var messageSenderLogger = new Mock<ILogger<MessageSender>>();
-        using var messageSender = new MessageSender(messageSenderLogger.Object);
+        using var messageSender = new MessageSender(messageSenderLogger.Object, connectionFactoryMock.Object);
         var messageReceiverLogger = new Mock<ILogger<MessageReceiver>>();
-        using var messageReceiver = new MessageReceiver(messageReceiverLogger.Object);
+        using var messageReceiver = new MessageReceiver(messageReceiverLogger.Object, connectionFactoryMock.Object);
 
         // When
         await messageSender.SendMessageAsync();
