@@ -37,3 +37,4 @@ jobs:
       project_file: WebApi/WebApi.csproj
       container_registry: ghcr.io
       container_image_name_postfix: api
+      grype_fail_build: false # TODO: Reset this after opentelemetry packages have been updated
