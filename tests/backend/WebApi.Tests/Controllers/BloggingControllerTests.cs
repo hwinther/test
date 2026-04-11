@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using Moq;
 using WebApi.Controllers;
@@ -37,10 +37,9 @@ public class BloggingControllerTests
         var result = await _controller.GetBlogs(CancellationToken.None);
 
         // Assert
-        Assert.IsType<ActionResult<IEnumerable<BlogDto>>>(result);
-        var okResult = result.Result as OkObjectResult;
-        Assert.NotNull(okResult);
-        var returnedBlogs = okResult.Value as IEnumerable<BlogDto>;
+        var ok = Assert.IsType<Ok<List<BlogDto>>>(result);
+        Assert.NotNull(ok.Value);
+        var returnedBlogs = ok.Value;
         Assert.NotNull(returnedBlogs);
         Assert.Equal(2, returnedBlogs.Count());
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetBlogs was called");
@@ -58,8 +57,8 @@ public class BloggingControllerTests
         var result = await _controller.GetBlog(1, CancellationToken.None);
 
         // Assert
-        Assert.IsType<ActionResult<BlogDto>>(result);
-        var returnedBlog = result.Value;
+        var ok = Assert.IsType<Ok<BlogDto>>(result.Result);
+        var returnedBlog = ok.Value;
         Assert.NotNull(returnedBlog);
         Assert.Equal(MockBlog.BlogId, returnedBlog.BlogId);
         Assert.Equal(MockBlog.Title, returnedBlog.Title);
@@ -80,7 +79,7 @@ public class BloggingControllerTests
         var result = await _controller.GetBlog(1, CancellationToken.None);
 
         // Assert
-        Assert.IsType<NotFoundResult>(result.Result);
+        Assert.IsType<NotFound>(result.Result);
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetBlog was called with id 1");
         _loggerMock.VerifyNoError();
     }
@@ -107,8 +106,8 @@ public class BloggingControllerTests
                                                 CancellationToken.None);
 
         // Assert
-        Assert.IsType<ActionResult<BlogDto>>(result);
-        var returnedBlog = result.Value;
+        var ok = Assert.IsType<Ok<BlogDto>>(result.Result);
+        var returnedBlog = ok.Value;
         Assert.NotNull(returnedBlog);
         Assert.Equal(blogId, returnedBlog.BlogId);
         Assert.Equal(MockBlog.Title, returnedBlog.Title);
@@ -129,7 +128,7 @@ public class BloggingControllerTests
         var result = await _controller.PostBlog(MockBlog, CancellationToken.None);
 
         // Assert
-        Assert.IsType<NotFoundResult>(result.Result);
+        Assert.IsType<NotFound>(result.Result);
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "PostBlog was called");
         _loggerMock.VerifyNoError();
     }
@@ -151,10 +150,9 @@ public class BloggingControllerTests
         var result = await _controller.GetPosts(1, CancellationToken.None);
 
         // Assert
-        Assert.IsType<ActionResult<IEnumerable<PostDto>>>(result);
-        var okResult = result.Result as OkObjectResult;
-        Assert.NotNull(okResult);
-        var returnedPosts = okResult.Value as IEnumerable<PostDto>;
+        var ok = Assert.IsType<Ok<List<PostDto>>>(result);
+        Assert.NotNull(ok.Value);
+        var returnedPosts = ok.Value;
         Assert.NotNull(returnedPosts);
         Assert.Equal(2, returnedPosts.Count());
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetPosts was called with id 1");
@@ -172,8 +170,8 @@ public class BloggingControllerTests
         var result = await _controller.GetPost(1, CancellationToken.None);
 
         // Assert
-        Assert.IsType<ActionResult<PostDto>>(result);
-        var returnedPost = result.Value;
+        var ok = Assert.IsType<Ok<PostDto>>(result.Result);
+        var returnedPost = ok.Value;
         Assert.NotNull(returnedPost);
         Assert.Equal(MockPost.PostId, returnedPost.PostId);
         Assert.Equal(MockPost.Title, returnedPost.Title);
@@ -195,7 +193,7 @@ public class BloggingControllerTests
         var result = await _controller.GetPost(1, CancellationToken.None);
 
         // Assert
-        Assert.IsType<NotFoundResult>(result.Result);
+        Assert.IsType<NotFound>(result.Result);
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetPost was called with id 1");
         _loggerMock.VerifyNoError();
     }
@@ -222,8 +220,8 @@ public class BloggingControllerTests
                                                 CancellationToken.None);
 
         // Assert
-        Assert.IsType<ActionResult<PostDto>>(result);
-        var returnedPost = result.Value;
+        var ok = Assert.IsType<Ok<PostDto>>(result.Result);
+        var returnedPost = ok.Value;
         Assert.NotNull(returnedPost);
         Assert.Equal(postId, returnedPost.PostId);
         Assert.Equal(MockPost.Title, returnedPost.Title);
@@ -245,7 +243,7 @@ public class BloggingControllerTests
         var result = await _controller.PostPost(MockPost, CancellationToken.None);
 
         // Assert
-        Assert.IsType<NotFoundResult>(result.Result);
+        Assert.IsType<NotFound>(result.Result);
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "PostPost was called");
         _loggerMock.VerifyNoError();
     }

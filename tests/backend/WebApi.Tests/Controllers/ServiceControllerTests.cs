@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using Moq;
 using WebApi.Controllers;
@@ -24,8 +24,7 @@ public class ServiceControllerTests
         var result = await _controller.Version();
 
         // Assert
-        Assert.IsType<ActionResult<VersionInformation>>(result);
-        Assert.IsType<OkObjectResult>(result.Result);
+        Assert.IsType<Ok<VersionInformation>>(result);
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "Version was called");
         _loggerMock.VerifyNoError();
     }
@@ -37,10 +36,9 @@ public class ServiceControllerTests
         var result = await _controller.Version();
 
         // Assert
-        Assert.NotNull(result.Result);
-        var okResult = Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-        Assert.NotNull(okResult.Value);
-        var version = Assert.IsAssignableFrom<VersionInformation>(okResult.Value);
+        var ok = Assert.IsType<Ok<VersionInformation>>(result);
+        Assert.NotNull(ok.Value);
+        var version = ok.Value;
         Assert.IsType<string>(version.Version);
         Assert.IsType<string[]>(version.Constants);
         Assert.IsType<string>(version.EnvironmentName);
@@ -57,12 +55,9 @@ public class ServiceControllerTests
         var result = await _controller.Ping();
 
         // Assert
-        Assert.IsType<ActionResult<GenericValue<string>>>(result);
-        Assert.IsType<OkObjectResult>(result.Result);
-        var okResult = (OkObjectResult) result.Result;
-        Assert.NotNull(okResult.Value);
-        var value = Assert.IsAssignableFrom<GenericValue<string>>(okResult.Value);
-        Assert.Equal("Ok", value.Value);
+        var ok = Assert.IsType<Ok<GenericValue<string>>>(result);
+        Assert.NotNull(ok.Value);
+        Assert.Equal("Ok", ok.Value.Value);
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "Ping was called");
         _loggerMock.VerifyNoError();
     }

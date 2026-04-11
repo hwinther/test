@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using Moq;
 using WebApi.Controllers;
@@ -18,41 +18,37 @@ public class WeatherForecastControllerTests
     }
 
     [Fact]
-    public async Task Get_ReturnsOkResult()
+    public void Get_ReturnsOkResult()
     {
         // Act
-        var result = await _controller.Get();
+        var result = _controller.Get();
 
         // Assert
-        Assert.IsType<ActionResult<IEnumerable<WeatherForecast>>>(result);
-        Assert.IsType<OkObjectResult>(result.Result);
+        Assert.IsType<Ok<List<WeatherForecast>>>(result);
     }
 
     [Fact]
-    public async Task Get_ReturnsFiveWeatherForecasts()
+    public void Get_ReturnsFiveWeatherForecasts()
     {
         // Act
-        var result = await _controller.Get();
+        var result = _controller.Get();
 
         // Assert
-        Assert.NotNull(result.Result);
-        var okResult = Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-        Assert.NotNull(okResult.Value);
-        var forecasts = Assert.IsAssignableFrom<WeatherForecast[]>(okResult.Value);
-        Assert.Equal(5, forecasts.Length);
+        var ok = Assert.IsType<Ok<List<WeatherForecast>>>(result);
+        Assert.NotNull(ok.Value);
+        Assert.Equal(5, ok.Value.Count);
     }
 
     [Fact]
-    public async Task Get_ReturnsWeatherForecastsWithCorrectProperties()
+    public void Get_ReturnsWeatherForecastsWithCorrectProperties()
     {
         // Act
-        var result = await _controller.Get();
+        var result = _controller.Get();
 
         // Assert
-        Assert.NotNull(result.Result);
-        var okResult = Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-        Assert.NotNull(okResult.Value);
-        var forecasts = Assert.IsAssignableFrom<WeatherForecast[]>(okResult.Value);
+        var ok = Assert.IsType<Ok<List<WeatherForecast>>>(result);
+        Assert.NotNull(ok.Value);
+        var forecasts = ok.Value;
         var expectedValueRange = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -69,10 +65,10 @@ public class WeatherForecastControllerTests
     }
 
     [Fact]
-    public async Task Get_LogsInformationMessage()
+    public void Get_LogsInformationMessage()
     {
         // Act
-        await _controller.Get();
+        _controller.Get();
 
         // Assert
         _loggerMock.VerifyLog(LogLevel.Information, Times.Once(), "GetWeatherForecast was called");

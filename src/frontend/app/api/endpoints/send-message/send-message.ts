@@ -1,56 +1,145 @@
 //@ts-nocheck
-import { useQuery } from '@tanstack/react-query'
-import type { QueryFunction, QueryKey, UseQueryOptions, UseQueryResult } from '@tanstack/react-query'
-import { customInstance } from '../../mutators/custom-instance'
-import type { ErrorType } from '../../mutators/custom-instance'
+import {
+  useQuery
+} from '@tanstack/react-query';
+import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
+  QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
+  UseQueryOptions,
+  UseQueryResult
+} from '@tanstack/react-query';
+
+import type {
+  StringGenericValue
+} from '../../models';
+
+import { customInstance } from '../../mutators/custom-instance';
+import type { ErrorType } from '../../mutators/custom-instance';
+
+
+
 
 /**
  * @summary Sends a message using the MessageSender service.
  */
-export const getSendMessage = (signal?: AbortSignal) => {
-  return customInstance<string>({ url: `/SendMessage`, method: 'GET', signal })
+export type getApiV1SendMessageResponse200 = {
+  data: StringGenericValue
+  status: 200
 }
 
-export const getGetSendMessageQueryKey = () => {
-  return [`/SendMessage`] as const
+export type getApiV1SendMessageResponse500 = {
+  data: void
+  status: 500
 }
 
-export const getGetSendMessageQueryOptions = <
-  TData = Awaited<ReturnType<typeof getSendMessage>>,
-  TError = ErrorType<void>,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSendMessage>>, TError, TData>>
-}) => {
-  const { query: queryOptions } = options ?? {}
+export type getApiV1SendMessageResponseSuccess = (getApiV1SendMessageResponse200) & {
+  headers: Headers;
+};
+export type getApiV1SendMessageResponseError = (getApiV1SendMessageResponse500) & {
+  headers: Headers;
+};
 
-  const queryKey = queryOptions?.queryKey ?? getGetSendMessageQueryKey()
+export type getApiV1SendMessageResponse = (getApiV1SendMessageResponseSuccess | getApiV1SendMessageResponseError)
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSendMessage>>> = ({ signal }) => getSendMessage(signal)
+export const getGetApiV1SendMessageUrl = () => {
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getSendMessage>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey }
+
+
+
+  return `/api/v1/SendMessage`
 }
 
-export type GetSendMessageQueryResult = NonNullable<Awaited<ReturnType<typeof getSendMessage>>>
-export type GetSendMessageQueryError = ErrorType<void>
+export const getApiV1SendMessage = async ( options?: RequestInit): Promise<getApiV1SendMessageResponse> => {
 
+  return customInstance<getApiV1SendMessageResponse>(getGetApiV1SendMessageUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetApiV1SendMessageQueryKey = () => {
+    return [
+    `/api/v1/SendMessage`
+    ] as const;
+    }
+
+
+export const getGetApiV1SendMessageQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1SendMessage>>, TError = ErrorType<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1SendMessage>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiV1SendMessageQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1SendMessage>>> = ({ signal }) => getApiV1SendMessage({ signal });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiV1SendMessage>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiV1SendMessageQueryResult = NonNullable<Awaited<ReturnType<typeof getApiV1SendMessage>>>
+export type GetApiV1SendMessageQueryError = ErrorType<void>
+
+
+export function useGetApiV1SendMessage<TData = Awaited<ReturnType<typeof getApiV1SendMessage>>, TError = ErrorType<void>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1SendMessage>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1SendMessage>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1SendMessage>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiV1SendMessage<TData = Awaited<ReturnType<typeof getApiV1SendMessage>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1SendMessage>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1SendMessage>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1SendMessage>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiV1SendMessage<TData = Awaited<ReturnType<typeof getApiV1SendMessage>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1SendMessage>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Sends a message using the MessageSender service.
  */
-export const useGetSendMessage = <
-  TData = Awaited<ReturnType<typeof getSendMessage>>,
-  TError = ErrorType<void>,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSendMessage>>, TError, TData>>
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
-  const queryOptions = getGetSendMessageQueryOptions(options)
 
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey }
+export function useGetApiV1SendMessage<TData = Awaited<ReturnType<typeof getApiV1SendMessage>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1SendMessage>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  query.queryKey = queryOptions.queryKey
+  const queryOptions = getGetApiV1SendMessageQueryOptions(options)
 
-  return query
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
+
+
+

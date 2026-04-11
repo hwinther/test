@@ -31,7 +31,7 @@ namespace WebApi.Client
         /// </list>
         /// </exception>
         [Headers("Accept: application/json")]
-        [Get("/Blogging/blog")]
+        [Get("/api/v1/Blogging/blog")]
         Task<ICollection<BlogDto>> GetBlogs();
 
         /// <summary>Creates a new blog or updates an existing one.</summary>
@@ -51,7 +51,7 @@ namespace WebApi.Client
         /// </list>
         /// </exception>
         [Headers("Accept: application/json")]
-        [Post("/Blogging/blog")]
+        [Post("/api/v1/Blogging/blog")]
         Task<BlogDto> PostBlog([Body] BlogDto body);
 
         /// <summary>Gets a specific blog by ID.</summary>
@@ -71,7 +71,7 @@ namespace WebApi.Client
         /// </list>
         /// </exception>
         [Headers("Accept: application/json")]
-        [Get("/Blogging/blog/{id}")]
+        [Get("/api/v1/Blogging/blog/{id}")]
         Task<BlogDto> GetBlog(int id);
 
         /// <summary>Gets a list of posts related to a specific blog.</summary>
@@ -91,7 +91,7 @@ namespace WebApi.Client
         /// </list>
         /// </exception>
         [Headers("Accept: application/json")]
-        [Get("/Blogging/blog/{blogId}/posts")]
+        [Get("/api/v1/Blogging/blog/{blogId}/posts")]
         Task<ICollection<PostDto>> GetPosts(int blogId);
 
         /// <summary>Gets a specific post by ID.</summary>
@@ -111,7 +111,7 @@ namespace WebApi.Client
         /// </list>
         /// </exception>
         [Headers("Accept: application/json")]
-        [Get("/Blogging/post/{id}")]
+        [Get("/api/v1/Blogging/post/{id}")]
         Task<PostDto> GetPost(int id);
 
         /// <summary>Creates a new post.</summary>
@@ -131,7 +131,7 @@ namespace WebApi.Client
         /// </list>
         /// </exception>
         [Headers("Accept: application/json")]
-        [Post("/Blogging/post")]
+        [Post("/api/v1/Blogging/post")]
         Task<PostDto> PostPost([Body] PostDto body);
 
         /// <summary>Sends a message using the MessageSender service.</summary>
@@ -150,7 +150,7 @@ namespace WebApi.Client
         /// </list>
         /// </exception>
         [Headers("Accept: application/json")]
-        [Get("/SendMessage")]
+        [Get("/api/v1/SendMessage")]
         Task<StringGenericValue> SendMessage();
 
         /// <summary>Returns ok</summary>
@@ -169,7 +169,7 @@ namespace WebApi.Client
         /// </list>
         /// </exception>
         [Headers("Accept: application/json")]
-        [Get("/Service/ping")]
+        [Get("/api/v1/Service/ping")]
         Task<StringGenericValue> Ping();
 
         /// <summary>Returns version</summary>
@@ -188,7 +188,7 @@ namespace WebApi.Client
         /// </list>
         /// </exception>
         [Headers("Accept: application/json")]
-        [Get("/Service/version")]
+        [Get("/api/v1/Service/version")]
         Task<VersionInformation> Version();
 
         /// <summary>Returns weather forecast</summary>
@@ -207,7 +207,7 @@ namespace WebApi.Client
         /// </list>
         /// </exception>
         [Headers("Accept: application/json")]
-        [Get("/WeatherForecast")]
+        [Get("/api/v1/WeatherForecast")]
         Task<ICollection<WeatherForecast>> GetWeatherForecast();
 
 

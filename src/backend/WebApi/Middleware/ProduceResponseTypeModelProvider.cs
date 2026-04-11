@@ -28,14 +28,14 @@ public class ProduceResponseTypeModelProvider : IApplicationModelProvider
         {
             foreach (var action in controller.Actions)
             {
-                var returnType = action.ActionMethod.ReturnType.GenericTypeArguments.FirstOrDefault()
-                                       ?.GetGenericArguments()
-                                       .FirstOrDefault();
+                // var returnType = action.ActionMethod.ReturnType.GenericTypeArguments.FirstOrDefault()
+                //                        ?.GetGenericArguments()
+                //                        .FirstOrDefault();
 
-                if (returnType != null)
-                    action.Filters.Add(new ProducesResponseTypeAttribute(returnType, StatusCodes.Status200OK));
-                else
-                    action.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status200OK));
+                // if (returnType != null)
+                //     action.Filters.Add(new ProducesResponseTypeAttribute(returnType, StatusCodes.Status200OK));
+                // else
+                //     action.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status200OK));
 
                 action.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status500InternalServerError));
             }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OpenApi;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -34,30 +35,60 @@ const string serviceName = "Test.WebApi";
 
 builder.Services.AddSingleton<IMessageSender, MessageSender>();
 
-builder.Logging.AddOpenTelemetry(static options =>
+// In Development, skip OTLP unless explicitly configured (avoids export errors when no collector on :4317).
+var exportToOtlp = !builder.Environment.IsDevelopment()
+                   || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT"))
+                   || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"));
+
+static void ConfigureOtlpExporter(OtlpExporterOptions options)
 {
-    options.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                                              .AddService(serviceName))
-           .AddConsoleExporter();
-});
+    var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
+                                  ?.Trim()
+                       ?? "http://localhost:4317";
+
+    options.Endpoint = new Uri(otlpEndpoint);
+}
+
+static void ConfigureOtlpLogExporter(OtlpExporterOptions options)
+{
+    var endpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT")
+                              ?.Trim()
+                   ?? Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
+                                 ?.Trim()
+                   ?? "http://localhost:4317";
+
+    options.Endpoint = new Uri(endpoint);
+}
+
+if (exportToOtlp)
+{
+    builder.Logging.AddOpenTelemetry(static options =>
+    {
+        options.SetResourceBuilder(ResourceBuilder.CreateDefault()
+                                                  .AddService(serviceName))
+               .AddOtlpExporter(ConfigureOtlpLogExporter);
+    });
+}
 
 builder.Services.AddOpenTelemetry()
        .ConfigureResource(static resource => resource.AddService(serviceName))
-       .WithTracing(static tracing => tracing
-                                      .AddAspNetCoreInstrumentation()
-                                      .AddHttpClientInstrumentation()
-                                      .AddSource(nameof(MessageSender))
-                                      //.AddConsoleExporter()
-                                      .AddOtlpExporter(static options =>
-                                      {
-                                          var host = Environment.GetEnvironmentVariable("ZIPKIN_HOSTNAME") ?? "localhost";
-                                          var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT") ?? $"http://{host}:4317";
-                                          options.Endpoint = new Uri(otlpEndpoint);
-                                      }))
+       .WithTracing(tracing =>
+       {
+           tracing.AddAspNetCoreInstrumentation()
+                  .AddHttpClientInstrumentation()
+                  .AddEntityFrameworkCoreInstrumentation()
+                  .AddRabbitMQInstrumentation()
+                  .AddSource(nameof(MessageSender))
+                  .AddSource(nameof(MessageReceiver));
+
+           if (exportToOtlp)
+           {
+               tracing.AddOtlpExporter(ConfigureOtlpExporter);
+           }
+       })
        .WithMetrics(static metrics => metrics
                                       .AddAspNetCoreInstrumentation()
                                       .AddHttpClientInstrumentation()
-                                      //.AddConsoleExporter()
                                       .AddRuntimeInstrumentation());
 
 builder.Services.AddControllers(static options =>
@@ -86,17 +117,6 @@ builder.Services.AddSwaggerGen(static options =>
                            Version = "v1",
                            Title = "Example API",
                            Description = "An ASP.NET Core Web API example instance",
-                           TermsOfService = new Uri("https://example.com/terms"),
-                           Contact = new OpenApiContact
-                           {
-                               Name = "Example Contact",
-                               Url = new Uri("https://example.com/contact")
-                           },
-                           License = new OpenApiLicense
-                           {
-                               Name = "Example License",
-                               Url = new Uri("https://example.com/license")
-                           }
                        });
 
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -104,6 +124,8 @@ builder.Services.AddSwaggerGen(static options =>
 
     options.SwaggerGeneratorOptions.XmlCommentEndOfLine = "\n";
 });
+
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 

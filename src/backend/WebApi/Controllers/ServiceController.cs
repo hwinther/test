@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Entities;
 
@@ -7,7 +8,7 @@ namespace WebApi.Controllers;
 ///     Service controller
 /// </summary>
 [ApiController]
-[Route("[controller]")]
+[Route("api/v1/[controller]")]
 public class ServiceController(ILogger<ServiceController> logger) : ControllerBase
 {
     /// <summary>
@@ -15,10 +16,10 @@ public class ServiceController(ILogger<ServiceController> logger) : ControllerBa
     /// </summary>
     /// <returns></returns>
     [HttpGet("ping", Name = "Ping")]
-    public Task<ActionResult<GenericValue<string>>> Ping()
+    public Task<Ok<GenericValue<string>>> Ping()
     {
         logger.LogInformation("Ping was called");
-        return Task.FromResult<ActionResult<GenericValue<string>>>(Ok(new GenericValue<string>
+        return Task.FromResult(TypedResults.Ok(new GenericValue<string>
         {
             Value = "Ok"
         }));
@@ -29,10 +30,10 @@ public class ServiceController(ILogger<ServiceController> logger) : ControllerBa
     /// </summary>
     /// <returns></returns>
     [HttpGet("version", Name = "Version")]
-    public Task<ActionResult<VersionInformation>> Version()
+    public Task<Ok<VersionInformation>> Version()
     {
         logger.LogInformation("Version was called");
         var versionInformation = new VersionInformation(typeof(ServiceController).Assembly);
-        return Task.FromResult<ActionResult<VersionInformation>>(Ok(versionInformation));
+        return Task.FromResult(TypedResults.Ok(versionInformation));
     }
 }

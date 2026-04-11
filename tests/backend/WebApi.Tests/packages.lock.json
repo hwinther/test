@@ -662,14 +662,6 @@
           "OpenTelemetry.Api": "1.15.2"
         }
       },
-      "OpenTelemetry.Exporter.Console": {
-        "type": "Transitive",
-        "resolved": "1.15.2",
-        "contentHash": "25RBbplOlkSHyKF9qVAA5DhGm47v0ghI++75ZgrUqOQKoEJ5GLOww77q625Z0WEZoJE7XyrCRBXIE7ggKoH41g==",
-        "dependencies": {
-          "OpenTelemetry": "1.15.2"
-        }
-      },
       "OpenTelemetry.Exporter.OpenTelemetryProtocol": {
         "type": "Transitive",
         "resolved": "1.15.2",
@@ -692,6 +684,16 @@
         "resolved": "1.15.1",
         "contentHash": "wXaZTu6LHY8xcbRd6ClcrtjHqGVoGYCcArXEZA3iUjUcYSVYwDGyPU0PdkwTfylxv8JeCCVDQhVb0fT7xBJjGA==",
         "dependencies": {
+          "OpenTelemetry.Api.ProviderBuilderExtensions": "[1.15.0, 2.0.0)"
+        }
+      },
+      "OpenTelemetry.Instrumentation.EntityFrameworkCore": {
+        "type": "Transitive",
+        "resolved": "1.15.0-beta.1",
+        "contentHash": "N01GzP+r8lpSBiqjRX0/WjSp17r+zk6dKvGKthiASyFzF44lrJo8cA3ihXnw3p4Rnqg1mVjOYy19R6iJ84NTpg==",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration": "10.0.0",
+          "Microsoft.Extensions.Options": "10.0.0",
           "OpenTelemetry.Api.ProviderBuilderExtensions": "[1.15.0, 2.0.0)"
         }
       },
@@ -719,6 +721,15 @@
         "contentHash": "YKXEfg9fVQiTKgZlvIhAfPSFaamEgi8DsQmisCH0IAsU4FYLrtoguDrDj6JtJVGUt40QPnBLRH6fTQcAC4qsOg==",
         "dependencies": {
           "System.Threading.RateLimiting": "8.0.0"
+        }
+      },
+      "RabbitMQ.Client.OpenTelemetry": {
+        "type": "Transitive",
+        "resolved": "1.0.0-rc.2",
+        "contentHash": "fVjEZ8DsLDw3EEp/Q5XGFhk7Rvluh32n+38kyBcCdZu/F7cOuj6ETo+pYMhXHtcKGk856sEEOaEWR+alsETv9w==",
+        "dependencies": {
+          "OpenTelemetry.Api": "1.9.0",
+          "RabbitMQ.Client": "7.2.0"
         }
       },
       "SharpZipLib": {
@@ -899,13 +910,14 @@
           "Microsoft.AspNetCore.OpenApi": "[10.0.5, )",
           "Microsoft.EntityFrameworkCore.SqlServer": "[10.0.5, )",
           "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": "[1.23.0, )",
-          "OpenTelemetry.Exporter.Console": "[1.15.2, )",
           "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.15.2, )",
           "OpenTelemetry.Extensions.Hosting": "[1.15.2, )",
           "OpenTelemetry.Instrumentation.AspNetCore": "[1.15.1, )",
+          "OpenTelemetry.Instrumentation.EntityFrameworkCore": "[1.15.0-beta.1, )",
           "OpenTelemetry.Instrumentation.Http": "[1.15.0, )",
           "OpenTelemetry.Instrumentation.Runtime": "[1.15.0, )",
           "RabbitMQ.Client": "[7.2.1, )",
+          "RabbitMQ.Client.OpenTelemetry": "[1.0.0-rc.2, )",
           "Swashbuckle.AspNetCore": "[10.1.7, )",
           "Swashbuckle.AspNetCore.ReDoc": "[10.1.7, )"
         }

@@ -5,12 +5,12 @@
  */
 export interface WeatherForecast {
   /** Date of forecast */
-  date?: string
-  /**
-   * Summary text
-   * @nullable
-   */
-  summary?: string | null
+  date?: string;
   /** Temperature in celsius */
-  temperatureC?: number
+  temperatureC?: number;
+  /**
+     * Summary text
+     * @nullable
+     */
+  summary?: string | null;
 }

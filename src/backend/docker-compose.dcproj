@@ -18,7 +18,6 @@
     <None Include="grafana-datasources.yml" />
     <None Include="Makefile" />
     <None Include="otel-config.yaml" />
-    <None Include="otel-dotnet.env" />
     <None Include="prometheus.yml" />
   </ItemGroup>
 </Project>
