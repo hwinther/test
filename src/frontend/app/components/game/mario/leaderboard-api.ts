@@ -5,11 +5,11 @@ export interface LeaderboardEntry {
 }
 
 /**
- * Load the public high-score list from the dev-server `/api/leaderboard` route.
+ * Load the public high-score list from the React Router resource route `/resources/leaderboard`.
  * @returns {Promise<LeaderboardEntry[]>} Latest entries, or an empty array on HTTP error
  */
 export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
-  const res = await fetch('/api/leaderboard')
+  const res = await fetch('/resources/leaderboard')
   if (!res.ok) return []
   return (await res.json()) as LeaderboardEntry[]
 }
@@ -21,7 +21,7 @@ export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
  * @returns {Promise<number>} 1-based rank if accepted, or `-1` on failure
  */
 export async function submitScore(name: string, score: number): Promise<number> {
-  const res = await fetch('/api/leaderboard', {
+  const res = await fetch('/resources/leaderboard', {
     body: JSON.stringify({ name: name.toUpperCase(), score }),
     headers: { 'Content-Type': 'application/json' },
     method: 'POST',
