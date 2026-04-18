@@ -35,7 +35,7 @@ function parseMember(member: string): { name: string; ts: number } {
 }
 
 /**
- * GET /api/leaderboard -- return up to MAX_ENTRIES rows.
+ * GET /resources/leaderboard -- return up to MAX_ENTRIES rows.
  * @returns {Promise<Response>} JSON array of `{ name, score, ts }`
  */
 export async function loader(): Promise<Response> {
@@ -55,7 +55,7 @@ export async function loader(): Promise<Response> {
 }
 
 /**
- * POST /api/leaderboard -- validate body, upsert score, trim tail, return rank.
+ * POST /resources/leaderboard -- validate body, upsert score, trim tail, return rank.
  * @param {object} args - Route action args
  * @param {Request} args.request - Incoming request with JSON body `{ name, score }`
  * @returns {Promise<Response>} JSON `{ rank }` or error

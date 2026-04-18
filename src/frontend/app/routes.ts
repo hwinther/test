@@ -5,5 +5,6 @@ export default [
   route('about', 'routes/about.tsx'),
   route('blogs', 'routes/blogs.tsx'),
   route('blogs/:id', 'routes/blogs.$id.tsx'),
-  route('api/leaderboard', 'routes/api.leaderboard.ts'),
+  // Under `/resources/*` so ingress can reserve `/api` and `/swagger` for the .NET Web API.
+  route('resources/leaderboard', 'routes/resources.leaderboard.ts'),
 ] satisfies RouteConfig
