@@ -6,14 +6,14 @@ const MAX_ENTRIES = 50
 let redis: Redis | null = null
 
 /**
- * Lazily create a shared Redis client (reads `REDIS_HOST` / `REDIS_PORT`).
+ * Lazily create a shared Redis client from `REDIS_URL` (e.g. `redis://:password@host:6379/0`).
+ * Defaults to local Redis when unset.
  * @returns {Redis} Connected `ioredis` instance
  */
 function getRedis(): Redis {
   if (!redis) {
-    const host = process.env.REDIS_HOST ?? 'localhost'
-    const port = Number.parseInt(process.env.REDIS_PORT ?? '6379', 10)
-    redis = new Redis({ host, port, lazyConnect: true, maxRetriesPerRequest: 3 })
+    const url = process.env.REDIS_URL ?? 'redis://localhost:6379'
+    redis = new Redis(url, { lazyConnect: true, maxRetriesPerRequest: 3 })
     redis.on('error', (err) => {
       console.warn('[leaderboard] Redis connection error:', err.message)
     })
