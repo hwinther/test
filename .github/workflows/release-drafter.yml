@@ -36,7 +36,7 @@ jobs:
       #  run: |
       #    echo "GHE_HOST=${GITHUB_SERVER_URL##https:\/\/}" >> $GITHUB_ENV
 
-      - uses: release-drafter/release-drafter@8841b1768a75503039c305042a3a703684960823 # v7.2.0
+      - uses: release-drafter/release-drafter@5de93583980a40bd78603b6dfdcda5b4df377b32 # v7.2.0
         with:
           version: ${{ steps.version.outputs.current-version }}
           # disable-autolabeler: true
