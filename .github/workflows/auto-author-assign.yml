@@ -11,4 +11,4 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: toshimaru/auto-author-assign@v2.1.2
+      - uses: toshimaru/auto-author-assign@fc10a9afdff733c0673a8ddf7771bede1a06f0bf # v2.1.2
