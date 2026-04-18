@@ -25,7 +25,7 @@ jobs:
           persist-credentials: false
 
       - name: Get version
-        uses: reecetech/version-increment@5de93583980a40bd78603b6dfdcda5b4df377b32 # v7.2.0
+        uses: reecetech/version-increment@a29aa752dc3b8118a2dc2ed93faf0e95a73a9c7e # 2024.10.1
         id: version
         with:
           scheme: semver
