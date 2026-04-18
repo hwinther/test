@@ -60,10 +60,10 @@ jobs:
     environment: ${{ inputs.deploy_target }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Get version
-        uses: reecetech/version-increment@2024.10.1
+        uses: reecetech/version-increment@a29aa752dc3b8118a2dc2ed93faf0e95a73a9c7e # 2024.10.1
         id: version
         with:
           scheme: semver
@@ -105,10 +105,10 @@ jobs:
           echo "Directory.Build.props content after version replacement:"
           cat Directory.Build.props
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-      - uses: actions/cache@v5
+      - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         id: nuget-cache
         with:
           path: ~/.nuget/packages

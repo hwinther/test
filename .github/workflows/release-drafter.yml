@@ -23,12 +23,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
 
       - name: Get version
-        uses: reecetech/version-increment@2024.10.1
+        uses: reecetech/version-increment@a29aa752dc3b8118a2dc2ed93faf0e95a73a9c7e # 2024.10.1
         id: version
         with:
           scheme: semver
@@ -39,7 +39,7 @@ jobs:
       #  run: |
       #    echo "GHE_HOST=${GITHUB_SERVER_URL##https:\/\/}" >> $GITHUB_ENV
 
-      - uses: release-drafter/release-drafter@v7
+      - uses: release-drafter/release-drafter@a6a982fee9675c45c1765e9fa5308f7d6c3ecbd4 # v7
         with:
           version: ${{ steps.version.outputs.current-version }}
           # disable-autolabeler: true

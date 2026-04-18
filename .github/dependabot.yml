@@ -12,7 +12,8 @@ updates:
   open-pull-requests-limit: 20
   target-branch: "main"
   schedule:
-    interval: "daily"
+    interval: "weekly"
+    day: "sunday"
   assignees:
   - "hwinther"
 
@@ -24,7 +25,8 @@ updates:
   open-pull-requests-limit: 20
   target-branch: "main"
   schedule:
-    interval: "daily"
+    interval: "weekly"
+    day: "sunday"
   assignees:
   - "hwinther"
 
@@ -33,7 +35,8 @@ updates:
   open-pull-requests-limit: 20
   target-branch: "main"
   schedule:
-    interval: "daily"
+    interval: "weekly"
+    day: "sunday"
   assignees:
   - "hwinther"
   groups:

@@ -48,16 +48,16 @@ jobs:
         working-directory: ${{ env.BACKEND_SOLUTION_PATH }}
     steps:
       - name: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0 # used by GitVersion to find the most recent tag outside of this branch
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - uses: actions/cache@v5
+      - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         id: nuget-cache
         with:
           path: ~/.nuget/packages
@@ -104,7 +104,7 @@ jobs:
           fi
 
       - name: "Create or Update PR Comment"
-        uses: im-open/update-pr-comment@v1.2.2
+        uses: im-open/update-pr-comment@b782531000dfcf02162c0bd9e78639d82a13c3b5 # v1.2.2
         if: ${{ always() && github.event_name == 'pull_request' }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -112,7 +112,7 @@ jobs:
           comment-content: ${{ steps.dotnet-build.outputs.result }}
 
       - name: Create Todo Comments
-        uses: gkampitakis/github-action-todo-commenter@v1
+        uses: gkampitakis/github-action-todo-commenter@06c49183cf11bc8d6e78ace915dce20649cf1ce7 # v1.3.0
         if: ${{ github.event_name == 'pull_request' }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -137,8 +137,7 @@ jobs:
         run: dotnet test ../../tests/backend/WebApi.Tests --no-restore -- --report-trx --report-trx-filename test-results.trx --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
         continue-on-error: true
 
-      #- uses: hwinther/test-reporter@dotnet-nunit # TODO: set back to original once nunit is supported: dorny/test-reporter@v3
-      - uses: dorny/test-reporter@v3
+      - uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
         id: test-reporter
         with:
           name: "WebApi Tests"
@@ -157,7 +156,7 @@ jobs:
           # TODO: commit the badges for README.md
 
       - name: "Create or Update PR Comment"
-        uses: im-open/update-pr-comment@v1.2.2
+        uses: im-open/update-pr-comment@b782531000dfcf02162c0bd9e78639d82a13c3b5 # v1.2.2
         if: ${{ always() && github.event_name == 'pull_request' }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -165,7 +164,7 @@ jobs:
           comment-content: ${{ steps.reportgenerator.outputs.markdown }}${{ steps.test-reporter.outputs.conclusion }}
 
       - name: Code Coverage Report
-        uses: irongut/CodeCoverageSummary@v1.3.0
+        uses: irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0
         with:
           filename: "tests/backend/CoverageReport/Cobertura.xml"
           badge: true
@@ -186,7 +185,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: "Create or Update PR Comment"
-        uses: im-open/update-pr-comment@v1.2.2
+        uses: im-open/update-pr-comment@b782531000dfcf02162c0bd9e78639d82a13c3b5 # v1.2.2
         if: ${{ always() && github.event_name == 'pull_request' }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -212,7 +211,7 @@ jobs:
       #     path: ${{ env.BACKEND_SOLUTION_PATH }}/StrykerReports
 
       # - name: "Create or Update PR Comment"
-      #   uses: im-open/update-pr-comment@v1.2.2
+      #   uses: im-open/update-pr-comment@b782531000dfcf02162c0bd9e78639d82a13c3b5 # v1.2.2
       #   if: ${{ always() && github.event_name == 'pull_request' && github.base_ref == 'main' }}
       #   with:
       #     github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -220,7 +219,7 @@ jobs:
       #     comment-content: ${{ steps.stryker.outputs.markdown }}
 
       - name: Inspect code
-        uses: muno92/resharper_inspectcode@v1
+        uses: muno92/resharper_inspectcode@5e99b0c6b542b5fd3b938d4de201c94a882070b7 # v1.17.0
         if: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' }}
         with:
           workingDirectory: ${{ env.BACKEND_SOLUTION_PATH }}

@@ -16,7 +16,7 @@ jobs:
       issues: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0 # used by version (git) operations to find the most recent tag outside of this branch
 
@@ -36,7 +36,7 @@ jobs:
           fi
 
       - name: Get next version
-        uses: reecetech/version-increment@2024.10.1
+        uses: reecetech/version-increment@a29aa752dc3b8118a2dc2ed93faf0e95a73a9c7e # 2024.10.1
         id: version
         if: ${{ steps.check-changes.outputs.has_diff == 'true' }}
         with:
@@ -45,7 +45,7 @@ jobs:
           # TODO: Could we use increment patch when bugfixes land on dev?
 
       - name: Create tag
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         if: ${{ steps.check-changes.outputs.has_diff == 'true' }}
         with:
           github-token: ${{ secrets.WORKFLOW_TOKEN }}
@@ -73,7 +73,7 @@ jobs:
           gh pr edit $pr_number --title "Merge test changes to main - ${{ steps.version.outputs.v-version }}"
 
       - name: Create or update version tag comment in promotion PR (test)
-        uses: im-open/update-pr-comment@v1.2.2
+        uses: im-open/update-pr-comment@b782531000dfcf02162c0bd9e78639d82a13c3b5 # v1.2.2
         if: ${{ steps.check-changes.outputs.has_diff == 'true' && github.ref == 'refs/heads/test' }}
         with:
           pr-number: ${{ steps.update-pr-test.outputs.pr_number }}
