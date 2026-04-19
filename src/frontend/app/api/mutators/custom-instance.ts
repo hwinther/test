@@ -26,9 +26,22 @@ export const AXIOS_INSTANCE = Axios.create({
   baseURL: getApiBaseUrl(),
 })
 
-export const customInstance = async <T>(config: AxiosRequestConfig): Promise<T> => {
+/**
+ * Orval mutator: generated clients call `customInstance(url, { method, headers, body, signal, … })`.
+ * Axios expects `url` on the config object and `data` (not `body`) for JSON bodies.
+ */
+export const customInstance = async <T>(
+  url: string,
+  config?: AxiosRequestConfig & RequestInit,
+): Promise<T> => {
   const source = Axios.CancelToken.source()
-  const promise = AXIOS_INSTANCE({ ...config, cancelToken: source.token }).then(({ data }) => data)
+  const { body, ...rest } = config ?? {}
+  const promise = AXIOS_INSTANCE({
+    ...rest,
+    url,
+    ...(body !== undefined ? { data: body } : {}),
+    cancelToken: source.token,
+  }).then(({ data }) => data)
 
   // @ts-expect-error cancel is not in the type definition
   promise.cancel = () => {

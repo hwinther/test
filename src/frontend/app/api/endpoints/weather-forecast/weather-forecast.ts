@@ -22,6 +22,8 @@ import { customInstance } from '../../mutators/custom-instance';
 import type { ErrorType } from '../../mutators/custom-instance';
 
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
 
 
 /**
@@ -76,16 +78,16 @@ export const getGetWeatherForecastQueryKey = () => {
     }
 
 
-export const getGetWeatherForecastQueryOptions = <TData = Awaited<ReturnType<typeof getWeatherForecast>>, TError = ErrorType<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeatherForecast>>, TError, TData>>, }
+export const getGetWeatherForecastQueryOptions = <TData = Awaited<ReturnType<typeof getWeatherForecast>>, TError = ErrorType<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeatherForecast>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWeatherForecastQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWeatherForecast>>> = ({ signal }) => getWeatherForecast({ signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWeatherForecast>>> = ({ signal }) => getWeatherForecast({ signal, ...requestOptions });
 
 
 
@@ -105,7 +107,7 @@ export function useGetWeatherForecast<TData = Awaited<ReturnType<typeof getWeath
           TError,
           Awaited<ReturnType<typeof getWeatherForecast>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetWeatherForecast<TData = Awaited<ReturnType<typeof getWeatherForecast>>, TError = ErrorType<void>>(
@@ -115,11 +117,11 @@ export function useGetWeatherForecast<TData = Awaited<ReturnType<typeof getWeath
           TError,
           Awaited<ReturnType<typeof getWeatherForecast>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetWeatherForecast<TData = Awaited<ReturnType<typeof getWeatherForecast>>, TError = ErrorType<void>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeatherForecast>>, TError, TData>>, }
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeatherForecast>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -127,7 +129,7 @@ export function useGetWeatherForecast<TData = Awaited<ReturnType<typeof getWeath
  */
 
 export function useGetWeatherForecast<TData = Awaited<ReturnType<typeof getWeatherForecast>>, TError = ErrorType<void>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeatherForecast>>, TError, TData>>, }
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeatherForecast>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 

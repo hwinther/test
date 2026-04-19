@@ -23,6 +23,8 @@ import { customInstance } from '../../mutators/custom-instance';
 import type { ErrorType } from '../../mutators/custom-instance';
 
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
 
 
 /**
@@ -77,16 +79,16 @@ export const getPingQueryKey = () => {
     }
 
 
-export const getPingQueryOptions = <TData = Awaited<ReturnType<typeof ping>>, TError = ErrorType<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ping>>, TError, TData>>, }
+export const getPingQueryOptions = <TData = Awaited<ReturnType<typeof ping>>, TError = ErrorType<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ping>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getPingQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof ping>>> = ({ signal }) => ping({ signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof ping>>> = ({ signal }) => ping({ signal, ...requestOptions });
 
 
 
@@ -106,7 +108,7 @@ export function usePing<TData = Awaited<ReturnType<typeof ping>>, TError = Error
           TError,
           Awaited<ReturnType<typeof ping>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function usePing<TData = Awaited<ReturnType<typeof ping>>, TError = ErrorType<void>>(
@@ -116,11 +118,11 @@ export function usePing<TData = Awaited<ReturnType<typeof ping>>, TError = Error
           TError,
           Awaited<ReturnType<typeof ping>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function usePing<TData = Awaited<ReturnType<typeof ping>>, TError = ErrorType<void>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ping>>, TError, TData>>, }
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ping>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -128,7 +130,7 @@ export function usePing<TData = Awaited<ReturnType<typeof ping>>, TError = Error
  */
 
 export function usePing<TData = Awaited<ReturnType<typeof ping>>, TError = ErrorType<void>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ping>>, TError, TData>>, }
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof ping>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -196,16 +198,16 @@ export const getVersionQueryKey = () => {
     }
 
 
-export const getVersionQueryOptions = <TData = Awaited<ReturnType<typeof version>>, TError = ErrorType<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof version>>, TError, TData>>, }
+export const getVersionQueryOptions = <TData = Awaited<ReturnType<typeof version>>, TError = ErrorType<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof version>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getVersionQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof version>>> = ({ signal }) => version({ signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof version>>> = ({ signal }) => version({ signal, ...requestOptions });
 
 
 
@@ -225,7 +227,7 @@ export function useVersion<TData = Awaited<ReturnType<typeof version>>, TError =
           TError,
           Awaited<ReturnType<typeof version>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useVersion<TData = Awaited<ReturnType<typeof version>>, TError = ErrorType<void>>(
@@ -235,11 +237,11 @@ export function useVersion<TData = Awaited<ReturnType<typeof version>>, TError =
           TError,
           Awaited<ReturnType<typeof version>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useVersion<TData = Awaited<ReturnType<typeof version>>, TError = ErrorType<void>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof version>>, TError, TData>>, }
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof version>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -247,7 +249,7 @@ export function useVersion<TData = Awaited<ReturnType<typeof version>>, TError =
  */
 
 export function useVersion<TData = Awaited<ReturnType<typeof version>>, TError = ErrorType<void>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof version>>, TError, TData>>, }
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof version>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
