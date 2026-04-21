@@ -17,7 +17,8 @@ public sealed class RabbitMqConnectionFactory(IOptions<RabbitMqOptions> options)
             Port = o.Port,
             UserName = o.UserName,
             Password = o.Password,
-            RequestedConnectionTimeout = TimeSpan.FromMilliseconds(3000),
+            VirtualHost = o.VirtualHost,
+            RequestedConnectionTimeout = TimeSpan.FromMilliseconds(3000)
         };
 
         return factory.CreateConnectionAsync();

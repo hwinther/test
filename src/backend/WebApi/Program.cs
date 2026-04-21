@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OpenApi;
-using OpenTelemetry.Exporter;
+using Npgsql;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -32,12 +32,12 @@ if (registerDataAccess)
             "Database connection string is required. Set ConnectionStrings:Blogging (for example in appsettings or user secrets, or the ConnectionStrings__Blogging environment variable).");
 
     builder.Services.AddDbContext<BloggingContext>(options =>
-                                                       options.UseSqlServer(bloggingConnectionString,
-                                                                            static sqlOptions =>
-                                                                            {
-                                                                                sqlOptions.CommandTimeout(30);
-                                                                                sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-                                                                            })
+                                                       options.UseNpgsql(bloggingConnectionString,
+                                                                         static sqlOptions =>
+                                                                         {
+                                                                             sqlOptions.CommandTimeout(30);
+                                                                             sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                                                                         })
                                                               .EnableDetailedErrors(builder.Environment.IsDevelopment())
                                                               .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
 
@@ -79,14 +79,12 @@ var exportToOtlp = !builder.Environment.IsDevelopment()
                    || OpenTelemetryEndpointResolver.HasExplicitOtlpConfiguration(configuration);
 
 if (exportToOtlp)
-{
     builder.Logging.AddOpenTelemetry(options =>
     {
         options.SetResourceBuilder(ResourceBuilder.CreateDefault()
                                                   .AddService(serviceName))
                .AddOtlpExporter(otlp => { otlp.Endpoint = new Uri(OpenTelemetryEndpointResolver.GetLogsEndpoint(configuration)); });
     });
-}
 
 builder.Services.AddOpenTelemetry()
        .ConfigureResource(static resource => resource.AddService(serviceName))
@@ -96,13 +94,12 @@ builder.Services.AddOpenTelemetry()
                   .AddHttpClientInstrumentation()
                   .AddEntityFrameworkCoreInstrumentation()
                   .AddRabbitMQInstrumentation()
+                  .AddNpgsql()
                   .AddSource(nameof(MessageSender))
                   .AddSource(nameof(MessageReceiver));
 
            if (exportToOtlp)
-           {
                tracing.AddOtlpExporter(otlp => { otlp.Endpoint = new Uri(OpenTelemetryEndpointResolver.GetTraceEndpoint(configuration)); });
-           }
        })
        .WithMetrics(static metrics => metrics
                                       .AddAspNetCoreInstrumentation()
@@ -134,7 +131,7 @@ builder.Services.AddSwaggerGen(static options =>
                        {
                            Version = "v1",
                            Title = "Example API",
-                           Description = "An ASP.NET Core Web API example instance",
+                           Description = "An ASP.NET Core Web API example instance"
                        });
 
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";

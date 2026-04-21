@@ -315,33 +315,6 @@
           }
         }
       }
-    },
-    "/api/v1/WeatherForecast": {
-      "get": {
-        "tags": [
-          "WeatherForecast"
-        ],
-        "summary": "Returns weather forecast",
-        "operationId": "GetWeatherForecast",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WeatherForecast"
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
     }
   },
   "components": {
@@ -466,31 +439,6 @@
         },
         "additionalProperties": false,
         "description": "Represents version information for an assembly, including constants, environment name, version, and informational\nversion."
-      },
-      "WeatherForecast": {
-        "type": "object",
-        "properties": {
-          "date": {
-            "type": "string",
-            "description": "Date of forecast",
-            "format": "date",
-            "example": "2024.06.07"
-          },
-          "temperatureC": {
-            "type": "integer",
-            "description": "Temperature in celsius",
-            "format": "int32",
-            "example": 25
-          },
-          "summary": {
-            "type": "string",
-            "description": "Summary text",
-            "nullable": true,
-            "example": "Sunny"
-          }
-        },
-        "additionalProperties": false,
-        "description": "Weather forecast model"
       }
     }
   },
@@ -503,9 +451,6 @@
     },
     {
       "name": "Service"
-    },
-    {
-      "name": "WeatherForecast"
     }
   ]
 }
