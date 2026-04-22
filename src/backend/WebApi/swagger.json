@@ -315,6 +315,30 @@
           }
         }
       }
+    },
+    "/api/v1/Service/status": {
+      "get": {
+        "tags": [
+          "Service"
+        ],
+        "summary": "Returns the connection status of downstream services (PostgreSQL and RabbitMQ).",
+        "operationId": "Status",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceStatus"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -347,6 +371,27 @@
         },
         "additionalProperties": false,
         "description": "Blog DTO"
+      },
+      "ConnectionStatus": {
+        "required": [
+          "connected"
+        ],
+        "type": "object",
+        "properties": {
+          "connected": {
+            "type": "boolean",
+            "description": "Whether the connection is available.",
+            "example": true
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if the connection failed, otherwise null.",
+            "nullable": true,
+            "example": "Connection refused"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents the status of a single service connection."
       },
       "PostDto": {
         "required": [
@@ -383,6 +428,23 @@
         },
         "additionalProperties": false,
         "description": "Post DTO"
+      },
+      "ServiceStatus": {
+        "required": [
+          "postgres",
+          "rabbitMq"
+        ],
+        "type": "object",
+        "properties": {
+          "postgres": {
+            "$ref": "#/components/schemas/ConnectionStatus"
+          },
+          "rabbitMq": {
+            "$ref": "#/components/schemas/ConnectionStatus"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents the status of all service connections."
       },
       "StringGenericValue": {
         "required": [
