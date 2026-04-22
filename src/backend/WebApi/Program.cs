@@ -48,23 +48,6 @@ const string serviceName = "Test.WebApi";
 
 builder.Services.AddOptions<RabbitMqOptions>()
        .Bind(configuration.GetSection(RabbitMqOptions.SectionName))
-       .PostConfigure(opts =>
-       {
-           var legacyHost = configuration["RABBITMQ_HOSTNAME"];
-           if (!string.IsNullOrEmpty(legacyHost))
-               opts.HostName = legacyHost;
-
-           if (int.TryParse(configuration["RABBITMQ_PORT"], out var legacyPort))
-               opts.Port = legacyPort;
-
-           var legacyUser = configuration["RABBITMQ_DEFAULT_USER"];
-           if (!string.IsNullOrEmpty(legacyUser))
-               opts.UserName = legacyUser;
-
-           var legacyPass = configuration["RABBITMQ_DEFAULT_PASS"];
-           if (!string.IsNullOrEmpty(legacyPass))
-               opts.Password = legacyPass;
-       })
        .Validate(static o => !string.IsNullOrWhiteSpace(o.HostName), "RabbitMq:HostName is required.")
        .Validate(static o => o.Port is > 0 and <= 65535, "RabbitMq:Port must be between 1 and 65535.")
        .Validate(static o => !string.IsNullOrWhiteSpace(o.UserName), "RabbitMq:UserName is required.")
