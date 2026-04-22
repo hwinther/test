@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { NavLink } from 'react-router'
 
 import { useAuth } from '~/auth.context'
+import { UserProfileModal } from '~/components/UserProfileModal'
 import './PageLayout.css'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -17,6 +18,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
  */
 function PageLayout({ children }: Readonly<{ children: React.ReactNode }>): React.JSX.Element {
   const auth = useAuth()
+  const [profileOpen, setProfileOpen] = useState(false)
 
   return (
     <>
@@ -29,15 +31,19 @@ function PageLayout({ children }: Readonly<{ children: React.ReactNode }>): Reac
         <div className="flex items-center gap-3 text-sm">
           {auth.isAuthenticated ? (
             <>
-              <span className="text-neutral-500 dark:text-neutral-400">
+              <button
+                className="text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors cursor-pointer"
+                onClick={() => setProfileOpen(true)}
+              >
                 {auth.user?.profile.name ?? auth.user?.profile.email ?? 'Signed in'}
-              </span>
+              </button>
               <button
                 className="rounded-md px-3 py-1 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer"
                 onClick={() => void auth.signoutRedirect({ post_logout_redirect_uri: window.location.origin })}
               >
                 Sign out
               </button>
+              {profileOpen && <UserProfileModal onClose={() => setProfileOpen(false)} />}
             </>
           ) : !auth.isLoading ? (
             <button
