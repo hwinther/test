@@ -12,5 +12,5 @@ public sealed class OidcOptions
     public string Authority { get; set; } = "https://auth.wsh.no";
 
     /// <summary>Expected <c>aud</c> claim in incoming JWT access tokens.</summary>
-    public string Audience { get; set; } = "pxce";
+    public string Audience { get; set; } = "pxce-api";
 }
