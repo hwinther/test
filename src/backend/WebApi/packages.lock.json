@@ -131,6 +131,16 @@
         "resolved": "2.0.2",
         "contentHash": "QGassHKg6wfLZStucfxW4lsfVf2KOxHSEtrd0whP9R6PJSSSua3WPcOXxyVzRVqfmXV8dLQcp9oCnMYiJNhFaQ=="
       },
+      "StackExchange.Redis": {
+        "type": "Direct",
+        "requested": "[2.12.14, )",
+        "resolved": "2.12.14",
+        "contentHash": "QiAQg40OP4Owem6/PjIbjEKq2+uIeQYeZ1TCMUnx/QvKugOPxOfC96wjlnBjWHi4Wq9pv9+fDlXGT06XkRZ6Ig==",
+        "dependencies": {
+          "Pipelines.Sockets.Unofficial": "2.2.8",
+          "System.IO.Hashing": "10.0.2"
+        }
+      },
       "Swashbuckle.AspNetCore": {
         "type": "Direct",
         "requested": "[10.1.7, )",
@@ -305,6 +315,11 @@
           "OpenTelemetry.Api": "1.15.3"
         }
       },
+      "Pipelines.Sockets.Unofficial": {
+        "type": "Transitive",
+        "resolved": "2.2.8",
+        "contentHash": "zG2FApP5zxSx6OcdJQLbZDk2AVlN2BNQD6MorwIfV6gVj0RRxWPEp2LXAxqDGZqeNV1Zp0BNPcNaey/GXmTdvQ=="
+      },
       "Swashbuckle.AspNetCore.Swagger": {
         "type": "Transitive",
         "resolved": "10.1.7",
@@ -378,6 +393,11 @@
           "System.Composition.Hosting": "9.0.0",
           "System.Composition.Runtime": "9.0.0"
         }
+      },
+      "System.IO.Hashing": {
+        "type": "Transitive",
+        "resolved": "10.0.2",
+        "contentHash": "AKJknIFi9O3+rGExxTry188JPvUoZAPcCtS2qdqyFhIzsxQ1Ap94BeGDG0VzVEHakhmRxmJtVih6TsHoghIt/g=="
       }
     },
     "net10.0/linux-x64": {},

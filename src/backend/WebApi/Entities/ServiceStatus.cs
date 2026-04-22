@@ -14,6 +14,11 @@ public class ServiceStatus
     ///     The status of the RabbitMQ connection.
     /// </summary>
     public required ConnectionStatus RabbitMq { get; set; }
+
+    /// <summary>
+    ///     The status of the Redis connection.
+    /// </summary>
+    public required ConnectionStatus Redis { get; set; }
 }
 
 /// <summary>

@@ -245,6 +245,74 @@
         }
       }
     },
+    "/api/v1/Redis/counter": {
+      "get": {
+        "tags": [
+          "Redis"
+        ],
+        "summary": "Returns the current hit counter value.",
+        "operationId": "GetCounter",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedisCounter"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Redis"
+        ],
+        "summary": "Increments the hit counter and returns the new value.",
+        "operationId": "IncrementCounter",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedisCounter"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Redis"
+        ],
+        "summary": "Resets the hit counter to zero.",
+        "operationId": "ResetCounter",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedisCounter"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/api/v1/SendMessage": {
       "get": {
         "tags": [
@@ -429,10 +497,27 @@
         "additionalProperties": false,
         "description": "Post DTO"
       },
+      "RedisCounter": {
+        "required": [
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "description": "The current counter value.",
+            "format": "int64",
+            "example": 42
+          }
+        },
+        "additionalProperties": false,
+        "description": "A simple counter value stored in Redis."
+      },
       "ServiceStatus": {
         "required": [
           "postgres",
-          "rabbitMq"
+          "rabbitMq",
+          "redis"
         ],
         "type": "object",
         "properties": {
@@ -440,6 +525,9 @@
             "$ref": "#/components/schemas/ConnectionStatus"
           },
           "rabbitMq": {
+            "$ref": "#/components/schemas/ConnectionStatus"
+          },
+          "redis": {
             "$ref": "#/components/schemas/ConnectionStatus"
           }
         },
@@ -507,6 +595,9 @@
   "tags": [
     {
       "name": "Blogging"
+    },
+    {
+      "name": "Redis"
     },
     {
       "name": "SendMessage"

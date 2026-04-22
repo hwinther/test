@@ -617,6 +617,11 @@
           "OpenTelemetry.Api": "[1.15.3, 2.0.0)"
         }
       },
+      "Pipelines.Sockets.Unofficial": {
+        "type": "Transitive",
+        "resolved": "2.2.8",
+        "contentHash": "zG2FApP5zxSx6OcdJQLbZDk2AVlN2BNQD6MorwIfV6gVj0RRxWPEp2LXAxqDGZqeNV1Zp0BNPcNaey/GXmTdvQ=="
+      },
       "RabbitMQ.Client": {
         "type": "Transitive",
         "resolved": "7.2.1",
@@ -646,6 +651,16 @@
         "dependencies": {
           "BouncyCastle.Cryptography": "2.6.2",
           "Microsoft.Extensions.Logging.Abstractions": "8.0.3"
+        }
+      },
+      "StackExchange.Redis": {
+        "type": "Transitive",
+        "resolved": "2.12.14",
+        "contentHash": "QiAQg40OP4Owem6/PjIbjEKq2+uIeQYeZ1TCMUnx/QvKugOPxOfC96wjlnBjWHi4Wq9pv9+fDlXGT06XkRZ6Ig==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
+          "Pipelines.Sockets.Unofficial": "2.2.8",
+          "System.IO.Hashing": "10.0.2"
         }
       },
       "Swashbuckle.AspNetCore": {
@@ -689,6 +704,11 @@
         "type": "Transitive",
         "resolved": "10.0.7",
         "contentHash": "WbmDLeTPYhEzXhvYVioTVn/D1XX6bovyny9n5p8Zxtf03+eY385RB818teZm6n+fA63iZNvng0/Np4tLuhkMhQ=="
+      },
+      "System.IO.Hashing": {
+        "type": "Transitive",
+        "resolved": "10.0.2",
+        "contentHash": "AKJknIFi9O3+rGExxTry188JPvUoZAPcCtS2qdqyFhIzsxQ1Ap94BeGDG0VzVEHakhmRxmJtVih6TsHoghIt/g=="
       },
       "System.Threading.RateLimiting": {
         "type": "Transitive",
@@ -779,6 +799,7 @@
           "OpenTelemetry.Instrumentation.Runtime": "[1.15.1, )",
           "RabbitMQ.Client": "[7.2.1, )",
           "RabbitMQ.Client.OpenTelemetry": "[1.0.0-rc.2, )",
+          "StackExchange.Redis": "[2.12.14, )",
           "Swashbuckle.AspNetCore": "[10.1.7, )",
           "Swashbuckle.AspNetCore.ReDoc": "[10.1.7, )"
         }

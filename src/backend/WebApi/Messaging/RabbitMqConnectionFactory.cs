@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
@@ -32,7 +31,8 @@ public sealed class RabbitMqConnectionFactory(
 
         try
         {
-            return await factory.CreateConnectionAsync().ConfigureAwait(false);
+            return await factory.CreateConnectionAsync()
+                                .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -52,17 +52,13 @@ public sealed class RabbitMqConnectionFactory(
             userName);
 
         if (hostName.Contains(".svc.", StringComparison.Ordinal))
-        {
             logger.LogWarning(
                 "The host name looks like in-cluster Kubernetes DNS. From a local machine it usually will not resolve; use kubectl port-forward to localhost and point RabbitMq:HostName at 127.0.0.1 (or run the API inside the cluster).");
-        }
 
         if (ContainsAuthenticationFailure(ex))
-        {
             logger.LogWarning(
                 "Authentication was refused. Confirm the user exists on this broker, has access to virtual host {VirtualHost}, and that username/password have no accidental trailing characters from secrets (newlines are common in copied or mounted secrets).",
                 virtualHost);
-        }
     }
 
     private static bool ContainsAuthenticationFailure(Exception? ex)
@@ -80,8 +76,7 @@ public sealed class RabbitMqConnectionFactory(
 
     private static string NormalizeUser(string? value) => string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
 
-    private static string NormalizePassword(string? value) =>
-        value == null ? string.Empty : value.TrimEnd('\r', '\n', ' ', '\t');
+    private static string NormalizePassword(string? value) => value == null ? string.Empty : value.TrimEnd('\r', '\n', ' ', '\t');
 
     private static string NormalizeVirtualHost(string? value)
     {

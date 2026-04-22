@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis;
 using WebApi.Database;
 using WebApi.Entities;
 using WebApi.Messaging;
@@ -47,19 +48,22 @@ public class ServiceController(ILogger<ServiceController> logger) : ControllerBa
     public async Task<Ok<ServiceStatus>> Status(
         [FromServices] BloggingContext? bloggingContext,
         [FromServices] IRabbitMqConnectionFactory rabbitMqConnectionFactory,
+        [FromServices] IConnectionMultiplexer? redis,
         CancellationToken cancellationToken)
     {
         logger.LogInformation("Status was called");
 
         var postgresTask = CheckPostgresAsync(bloggingContext, cancellationToken);
         var rabbitMqTask = CheckRabbitMqAsync(rabbitMqConnectionFactory);
+        var redisTask = CheckRedisAsync(redis);
 
-        await Task.WhenAll(postgresTask, rabbitMqTask);
+        await Task.WhenAll(postgresTask, rabbitMqTask, redisTask);
 
         return TypedResults.Ok(new ServiceStatus
         {
             Postgres = postgresTask.Result,
             RabbitMq = rabbitMqTask.Result,
+            Redis = redisTask.Result,
         });
     }
 
@@ -85,6 +89,22 @@ public class ServiceController(ILogger<ServiceController> logger) : ControllerBa
         {
             await using var connection = await factory.CreateConnectionAsync();
             return new ConnectionStatus { Connected = connection.IsOpen };
+        }
+        catch (Exception ex)
+        {
+            return new ConnectionStatus { Connected = false, Error = ex.Message };
+        }
+    }
+
+    private static async Task<ConnectionStatus> CheckRedisAsync(IConnectionMultiplexer? multiplexer)
+    {
+        if (multiplexer is null)
+            return new ConnectionStatus { Connected = false, Error = "Not configured" };
+
+        try
+        {
+            await multiplexer.GetDatabase().PingAsync();
+            return new ConnectionStatus { Connected = true };
         }
         catch (Exception ex)
         {

@@ -10,6 +10,7 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using StackExchange.Redis;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using WebApi.Database;
 using WebApi.Filters;
@@ -56,6 +57,14 @@ builder.Services.AddOptions<RabbitMqOptions>()
 
 builder.Services.AddSingleton<IRabbitMqConnectionFactory, RabbitMqConnectionFactory>();
 builder.Services.AddSingleton<IMessageSender, MessageSender>();
+
+var redisConnectionString = configuration.GetConnectionString("Redis");
+if (!string.IsNullOrWhiteSpace(redisConnectionString))
+{
+    var redisOptions = RedisUrlParser.Parse(redisConnectionString);
+    redisOptions.AbortOnConnectFail = false;
+    builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisOptions));
+}
 
 // In Development, skip OTLP unless explicitly configured (avoids export errors when no collector on :4317).
 var exportToOtlp = !builder.Environment.IsDevelopment()
