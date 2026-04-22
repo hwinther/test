@@ -11,6 +11,9 @@ public sealed class OidcOptions
     /// <summary>Issuer / authority base URL — OIDC discovery is fetched from <c>{Authority}/.well-known/openid-configuration</c>.</summary>
     public string Authority { get; set; } = "https://auth.wsh.no";
 
-    /// <summary>Expected <c>aud</c> claim in incoming JWT access tokens.</summary>
+    /// <summary>OAuth 2.0 client_id registered with the identity provider. Used by Swagger UI to initiate the PKCE flow.</summary>
+    public string ClientId { get; set; } = "pxce";
+
+    /// <summary>Expected <c>aud</c> claim in incoming JWT access tokens. Identifies this resource server, not the client.</summary>
     public string Audience { get; set; } = "pxce-api";
 }

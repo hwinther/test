@@ -191,7 +191,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.DocExpansion(DocExpansion.None);
-        options.OAuthClientId(oidcConfig.Audience);
+        options.OAuthClientId(oidcConfig.ClientId);
         options.OAuthUsePkce();
         options.OAuthScopes("openid", "profile", "email", "groups");
     });
