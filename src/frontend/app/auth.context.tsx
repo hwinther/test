@@ -1,35 +1,45 @@
-import React from 'react'
-import { createContext, type ReactNode, useContext, useState } from 'react'
-interface AuthProviderProps {
-  children: ReactNode
-  initialState?: null | string
+import { type ReactNode, useEffect } from 'react'
+import { AuthProvider as OidcAuthProvider, useAuth } from 'react-oidc-context'
+
+import { setAuthToken } from '~/api/mutators/custom-instance'
+
+/**
+ * Keeps the Axios auth token in sync with the OIDC session.
+ * Rendered inside OidcAuthProvider so it can read the auth state.
+ */
+function TokenBridge() {
+  const auth = useAuth()
+  useEffect(() => {
+    setAuthToken(auth.user?.access_token ?? null)
+  }, [auth.user?.access_token])
+  return null
 }
 
-type Dispatch = (Auth: string) => void
-
-const AuthContext = createContext<null | string>(null)
-const AuthDispatchContext = createContext<Dispatch | null>(null)
-
-const AuthProvider = ({ children, initialState = null }: AuthProviderProps): React.JSX.Element => {
-  // it's a quick demo with useState but you can also have a more complex state with a useReducer
-  const [token, setToken] = useState(initialState)
+/**
+ * Root authentication provider. Wraps the app with OIDC context and bridges
+ * the access token into the Axios instance whenever the session changes.
+ * @param {object} props - Component props.
+ * @param {ReactNode} props.children - Child elements.
+ * @returns {import('react').JSX.Element} The OIDC-backed provider tree.
+ */
+export function AuthProvider({ children }: { readonly children: ReactNode }) {
+  const redirectUri =
+    typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : 'https://test.test.wsh.no/auth/callback'
 
   return (
-    <AuthContext.Provider value={token}>
-      <AuthDispatchContext.Provider value={setToken}>{children}</AuthDispatchContext.Provider>
-    </AuthContext.Provider>
+    <OidcAuthProvider
+      authority="https://auth.wsh.no"
+      client_id="pxce"
+      redirect_uri={redirectUri}
+      scope="openid profile email groups offline_access"
+      onSigninCallback={() => {
+        window.history.replaceState({}, document.title, window.location.pathname)
+      }}
+    >
+      <TokenBridge />
+      {children}
+    </OidcAuthProvider>
   )
 }
 
-const useAuth = (): null | string => useContext<null | string>(AuthContext)
-
-const useAuthDispatch = (): Dispatch => {
-  const context = useContext<Dispatch | null>(AuthDispatchContext)
-
-  if (context === null) {
-    throw new Error('useAuthDispatch must be used within a AuthProvider')
-  }
-  return context
-}
-
-export { AuthProvider, useAuth, useAuthDispatch }
+export { useAuth }

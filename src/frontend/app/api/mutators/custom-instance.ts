@@ -26,6 +26,24 @@ export const AXIOS_INSTANCE = Axios.create({
   baseURL: getApiBaseUrl(),
 })
 
+let _authToken: string | null = null
+
+/**
+ * Updates the Bearer token injected into every outgoing API request.
+ * Called by the TokenBridge component whenever the OIDC session changes.
+ * @param {string | null} token Access token, or null to clear it.
+ */
+export function setAuthToken(token: string | null): void {
+  _authToken = token
+}
+
+AXIOS_INSTANCE.interceptors.request.use((config) => {
+  if (_authToken) {
+    config.headers.Authorization = `Bearer ${_authToken}`
+  }
+  return config
+})
+
 /**
  * Orval mutator: generated clients call `customInstance(url, { method, headers, body, signal, … })`.
  * Axios expects `url` on the config object and `data` (not `body`) for JSON bodies.

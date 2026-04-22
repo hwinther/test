@@ -5,7 +5,6 @@ import type { SpriteTheme } from '~/components/game/mario/mario-types'
 
 import { useVersion } from '~/api/endpoints/service/service'
 import { useGetWeatherForecast } from '~/api/endpoints/weather-forecast/weather-forecast'
-import { useAuthDispatch } from '~/auth.context'
 import { LevelLoader } from '~/components/game/mario/level-loader'
 import { MarioGame } from '~/components/game/mario/MarioGame'
 import { MaritimeVentures } from '~/components/game/maritime-ventures/MaritimeVentures'
@@ -47,7 +46,6 @@ function Page(): JSX.Element {
   const [showGame, setShowGame] = useState(false)
   const [showMarioGame, setShowMarioGame] = useState(false)
   const [marioTheme, setMarioTheme] = useState<SpriteTheme>('classic')
-  const dispatch = useAuthDispatch()
   const { data: weatherForecasts, refetch } = useGetWeatherForecast()
   const forecastRows = weatherRowsFromQuery(weatherForecasts)
   const { data: versionRaw } = useVersion()
@@ -55,11 +53,10 @@ function Page(): JSX.Element {
   const isKonamiActivated = useKonamiCode()
 
   useEffect(() => {
-    dispatch('token')
     setTimeout(() => {
-      refetch()
+      void refetch()
     }, 2000)
-  }, [refetch, dispatch])
+  }, [refetch])
 
   if (isKonamiActivated) {
     return <MaritimeVentures />
