@@ -10,7 +10,7 @@ import {
  * Resolves Axios base URL: injected `window` config in the browser, process env on the server.
  * @returns {string} API origin with trailing slash.
  */
-function getApiBaseUrl(): string {
+export function getApiBaseUrl(): string {
   // eslint-disable-next-line sonarjs/different-types-comparison -- SSR: window is undefined on the server
   if (globalThis.window !== undefined) {
     const fromWindow = readPublicRuntimeConfigFromWindow()?.apiBaseUrl?.trim()

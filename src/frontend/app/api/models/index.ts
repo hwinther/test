@@ -1,6 +1,7 @@
 //@ts-nocheck
 
 export * from './blogDto';
+export * from './chatMessageRequest';
 export * from './connectionStatus';
 export * from './postDto';
 export * from './redisCounter';

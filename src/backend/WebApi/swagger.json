@@ -245,6 +245,52 @@
         }
       }
     },
+    "/api/v1/Chat/stream": {
+      "get": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "SSE stream — keeps the connection open and pushes chat messages as `data: {json}\\n\\n` events.",
+        "responses": {
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/Chat/messages": {
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Publishes a chat message. The author is taken from the JWT claims.",
+        "requestBody": {
+          "description": "Message body.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessageRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessageRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/api/v1/Redis/counter": {
       "get": {
         "tags": [
@@ -440,6 +486,21 @@
         "additionalProperties": false,
         "description": "Blog DTO"
       },
+      "ChatMessageRequest": {
+        "required": [
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Message body.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request body for sending a chat message."
+      },
       "ConnectionStatus": {
         "required": [
           "connected"
@@ -613,6 +674,9 @@
   "tags": [
     {
       "name": "Blogging"
+    },
+    {
+      "name": "Chat"
     },
     {
       "name": "Redis"

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { NavLink } from 'react-router'
 
 import { useAuth } from '~/auth.context'
+import { ChatModal } from '~/components/ChatModal'
 import { UserProfileModal } from '~/components/UserProfileModal'
 import './PageLayout.css'
 
@@ -56,6 +57,7 @@ function PageLayout({ children }: Readonly<{ children: React.ReactNode }>): Reac
         </div>
       </nav>
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6">{children}</main>
+      {auth.isAuthenticated && <ChatModal />}
     </>
   )
 }
