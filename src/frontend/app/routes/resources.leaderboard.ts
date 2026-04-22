@@ -1,22 +1,26 @@
-import Redis from 'ioredis'
+import { createClient } from 'redis'
 
 const LEADERBOARD_KEY = 'mario:leaderboard'
 const MAX_ENTRIES = 50
 
-let redis: Redis | null = null
+type RedisClient = ReturnType<typeof createClient>
+let redis: RedisClient | null = null
 
 /**
- * Lazily create a shared Redis client from `REDIS_URL` (e.g. `redis://:password@host:6379/0`).
- * Defaults to local Redis when unset.
- * @returns {Redis} Connected `ioredis` instance
+ * Lazily create and connect a shared Redis client from `REDIS_URL`.
+ * Accepts the standard `redis://:password@host:port/db` URL format.
+ * @returns {Promise<RedisClient>} Connected client.
  */
-function getRedis(): Redis {
+async function getRedis(): Promise<RedisClient> {
   if (!redis) {
     const url = process.env.REDIS_URL ?? 'redis://localhost:6379'
-    redis = new Redis(url, { lazyConnect: true, maxRetriesPerRequest: 3 })
-    redis.on('error', (err) => {
+    redis = createClient({ url })
+    redis.on('error', (err: Error) => {
       console.warn('[leaderboard] Redis connection error:', err.message)
     })
+  }
+  if (!redis.isOpen) {
+    await redis.connect()
   }
   return redis
 }
@@ -40,13 +44,12 @@ function parseMember(member: string): { name: string; ts: number } {
  */
 export async function loader(): Promise<Response> {
   try {
-    const r = getRedis()
-    const raw = await r.zrevrange(LEADERBOARD_KEY, 0, MAX_ENTRIES - 1, 'WITHSCORES')
-    const entries: { name: string; score: number; ts: number }[] = []
-    for (let i = 0; i < raw.length; i += 2) {
-      const { name, ts } = parseMember(raw[i])
-      entries.push({ name, score: Number.parseInt(raw[i + 1], 10), ts })
-    }
+    const r = await getRedis()
+    const raw = await r.zRangeWithScores(LEADERBOARD_KEY, 0, MAX_ENTRIES - 1, { REV: true })
+    const entries = raw.map(({ value, score }) => {
+      const { name, ts } = parseMember(value)
+      return { name, score: Math.round(score), ts }
+    })
     return Response.json(entries)
   } catch (err) {
     console.error('[leaderboard] API error:', err)
@@ -62,7 +65,7 @@ export async function loader(): Promise<Response> {
  */
 export async function action({ request }: { request: Request }): Promise<Response> {
   try {
-    const r = getRedis()
+    const r = await getRedis()
     const { name, score } = (await request.json()) as { name: string; score: number }
 
     if (typeof name !== 'string' || name.length === 0 || name.length > 8) {
@@ -74,13 +77,13 @@ export async function action({ request }: { request: Request }): Promise<Respons
 
     const ts = Date.now()
     const member = `${name.toUpperCase()}|${ts}`
-    await r.zadd(LEADERBOARD_KEY, score, member)
+    await r.zAdd(LEADERBOARD_KEY, { score, value: member })
 
-    const rank = await r.zrevrank(LEADERBOARD_KEY, member)
-    const total = await r.zcard(LEADERBOARD_KEY)
+    const rank = await r.zRevRank(LEADERBOARD_KEY, member)
+    const total = await r.zCard(LEADERBOARD_KEY)
 
     if (total > MAX_ENTRIES) {
-      await r.zremrangebyrank(LEADERBOARD_KEY, 0, total - MAX_ENTRIES - 1)
+      await r.zRemRangeByRank(LEADERBOARD_KEY, 0, total - MAX_ENTRIES - 1)
     }
 
     return Response.json({ rank: rank ?? -1 })
