@@ -8,13 +8,10 @@ import { afterAll, afterEach, beforeAll } from 'vitest'
 import { getBloggingMock } from '~/api/endpoints/blogging/blogging.msw'
 import { getSendMessageMock } from '~/api/endpoints/send-message/send-message.msw'
 import { getServiceMock } from '~/api/endpoints/service/service.msw'
-import { getWeatherForecastMock } from '~/api/endpoints/weather-forecast/weather-forecast.msw'
-
 const server = setupServer(
   ...getBloggingMock(),
   ...getSendMessageMock(),
   ...getServiceMock(),
-  ...getWeatherForecastMock(),
 )
 
 // Start server before all tests
