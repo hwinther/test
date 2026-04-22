@@ -590,6 +590,24 @@
         "additionalProperties": false,
         "description": "Represents version information for an assembly, including constants, environment name, version, and informational\nversion."
       }
+    },
+    "securitySchemes": {
+      "oidc": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.wsh.no/api/oidc/authorization",
+            "tokenUrl": "https://auth.wsh.no/api/oidc/token",
+            "scopes": {
+              "openid": "OpenID",
+              "profile": "Profile",
+              "email": "Email",
+              "groups": "Groups",
+              "offline_access": "Offline access"
+            }
+          }
+        }
+      }
     }
   },
   "tags": [

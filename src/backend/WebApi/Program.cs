@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,19 @@ using WebApi.Repository;
 var builder = WebApplication.CreateBuilder(args);
 
 var configuration = builder.Configuration;
+
+var oidcConfig = configuration.GetSection(OidcOptions.SectionName).Get<OidcOptions>() ?? new OidcOptions();
+
+builder.Services.AddOptions<OidcOptions>()
+       .Bind(configuration.GetSection(OidcOptions.SectionName));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+       .AddJwtBearer(options =>
+       {
+           options.Authority = oidcConfig.Authority;
+           options.Audience = oidcConfig.Audience;
+       });
+builder.Services.AddAuthorization();
 
 // OpenAPI generation (`dotnet swagger tofile` uses ASPNETCORE_ENVIRONMENT=Swagger) does not need SQL Server.
 var registerDataAccess = !builder.Environment.IsEnvironment("Swagger");
@@ -107,16 +121,18 @@ builder.Services.AddControllers(static options =>
 
 builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, ProduceResponseTypeModelProvider>());
 
-const string corsPolicyName = "corsPolicy";
-builder.Services.AddCors(static options => options
-                             .AddPolicy(corsPolicyName,
-                                        static policyBuilder => policyBuilder
-                                                                .WithOrigins("https://localhost:5173")
-                                                                .AllowCredentials()
-                                                                .AllowAnyHeader()
-                                                                .AllowAnyMethod()));
+var corsOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? ["https://localhost:5173"];
 
-builder.Services.AddSwaggerGen(static options =>
+const string corsPolicyName = "corsPolicy";
+builder.Services.AddCors(options => options
+                             .AddPolicy(corsPolicyName,
+                                        policyBuilder => policyBuilder
+                                                         .WithOrigins(corsOrigins)
+                                                         .AllowCredentials()
+                                                         .AllowAnyHeader()
+                                                         .AllowAnyMethod()));
+
+builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1",
                        new OpenApiInfo
@@ -130,6 +146,27 @@ builder.Services.AddSwaggerGen(static options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 
     options.SwaggerGeneratorOptions.XmlCommentEndOfLine = "\n";
+
+    options.AddSecurityDefinition("oidc", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.OAuth2,
+        Flows = new OpenApiOAuthFlows
+        {
+            AuthorizationCode = new OpenApiOAuthFlow
+            {
+                AuthorizationUrl = new Uri($"{oidcConfig.Authority}/api/oidc/authorization"),
+                TokenUrl = new Uri($"{oidcConfig.Authority}/api/oidc/token"),
+                Scopes = new Dictionary<string, string>
+                {
+                    ["openid"] = "OpenID",
+                    ["profile"] = "Profile",
+                    ["email"] = "Email",
+                    ["groups"] = "Groups",
+                    ["offline_access"] = "Offline access"
+                }
+            }
+        }
+    });
 });
 
 builder.Services.AddProblemDetails();
@@ -151,13 +188,20 @@ if (!app.Environment.IsEnvironment("Swagger") && !EF.IsDesignTime)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(static options => options.DocExpansion(DocExpansion.None));
+    app.UseSwaggerUI(options =>
+    {
+        options.DocExpansion(DocExpansion.None);
+        options.OAuthClientId(oidcConfig.Audience);
+        options.OAuthUsePkce();
+        options.OAuthScopes("openid", "profile", "email", "groups");
+    });
     app.UseReDoc();
 }
 
 // app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseCors(corsPolicyName);
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
