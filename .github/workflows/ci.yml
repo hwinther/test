@@ -25,5 +25,5 @@ jobs:
       node_enabled: true
       node_working_directory: "src/frontend"
       dotnet_enabled: true
-      dotnet_working_directory: "src/backend"
+      dotnet_working_directory: "src/backend|tests/backend"
       dotnet_solution_file: "Backend.slnx"
