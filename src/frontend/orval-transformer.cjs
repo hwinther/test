@@ -10,7 +10,8 @@
 module.exports = (schema) => {
   const paths = schema.paths ?? {}
 
-  // SSE stream — use useChatStream hook instead
+  // Chat moved to SignalR (/hubs/chat). Hubs don't appear in swagger.json, so nothing
+  // to strip here — this entry is kept as a guard in case the path ever reappears.
   delete paths['/api/v1/Chat/stream']
 
   return schema

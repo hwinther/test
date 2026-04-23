@@ -15,6 +15,8 @@ using StackExchange.Redis;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using WebApi.Database;
 using WebApi.Filters;
+using WebApi.HealthChecks;
+using WebApi.Hubs;
 using WebApi.Messaging;
 using WebApi.Middleware;
 using WebApi.Options;
@@ -34,8 +36,29 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
        {
            options.Authority = oidcConfig.Authority;
            options.Audience = oidcConfig.Audience;
+           // Browsers cannot set Authorization headers on WebSocket upgrades, so SignalR's
+           // JS client appends the token as ?access_token= on /hubs/* paths instead.
+           options.Events = new JwtBearerEvents
+           {
+               OnMessageReceived = ctx =>
+               {
+                   var token = ctx.Request.Query["access_token"];
+                   if (!string.IsNullOrEmpty(token) &&
+                       ctx.HttpContext.Request.Path.StartsWithSegments("/hubs"))
+                   {
+                       ctx.Token = token;
+                   }
+                   return Task.CompletedTask;
+               }
+           };
        });
 builder.Services.AddAuthorization();
+var healthChecks = builder.Services.AddHealthChecks();
+
+var signalRBuilder = builder.Services
+    .AddSignalR()
+    .AddJsonProtocol(static opts =>
+        opts.PayloadSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase);
 
 // OpenAPI generation (`dotnet swagger tofile` uses ASPNETCORE_ENVIRONMENT=Swagger) does not need SQL Server.
 var registerDataAccess = !builder.Environment.IsEnvironment("Swagger");
@@ -57,6 +80,7 @@ if (registerDataAccess)
                                                               .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
 
     builder.Services.AddScoped<IBloggingRepository, BloggingRepository>();
+    healthChecks.AddDbContextCheck<BloggingContext>();
 }
 
 const string serviceName = "Test.WebApi";
@@ -78,6 +102,12 @@ if (!string.IsNullOrWhiteSpace(redisConnectionString))
     var redisOptions = RedisUrlParser.Parse(redisConnectionString);
     redisOptions.AbortOnConnectFail = false;
     builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisOptions));
+
+    var signalRRedisOptions = RedisUrlParser.Parse(redisConnectionString);
+    signalRRedisOptions.AbortOnConnectFail = false;
+    signalRRedisOptions.ChannelPrefix = RedisChannel.Literal("test-api.signalr");
+    signalRBuilder.AddStackExchangeRedis(opts => opts.Configuration = signalRRedisOptions);
+    healthChecks.AddCheck<RedisHealthCheck>("redis");
 }
 
 // In Development, skip OTLP unless explicitly configured (avoids export errors when no collector on :4317).
@@ -96,7 +126,8 @@ builder.Services.AddOpenTelemetry()
        .ConfigureResource(static resource => resource.AddService(serviceName))
        .WithTracing(tracing =>
        {
-           tracing.AddAspNetCoreInstrumentation()
+           tracing.AddAspNetCoreInstrumentation(static opts =>
+                      opts.Filter = static ctx => !ctx.Request.Path.StartsWithSegments("/healthz"))
                   .AddHttpClientInstrumentation()
                   .AddEntityFrameworkCoreInstrumentation()
                   .AddRabbitMQInstrumentation()
@@ -110,7 +141,8 @@ builder.Services.AddOpenTelemetry()
        .WithMetrics(static metrics => metrics
                                       .AddAspNetCoreInstrumentation()
                                       .AddHttpClientInstrumentation()
-                                      .AddRuntimeInstrumentation());
+                                      .AddRuntimeInstrumentation()
+                                      .AddMeter("Microsoft.Extensions.Diagnostics.HealthChecks"));
 
 builder.Services.AddControllers(static options =>
 {
@@ -204,6 +236,8 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<ChatHub>("/hubs/chat").RequireAuthorization();
+app.MapHealthChecks("/healthz");
 
 app.Run();
 

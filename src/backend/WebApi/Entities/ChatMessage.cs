@@ -1,6 +1,6 @@
 namespace WebApi.Entities;
 
-/// <summary>A chat message broadcast over Redis pub/sub.</summary>
+/// <summary>A chat message broadcast via the SignalR hub.</summary>
 public record ChatMessage
 {
     /// <summary>Display name of the sender (from JWT claims).</summary>
@@ -11,11 +11,4 @@ public record ChatMessage
 
     /// <summary>Unix timestamp in milliseconds (UTC).</summary>
     public required long Timestamp { get; init; }
-}
-
-/// <summary>Request body for sending a chat message.</summary>
-public record ChatMessageRequest
-{
-    /// <summary>Message body.</summary>
-    public required string Text { get; init; }
 }
