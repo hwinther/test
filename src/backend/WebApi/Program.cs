@@ -15,6 +15,7 @@ using StackExchange.Redis;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using WebApi.Database;
 using WebApi.Filters;
+using WebApi.HealthChecks;
 using WebApi.Hubs;
 using WebApi.Messaging;
 using WebApi.Middleware;
@@ -125,7 +126,8 @@ builder.Services.AddOpenTelemetry()
        .ConfigureResource(static resource => resource.AddService(serviceName))
        .WithTracing(tracing =>
        {
-           tracing.AddAspNetCoreInstrumentation()
+           tracing.AddAspNetCoreInstrumentation(static opts =>
+                      opts.Filter = static ctx => !ctx.Request.Path.StartsWithSegments("/healthz"))
                   .AddHttpClientInstrumentation()
                   .AddEntityFrameworkCoreInstrumentation()
                   .AddRabbitMQInstrumentation()
@@ -139,7 +141,8 @@ builder.Services.AddOpenTelemetry()
        .WithMetrics(static metrics => metrics
                                       .AddAspNetCoreInstrumentation()
                                       .AddHttpClientInstrumentation()
-                                      .AddRuntimeInstrumentation());
+                                      .AddRuntimeInstrumentation()
+                                      .AddMeter("Microsoft.Extensions.Diagnostics.HealthChecks"));
 
 builder.Services.AddControllers(static options =>
 {
