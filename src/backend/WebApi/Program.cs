@@ -52,6 +52,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
            };
        });
 builder.Services.AddAuthorization();
+var healthChecks = builder.Services.AddHealthChecks();
 
 var signalRBuilder = builder.Services
     .AddSignalR()
@@ -78,6 +79,7 @@ if (registerDataAccess)
                                                               .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
 
     builder.Services.AddScoped<IBloggingRepository, BloggingRepository>();
+    healthChecks.AddDbContextCheck<BloggingContext>();
 }
 
 const string serviceName = "Test.WebApi";
@@ -104,6 +106,7 @@ if (!string.IsNullOrWhiteSpace(redisConnectionString))
     signalRRedisOptions.AbortOnConnectFail = false;
     signalRRedisOptions.ChannelPrefix = RedisChannel.Literal("test-api.signalr");
     signalRBuilder.AddStackExchangeRedis(opts => opts.Configuration = signalRRedisOptions);
+    healthChecks.AddCheck<RedisHealthCheck>("redis");
 }
 
 // In Development, skip OTLP unless explicitly configured (avoids export errors when no collector on :4317).
@@ -231,6 +234,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHub<ChatHub>("/hubs/chat").RequireAuthorization();
+app.MapHealthChecks("/healthz");
 
 app.Run();
 

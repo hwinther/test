@@ -47,6 +47,15 @@
           "Newtonsoft.Json": "13.0.3"
         }
       },
+      "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore": {
+        "type": "Direct",
+        "requested": "[10.0.7, )",
+        "resolved": "10.0.7",
+        "contentHash": "jB9/rxTI0c1n7ynagvyJCLVcY1yA47Ngu8Ef9YBEDQ/3O/fNTgGMRd9aRK9tthtMZ40W9P7ih8423ePsyZc/2g==",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.7"
+        }
+      },
       "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
         "type": "Direct",
         "requested": "[1.23.0, )",
