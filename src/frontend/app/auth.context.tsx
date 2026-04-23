@@ -1,3 +1,4 @@
+// cspell:ignore pxce
 import { type ReactNode, useEffect } from 'react'
 import { AuthProvider as OidcAuthProvider, useAuth } from 'react-oidc-context'
 
@@ -6,6 +7,7 @@ import { setAuthToken } from '~/api/mutators/custom-instance'
 /**
  * Keeps the Axios auth token in sync with the OIDC session.
  * Rendered inside OidcAuthProvider so it can read the auth state.
+ * @returns {null} Renders nothing.
  */
 function TokenBridge() {
   const auth = useAuth()

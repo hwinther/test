@@ -29,13 +29,16 @@ export function UserProfileModal({ onClose }: UserProfileModalProps): JSX.Elemen
 
   const profile = user?.profile
   const groups = profile?.['groups']
-  const groupList: string[] = Array.isArray(groups) ? groups : typeof groups === 'string' ? [groups] : []
+  let groupList: string[]
+  if (Array.isArray(groups)) groupList = groups as string[]
+  else if (typeof groups === 'string') groupList = [groups]
+  else groupList = []
 
   return (
     <dialog
       ref={dialogRef}
       className="rounded-xl shadow-2xl p-0 backdrop:bg-black/50 w-full max-w-md"
-      onClick={(e) => { if (e.target === dialogRef.current) dialogRef.current?.close() }}
+      onClick={(e) => { if (e.target === e.currentTarget) dialogRef.current?.close() }}
     >
       <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200 dark:border-neutral-700">
         <h2 className="text-lg font-semibold">Profile</h2>
@@ -53,7 +56,7 @@ export function UserProfileModal({ onClose }: UserProfileModalProps): JSX.Elemen
         <Row label="Username" value={profile?.preferred_username} />
         <Row label="Email">
           <span>{profile?.email}</span>
-          {profile?.email_verified === true && (
+          {profile?.email_verified && (
             <span className="ml-2 rounded-full bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs px-2 py-0.5">
               verified
             </span>
@@ -87,6 +90,11 @@ interface RowProps {
   readonly children?: React.ReactNode
 }
 
+/**
+ * A definition-list row that renders nothing when both value and children are absent.
+ * @param {RowProps} props - Component props.
+ * @returns {JSX.Element | null} The rendered row or null.
+ */
 function Row({ label, value, mono = false, children }: RowProps): JSX.Element | null {
   if (!children && !value) return null
   return (

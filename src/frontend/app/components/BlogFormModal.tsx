@@ -37,7 +37,7 @@ export function BlogFormModal({ blog, onClose }: BlogFormModalProps): JSX.Elemen
     return () => dialog.removeEventListener('close', handleClose)
   }, [onClose])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     mutate(
       { data: { blogId: blog?.blogId, title, url } },
@@ -57,7 +57,7 @@ export function BlogFormModal({ blog, onClose }: BlogFormModalProps): JSX.Elemen
     <dialog
       ref={dialogRef}
       className="rounded-xl shadow-2xl p-0 backdrop:bg-black/50 w-full max-w-md"
-      onClick={(e) => { if (e.target === dialogRef.current) dialogRef.current?.close() }}
+      onClick={(e) => { if (e.target === e.currentTarget) dialogRef.current?.close() }}
     >
       <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200 dark:border-neutral-700">
         <h2 className="text-lg font-semibold">{isEdit ? 'Edit blog' : 'New blog'}</h2>
@@ -120,12 +120,17 @@ interface FieldProps {
   readonly children: React.ReactNode
 }
 
+/**
+ * Labelled form field wrapper.
+ * @param {FieldProps} props - Component props.
+ * @returns {JSX.Element} Label + field slot.
+ */
 function Field({ label, required, children }: FieldProps): JSX.Element {
   return (
     <div>
       <label className="block text-sm font-medium mb-1">
         {label}
-        {required === true && <span className="text-red-500 ml-0.5">*</span>}
+        {required && <span className="text-red-500 ml-0.5">*</span>}
       </label>
       {children}
     </div>
