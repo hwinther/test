@@ -1,8 +1,7 @@
 import { type JSX, useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from 'react-oidc-context'
 
-import { usePostApiV1ChatMessages } from '~/api/endpoints/chat/chat'
-import { type ChatMessage, useChatStream } from '~/hooks/useChatStream'
+import { type ChatMessage, useSignalRChat } from '~/hooks/useSignalRChat'
 
 /**
  * Floating chat widget backed by the Redis pub/sub SSE stream.
@@ -15,8 +14,8 @@ export function ChatModal(): JSX.Element {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
+  const [sending, setSending] = useState(false)
   const [unread, setUnread] = useState(0)
-  const { mutate: sendMessage, isPending: sending } = usePostApiV1ChatMessages()
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -30,27 +29,27 @@ export function ChatModal(): JSX.Element {
     setUnread((prev) => prev + 1)
   }, [])
 
-  useChatStream(handleMessage)
+  const sendMessage = useSignalRChat(handleMessage)
 
-  // Scroll to bottom when new messages arrive while open
   useEffect(() => {
     if (open) bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, open])
 
-  // Clear unread count when opened
   useEffect(() => {
     if (open) setUnread(0)
   }, [open])
 
-  // Focus input when opened
   useEffect(() => {
     if (open) inputRef.current?.focus()
   }, [open])
 
   const send = (): void => {
     const text = input.trim()
-    if (!text) return
-    sendMessage({ data: { text } }, { onSuccess: () => setInput('') })
+    if (!text || sending) return
+    setSending(true)
+    void sendMessage(text)
+      .then(() => setInput(''))
+      .finally(() => setSending(false))
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
@@ -79,7 +78,6 @@ export function ChatModal(): JSX.Element {
 
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col w-80 h-[28rem] rounded-2xl shadow-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 overflow-hidden">
-      {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-indigo-600 text-white shrink-0">
         <span className="font-semibold text-sm">Chat</span>
         <button
@@ -91,7 +89,6 @@ export function ChatModal(): JSX.Element {
         </button>
       </div>
 
-      {/* Message list */}
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2 text-sm">
         {messages.length === 0 && (
           <p className="text-center text-neutral-400 text-xs mt-6">No messages yet. Say hi!</p>
@@ -100,9 +97,7 @@ export function ChatModal(): JSX.Element {
           const isMe = msg.author === myName
           return (
             <div key={i} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-              {!isMe && (
-                <span className="text-xs text-neutral-400 mb-0.5 px-1">{msg.author}</span>
-              )}
+              {!isMe && <span className="text-xs text-neutral-400 mb-0.5 px-1">{msg.author}</span>}
               <div
                 className={`max-w-[85%] rounded-2xl px-3 py-1.5 break-words ${
                   isMe
@@ -118,7 +113,6 @@ export function ChatModal(): JSX.Element {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
       <div className="flex gap-2 px-3 py-2 border-t border-neutral-200 dark:border-neutral-700 shrink-0">
         <input
           ref={inputRef}
