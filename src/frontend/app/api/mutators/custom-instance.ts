@@ -47,6 +47,10 @@ AXIOS_INSTANCE.interceptors.request.use((config) => {
 /**
  * Orval mutator: generated clients call `customInstance(url, { method, headers, body, signal, … })`.
  * Axios expects `url` on the config object and `data` (not `body`) for JSON bodies.
+ * @template T - Response body type.
+ * @param {string} url - Request path (relative to baseURL).
+ * @param {AxiosRequestConfig & RequestInit} [config] - Merged Axios/fetch config from the generated client.
+ * @returns {Promise<T>} Resolved response body.
  */
 export const customInstance = async <T>(
   url: string,

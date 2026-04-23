@@ -6,7 +6,7 @@ import { type ChatMessage, useChatStream } from '~/hooks/useChatStream'
 
 /**
  * Floating chat widget backed by the Redis pub/sub SSE stream.
- * Renders a minimised bubble in the bottom-right corner; expands into a chat panel on click.
+ * Renders a minimized bubble in the bottom-right corner; expands into a chat panel on click.
  * Only mounts when the user is authenticated.
  * @returns {JSX.Element} The chat widget.
  */
@@ -83,7 +83,7 @@ export function ChatModal(): JSX.Element {
       <div className="flex items-center justify-between px-4 py-3 bg-indigo-600 text-white shrink-0">
         <span className="font-semibold text-sm">Chat</span>
         <button
-          aria-label="Minimise chat"
+          aria-label="Minimize chat"
           className="text-indigo-200 hover:text-white transition-colors cursor-pointer text-lg leading-none"
           onClick={() => setOpen(false)}
         >

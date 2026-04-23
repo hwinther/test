@@ -30,7 +30,7 @@ function PageLayout({ children }: Readonly<{ children: React.ReactNode }>): Reac
           <NavLink className={navLinkClass} to="/blogs">Blogs</NavLink>
         </div>
         <div className="flex items-center gap-3 text-sm">
-          {auth.isAuthenticated ? (
+          {auth.isAuthenticated && (
             <>
               <button
                 className="text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors cursor-pointer"
@@ -46,14 +46,15 @@ function PageLayout({ children }: Readonly<{ children: React.ReactNode }>): Reac
               </button>
               {profileOpen && <UserProfileModal onClose={() => setProfileOpen(false)} />}
             </>
-          ) : !auth.isLoading ? (
+          )}
+          {!auth.isAuthenticated && !auth.isLoading && (
             <button
               className="rounded-md px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white transition-colors cursor-pointer"
               onClick={() => void auth.signinRedirect()}
             >
               Sign in
             </button>
-          ) : null}
+          )}
         </div>
       </nav>
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6">{children}</main>

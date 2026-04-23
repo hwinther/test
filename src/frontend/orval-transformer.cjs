@@ -5,7 +5,6 @@
  * SSE streams require a persistent fetch-based connection and are handled by the
  * custom `useChatStream` hook; generating a standard React Query hook for them
  * would produce dead, misleading code.
- *
  * @type {import('orval').DocumentTransformer}
  */
 module.exports = (schema) => {
