@@ -37,7 +37,8 @@
     "tailwindcss",
     "botvar",
     "bugvar",
-    "Botvar"
+    "Botvar",
+    "healthz"
   ],
   "ignorePaths": ["node_modules/**", "*.lock"]
 }
