@@ -1,31 +1,16 @@
-import { type JSX, useEffect, useState } from 'react'
+import { type JSX, useState } from 'react'
 
-import type { VersionInformation, WeatherForecast } from '~/api/models'
+import type { VersionInformation } from '~/api/models'
 import type { SpriteTheme } from '~/components/game/mario/mario-types'
 
 import { useVersion } from '~/api/endpoints/service/service'
-import { useGetWeatherForecast } from '~/api/endpoints/weather-forecast/weather-forecast'
-import { useAuthDispatch } from '~/auth.context'
 import { LevelLoader } from '~/components/game/mario/level-loader'
 import { MarioGame } from '~/components/game/mario/MarioGame'
 import { MaritimeVentures } from '~/components/game/maritime-ventures/MaritimeVentures'
 import { useKonamiCode } from '~/hooks/useKonamiCode'
 
 /**
- * Query payload may be a JSON array (actual axios body) or Orval's typed `{ status, data }` envelope.
- * @param {unknown} data Raw react-query data from getWeatherForecast.
- * @returns {WeatherForecast[] | undefined} Parsed rows or undefined.
- */
-function weatherRowsFromQuery(data: unknown): WeatherForecast[] | undefined {
-  if (data == null) return undefined
-  if (Array.isArray(data)) return data as WeatherForecast[]
-  const o = data as unknown as { status?: number; data?: unknown }
-  if (o.status === 200 && Array.isArray(o.data)) return o.data as WeatherForecast[]
-  return undefined
-}
-
-/**
- * Same shape mismatch as weather: mutator returns JSON body; Orval types may use `{ status, data }`.
+ * Same shape mismatch as other endpoints: mutator returns JSON body; Orval types may use `{ status, data }`.
  * @param {unknown} data Raw react-query data from version().
  * @returns {VersionInformation | undefined} Parsed version payload or undefined.
  */
@@ -40,26 +25,16 @@ function versionInfoFromQuery(data: unknown): VersionInformation | undefined {
 }
 
 /**
- * Home page with weather data, version info, and game launchers.
+ * Home page with version info and game launchers.
  * @returns {JSX.Element} The home page content.
  */
 function Page(): JSX.Element {
   const [showGame, setShowGame] = useState(false)
   const [showMarioGame, setShowMarioGame] = useState(false)
   const [marioTheme, setMarioTheme] = useState<SpriteTheme>('classic')
-  const dispatch = useAuthDispatch()
-  const { data: weatherForecasts, refetch } = useGetWeatherForecast()
-  const forecastRows = weatherRowsFromQuery(weatherForecasts)
   const { data: versionRaw } = useVersion()
   const versionInfo = versionInfoFromQuery(versionRaw)
   const isKonamiActivated = useKonamiCode()
-
-  useEffect(() => {
-    dispatch('token')
-    setTimeout(() => {
-      refetch()
-    }, 2000)
-  }, [refetch, dispatch])
 
   if (isKonamiActivated) {
     return <MaritimeVentures />
@@ -99,17 +74,6 @@ function Page(): JSX.Element {
           Play Botvar Theme
         </button>
       </div>
-
-      {forecastRows != null && forecastRows.length > 0 ? (
-        <section className="space-y-1">
-          <h2 className="text-xl font-semibold">Weather Forecast</h2>
-          {forecastRows.map((wf: WeatherForecast) => (
-            <p key={wf.date} className="text-sm text-neutral-600 dark:text-neutral-400">
-              {wf.date}: {wf.summary} – {wf.temperatureC}°C
-            </p>
-          ))}
-        </section>
-      ) : null}
 
       {versionInfo != null && (
         <p className="text-xs text-neutral-500 dark:text-neutral-400">

@@ -10,17 +10,13 @@
     <File Path="Directory.Build.props" />
     <File Path="global.json" />
   </Folder>
-  <Folder Name="/Solution Items/src/log/">
-    <File Path="log/placeholder.md" />
+  <Folder Name="/src/">
+    <Project Path="../../shared/NugetDistSample/NugetDistSample.csproj" />
+    <Project Path="ApiClient/ApiClient.csproj" />
+    <Project Path="WebApi/WebApi.csproj" />
   </Folder>
-  <Folder Name="/Solution Items/tests/">
+  <Folder Name="/tests/">
     <File Path="../../tests/backend/Directory.Build.props" />
+    <Project Path="../../tests/backend/WebApi.Tests/WebApi.Tests.csproj" />
   </Folder>
-  <Project Path="../../shared/NugetDistSample/NugetDistSample.csproj" />
-  <Project Path="../../tests/backend/WebApi.Tests/WebApi.Tests.csproj" />
-  <Project Path="ApiClient/ApiClient.csproj" />
-  <Project Path="docker-compose.dcproj">
-    <Build />
-  </Project>
-  <Project Path="WebApi/WebApi.csproj" />
 </Solution>

@@ -1,6 +1,5 @@
 using System.Data;
 using System.Data.Common;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Database;
 using WebApi.Repository;
@@ -11,51 +10,55 @@ namespace WebApi.Tests.Database;
 public class BloggingContextTests : IAsyncLifetime, IAsyncDisposable
 {
     private BloggingContext _context = null!;
-    private MsSqlDefaultConfiguration _msSqlContainer = null!;
+    private PostgreSqlDefaultConfiguration _postgreSqlContainer = null!;
     private string _connectionString = null!;
+
+    public async ValueTask DisposeAsync()
+    {
+        await _context.DisposeAsync();
+        await _postgreSqlContainer.DisposeAsync();
+    }
 
     public async ValueTask InitializeAsync()
     {
-        _msSqlContainer = new MsSqlDefaultConfiguration();
-        await _msSqlContainer.InitializeAsync();
+        _postgreSqlContainer = new PostgreSqlDefaultConfiguration();
+        await _postgreSqlContainer.InitializeAsync();
 
-        _connectionString = _msSqlContainer.MsSqlContainer.GetConnectionString();
+        _connectionString = _postgreSqlContainer.PostgreSqlContainer.GetConnectionString();
         var options = new DbContextOptionsBuilder<BloggingContext>()
-                      .UseSqlServer(_connectionString)
+                      .UseNpgsql(_connectionString)
                       .Options;
 
         _context = new BloggingContext(options);
         await _context.Database.MigrateAsync(CancellationToken.None);
 
         var blogEntity = await _context.Blogs.AddAsync(new Blog
-        {
-            BlogId = 0,
-            Title = "test blog",
-            Url = "test://url"
-        }, CancellationToken.None);
+                                                       {
+                                                           BlogId = 0,
+                                                           Title = "test blog",
+                                                           Url = "test://url"
+                                                       },
+                                                       CancellationToken.None);
+
         await _context.SaveChangesAsync(CancellationToken.None);
 
         await _context.Posts.AddAsync(new Post
-        {
-            PostId = 0,
-            BlogId = blogEntity.Entity.BlogId,
-            Title = "test post",
-            Content = "test content"
-        }, CancellationToken.None);
-        await _context.SaveChangesAsync(CancellationToken.None);
-    }
+                                      {
+                                          PostId = 0,
+                                          BlogId = blogEntity.Entity.BlogId,
+                                          Title = "test post",
+                                          Content = "test content"
+                                      },
+                                      CancellationToken.None);
 
-    public async ValueTask DisposeAsync()
-    {
-        await _context.DisposeAsync();
-        await _msSqlContainer.DisposeAsync();
+        await _context.SaveChangesAsync(CancellationToken.None);
     }
 
     [Fact]
     public void ConnectionState_ReturnsOpen()
     {
         // Given
-        using DbConnection connection = new SqlConnection(_msSqlContainer.MsSqlContainer.GetConnectionString());
+        using DbConnection connection = new Npgsql.NpgsqlConnection(_postgreSqlContainer.PostgreSqlContainer.GetConnectionString());
 
         // When
         connection.Open();

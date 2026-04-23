@@ -15,6 +15,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ServiceStatus,
   StringGenericValue,
   VersionInformation
 } from '../../models';
@@ -254,6 +255,125 @@ export function useVersion<TData = Awaited<ReturnType<typeof version>>, TError =
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getVersionQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+/**
+ * @summary Returns the connection status of downstream services (PostgreSQL and RabbitMQ).
+ */
+export type statusResponse200 = {
+  data: ServiceStatus
+  status: 200
+}
+
+export type statusResponse500 = {
+  data: void
+  status: 500
+}
+
+export type statusResponseSuccess = (statusResponse200) & {
+  headers: Headers;
+};
+export type statusResponseError = (statusResponse500) & {
+  headers: Headers;
+};
+
+export type statusResponse = (statusResponseSuccess | statusResponseError)
+
+export const getStatusUrl = () => {
+
+
+
+
+  return `/api/v1/Service/status`
+}
+
+export const status = async ( options?: RequestInit): Promise<statusResponse> => {
+
+  return customInstance<statusResponse>(getStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getStatusQueryKey = () => {
+    return [
+    `/api/v1/Service/status`
+    ] as const;
+    }
+
+
+export const getStatusQueryOptions = <TData = Awaited<ReturnType<typeof status>>, TError = ErrorType<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof status>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof status>>> = ({ signal }) => status({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof status>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type StatusQueryResult = NonNullable<Awaited<ReturnType<typeof status>>>
+export type StatusQueryError = ErrorType<void>
+
+
+export function useStatus<TData = Awaited<ReturnType<typeof status>>, TError = ErrorType<void>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof status>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof status>>,
+          TError,
+          Awaited<ReturnType<typeof status>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStatus<TData = Awaited<ReturnType<typeof status>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof status>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof status>>,
+          TError,
+          Awaited<ReturnType<typeof status>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStatus<TData = Awaited<ReturnType<typeof status>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof status>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Returns the connection status of downstream services (PostgreSQL and RabbitMQ).
+ */
+
+export function useStatus<TData = Awaited<ReturnType<typeof status>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof status>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getStatusQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

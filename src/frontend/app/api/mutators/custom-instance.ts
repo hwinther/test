@@ -10,7 +10,7 @@ import {
  * Resolves Axios base URL: injected `window` config in the browser, process env on the server.
  * @returns {string} API origin with trailing slash.
  */
-function getApiBaseUrl(): string {
+export function getApiBaseUrl(): string {
   // eslint-disable-next-line sonarjs/different-types-comparison -- SSR: window is undefined on the server
   if (globalThis.window !== undefined) {
     const fromWindow = readPublicRuntimeConfigFromWindow()?.apiBaseUrl?.trim()
@@ -24,6 +24,24 @@ function getApiBaseUrl(): string {
 
 export const AXIOS_INSTANCE = Axios.create({
   baseURL: getApiBaseUrl(),
+})
+
+let _authToken: string | null = null
+
+/**
+ * Updates the Bearer token injected into every outgoing API request.
+ * Called by the TokenBridge component whenever the OIDC session changes.
+ * @param {string | null} token Access token, or null to clear it.
+ */
+export function setAuthToken(token: string | null): void {
+  _authToken = token
+}
+
+AXIOS_INSTANCE.interceptors.request.use((config) => {
+  if (_authToken) {
+    config.headers.Authorization = `Bearer ${_authToken}`
+  }
+  return config
 })
 
 /**

@@ -1,6 +1,7 @@
 ﻿// Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Entities;
@@ -15,6 +16,7 @@ namespace WebApi.Controllers;
 ///     Initializes a new instance of the <see cref="SendMessageController" /> class.
 /// </remarks>
 /// <param name="messageSender">The service used for sending messages.</param>
+[Authorize]
 [ApiController]
 [Route("api/v1/[controller]")]
 public class SendMessageController(IMessageSender messageSender) : ControllerBase

@@ -19,4 +19,7 @@ public sealed class RabbitMqOptions
 
     /// <summary>Login password.</summary>
     public string Password { get; set; } = "guest";
+
+    /// <summary>Virtual host.</summary>
+    public string VirtualHost { get; set; } = "/";
 }

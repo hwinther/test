@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Entities;
@@ -8,6 +9,7 @@ namespace WebApi.Controllers;
 /// <summary>
 ///     Blogging controller
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("api/v1/[controller]")]
 public class BloggingController(ILogger<BloggingController> logger, IBloggingRepository bloggingRepository) : ControllerBase

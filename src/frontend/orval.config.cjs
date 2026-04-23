@@ -3,9 +3,9 @@ export default {
   api: {
     input: {
       target: '../backend/WebApi/swagger.json',
-      // override: {
-      //   transformer: './src/api/transformer/add-version.js',
-      // },
+      override: {
+        transformer: './orval-transformer.cjs',
+      },
     },
     output: {
       clean: true,
