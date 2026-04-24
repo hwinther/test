@@ -35,7 +35,7 @@ export function useSignalRChat(onMessage: (msg: ChatMessage) => void): (text: st
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl, { accessTokenFactory: () => token })
       .withAutomaticReconnect()
-      .configureLogging(signalR.LogLevel.Warning)
+      .configureLogging(signalR.LogLevel.Error)
       .build()
 
     connection.on('ReceiveMessage', (msg: ChatMessage) => {
