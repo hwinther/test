@@ -31,9 +31,9 @@ export function useSignalRChat(onMessage: (msg: ChatMessage) => void): (text: st
   useEffect(() => {
     if (!token) return
 
-    const base = getApiBaseUrl().replace(/\/$/, '')
+    const hubUrl = new URL('/hubs/chat', getApiBaseUrl()).toString()
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${base}/hubs/chat`, { accessTokenFactory: () => token })
+      .withUrl(hubUrl, { accessTokenFactory: () => token })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Warning)
       .build()
@@ -44,6 +44,7 @@ export function useSignalRChat(onMessage: (msg: ChatMessage) => void): (text: st
 
     connectionRef.current = connection
     void connection.start().catch((err: unknown) => {
+      if (err instanceof Error && err.name === 'AbortError') return
       console.error('[SignalR] connection failed:', err)
     })
 
