@@ -26,7 +26,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 var configuration = builder.Configuration;
 
-var oidcConfig = configuration.GetSection(OidcOptions.SectionName).Get<OidcOptions>() ?? new OidcOptions();
+var oidcConfig = configuration.GetSection(OidcOptions.SectionName)
+                              .Get<OidcOptions>() ?? new OidcOptions();
 
 builder.Services.AddOptions<OidcOptions>()
        .Bind(configuration.GetSection(OidcOptions.SectionName));
@@ -36,6 +37,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
        {
            options.Authority = oidcConfig.Authority;
            options.Audience = oidcConfig.Audience;
+           options.TokenValidationParameters.ValidIssuer = oidcConfig.Authority;
            // Browsers cannot set Authorization headers on WebSocket upgrades, so SignalR's
            // JS client appends the token as ?access_token= on /hubs/* paths instead.
            options.Events = new JwtBearerEvents
@@ -45,20 +47,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                    var token = ctx.Request.Query["access_token"];
                    if (!string.IsNullOrEmpty(token) &&
                        ctx.HttpContext.Request.Path.StartsWithSegments("/hubs"))
-                   {
                        ctx.Token = token;
-                   }
+
                    return Task.CompletedTask;
                }
            };
        });
+
 builder.Services.AddAuthorization();
 var healthChecks = builder.Services.AddHealthChecks();
 
 var signalRBuilder = builder.Services
-    .AddSignalR()
-    .AddJsonProtocol(static opts =>
-        opts.PayloadSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase);
+                            .AddSignalR()
+                            .AddJsonProtocol(static opts =>
+                                                 opts.PayloadSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase);
 
 // OpenAPI generation (`dotnet swagger tofile` uses ASPNETCORE_ENVIRONMENT=Swagger) does not need SQL Server.
 var registerDataAccess = !builder.Environment.IsEnvironment("Swagger");
@@ -127,7 +129,7 @@ builder.Services.AddOpenTelemetry()
        .WithTracing(tracing =>
        {
            tracing.AddAspNetCoreInstrumentation(static opts =>
-                      opts.Filter = static ctx => !ctx.Request.Path.StartsWithSegments("/healthz"))
+                                                    opts.Filter = static ctx => !ctx.Request.Path.StartsWithSegments("/healthz"))
                   .AddHttpClientInstrumentation()
                   .AddEntityFrameworkCoreInstrumentation()
                   .AddRabbitMQInstrumentation()
@@ -153,7 +155,8 @@ builder.Services.AddControllers(static options =>
 
 builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, ProduceResponseTypeModelProvider>());
 
-var corsOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? ["https://localhost:5173"];
+var corsOrigins = configuration.GetSection("Cors:AllowedOrigins")
+                               .Get<string[]>() ?? ["https://localhost:5173"];
 
 const string corsPolicyName = "corsPolicy";
 builder.Services.AddCors(options => options
@@ -179,25 +182,31 @@ builder.Services.AddSwaggerGen(options =>
 
     options.SwaggerGeneratorOptions.XmlCommentEndOfLine = "\n";
 
-    options.AddSecurityDefinition("oidc", new OpenApiSecurityScheme
+    options.AddSecurityDefinition("oidc",
+                                  new OpenApiSecurityScheme
+                                  {
+                                      Type = SecuritySchemeType.OAuth2,
+                                      Flows = new OpenApiOAuthFlows
+                                      {
+                                          AuthorizationCode = new OpenApiOAuthFlow
+                                          {
+                                              AuthorizationUrl = new Uri($"{oidcConfig.Authority}/api/oidc/authorization"),
+                                              TokenUrl = new Uri($"{oidcConfig.Authority}/api/oidc/token"),
+                                              Scopes = new Dictionary<string, string>
+                                              {
+                                                  ["openid"] = "OpenID",
+                                                  ["profile"] = "Profile",
+                                                  ["email"] = "Email",
+                                                  ["groups"] = "Groups",
+                                                  ["offline_access"] = "Offline access"
+                                              }
+                                          }
+                                      }
+                                  });
+
+    options.AddSecurityRequirement(static doc => new OpenApiSecurityRequirement
     {
-        Type = SecuritySchemeType.OAuth2,
-        Flows = new OpenApiOAuthFlows
-        {
-            AuthorizationCode = new OpenApiOAuthFlow
-            {
-                AuthorizationUrl = new Uri($"{oidcConfig.Authority}/api/oidc/authorization"),
-                TokenUrl = new Uri($"{oidcConfig.Authority}/api/oidc/token"),
-                Scopes = new Dictionary<string, string>
-                {
-                    ["openid"] = "OpenID",
-                    ["profile"] = "Profile",
-                    ["email"] = "Email",
-                    ["groups"] = "Groups",
-                    ["offline_access"] = "Offline access"
-                }
-            }
-        }
+        { new OpenApiSecuritySchemeReference("oidc", doc), [] }
     });
 });
 
@@ -227,6 +236,7 @@ if (app.Environment.IsDevelopment())
         options.OAuthUsePkce();
         options.OAuthScopes("openid", "profile", "email", "groups");
     });
+
     app.UseReDoc();
 }
 
@@ -236,7 +246,9 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapHub<ChatHub>("/hubs/chat").RequireAuthorization();
+app.MapHub<ChatHub>("/hubs/chat")
+   .RequireAuthorization();
+
 app.MapHealthChecks("/healthz");
 
 app.Run();

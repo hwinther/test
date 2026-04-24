@@ -434,3 +434,6 @@ CoverageReport/
 
 # Python virtual environment
 **/venv/
+
+# Claude files
+.claude/
