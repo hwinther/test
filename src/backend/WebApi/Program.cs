@@ -72,7 +72,7 @@ if (registerDataAccess)
             "Database connection string is required. Set ConnectionStrings:Blogging (for example in appsettings or user secrets, or the ConnectionStrings__Blogging environment variable).");
 
     builder.Services.AddDbContext<BloggingContext>(options =>
-                                                       options.UseNpgsql(bloggingConnectionString,
+                                                       options.UseNpgsql(PostgresUrlParser.Parse(bloggingConnectionString),
                                                                          static sqlOptions =>
                                                                          {
                                                                              sqlOptions.CommandTimeout(30);
