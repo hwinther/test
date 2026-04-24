@@ -610,6 +610,11 @@
       }
     }
   },
+  "security": [
+    {
+      "oidc": [ ]
+    }
+  ],
   "tags": [
     {
       "name": "Blogging"

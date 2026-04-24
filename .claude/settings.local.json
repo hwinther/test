@@ -13,7 +13,8 @@
       "Read(//c/Users/DgVm/AppData/Local/npm-cache/_logs/**)",
       "Bash(node_modules/.bin/react-router typegen *)",
       "Bash(node_modules/.bin/tsc --noEmit)",
-      "Bash(dotnet list *)"
+      "Bash(dotnet list *)",
+      "WebFetch(domain:auth.wsh.no)"
     ]
   }
 }
