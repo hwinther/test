@@ -17,6 +17,7 @@
   </Folder>
   <Folder Name="/tests/">
     <File Path="../../tests/backend/Directory.Build.props" />
+    <Project Path="../../tests/backend/ApiClient.Tests/ApiClient.Tests.csproj" />
     <Project Path="../../tests/backend/WebApi.Tests/WebApi.Tests.csproj" />
   </Folder>
 </Solution>
