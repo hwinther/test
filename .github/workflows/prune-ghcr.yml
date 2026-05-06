@@ -1,0 +1,57 @@
+name: "Prune GHCR images"
+
+# Thin caller. The pruning logic lives in
+# hwinther/reusable-workflows/.github/workflows/prune-ghcr.yml — see that
+# workflow's header for the rules (untagged-orphan vs OCI 1.1 attestation,
+# dead-branch prerelease tags, cosign legacy sig/att, etc.).
+#
+# Auth note:
+#   ghcr.io/hwinther/* is a USER-scoped registry. The repo's GITHUB_TOKEN can
+#   delete versions only when each package has "Inherit access from source
+#   repository" enabled. If deletion 403s, set repo secret GHCR_PRUNE_TOKEN to
+#   a PAT with `delete:packages` (and `read:packages` if you want auto-discovery
+#   to enumerate private user packages). Passed through via secrets: inherit.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "When false, actually delete versions. Cron runs always force false."
+        type: boolean
+        default: true
+      images:
+        # Folded scalar (>-) so the source reads as a list but YAML resolves
+        # to a single-line comma string. The workflow_dispatch UI flattens
+        # `|` literal-block defaults and drops the newlines without inserting
+        # a separator, so a `|` default becomes one giant concatenated token.
+        description: "Comma-separated package names to prune. Blank = let the reusable workflow auto-discover by prefix."
+        type: string
+        default: >-
+          test/api,
+          test/frontend
+  schedule:
+    # Sundays 03:00 UTC. Cron always runs live (dry_run forced to false).
+    - cron: "0 3 * * 0"
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: prune-ghcr
+  cancel-in-progress: false
+
+jobs:
+  prune:
+    permissions:
+      contents: read
+      packages: write
+    uses: hwinther/reusable-workflows/.github/workflows/prune-ghcr.yml@v1
+    with:
+      dry_run: ${{ github.event_name == 'schedule' && false || inputs.dry_run }}
+      # Schedule events don't expose `inputs`, so mirror the workflow_dispatch
+      # default as a single-line comma string. Keep this in sync with the
+      # `images` input default above.
+      images: ${{ inputs.images || 'test/api,test/frontend' }}
+      package_namespace_prefix: test/
+    secrets: inherit
