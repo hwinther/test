@@ -112,11 +112,6 @@ updates:
       patterns:
       - "prettier"
       - "@cspell/*"
-    build-tools:
-      patterns:
-      - "typescript"
-      - "typescript-*"
-      - "orval"
 
 - package-ecosystem: "npm"
   directory: "/tests/playwright"
@@ -150,10 +145,6 @@ updates:
       patterns:
       - "prettier"
       - "@cspell/*"
-    build-tools:
-      patterns:
-      - "typescript"
-      - "typescript-*"
     utilities:
       patterns:
       - "dotenv"
