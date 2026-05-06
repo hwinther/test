@@ -105,6 +105,9 @@ updates:
     tanstack:
       patterns:
       - "@tanstack/*"
+    opentelemetry:
+      patterns:
+      - "@opentelemetry/*"
     code-quality:
       patterns:
       - "prettier"
