@@ -1,0 +1,82 @@
+name: "PR build, scan, and E2E"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    types: [opened, reopened, labeled, synchronize, ready_for_review]
+    paths:
+      - "src/backend/**"
+      - "src/frontend/**"
+      - "tests/playwright/**"
+      - "docker-compose.e2e.yml"
+      - ".github/workflows/pr-e2e.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "src/backend/**"
+      - "src/frontend/**"
+      - "tests/playwright/**"
+      - "docker-compose.e2e.yml"
+      - ".github/workflows/pr-e2e.yml"
+
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  api:
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    permissions:
+      contents: read
+      packages: read
+      id-token: write
+      attestations: write
+      actions: write
+      security-events: write
+      pull-requests: write
+    uses: hwinther/reusable-workflows/.github/workflows/build-and-scan-dotnet.yml@c14eb75f61df1e0344a70d6e8ce2210406a5fea0 # v1.60.0
+    with:
+      dotnet_version: 10.0.x
+      solution_path: src/backend
+      solution_file: Backend.slnx
+      project_file: WebApi/WebApi.csproj
+      container_registry: ghcr.io
+      container_image_name_postfix: api
+      grype_fail_build: false # TODO: Reset once opentelemetry packages have been updated (matches api-container.yml)
+
+  frontend:
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    permissions:
+      contents: read
+      packages: read
+      id-token: write
+      attestations: write
+      actions: write
+      security-events: write
+      pull-requests: write
+    uses: hwinther/reusable-workflows/.github/workflows/build-and-scan-docker.yml@c14eb75f61df1e0344a70d6e8ce2210406a5fea0 # v1.60.0
+    with:
+      container_registry: ghcr.io
+      container_image_name_postfix: frontend
+      build_context: src/frontend
+      dockerfile: src/frontend/Dockerfile
+      grype_fail_build: false # TODO: Reset once node:24-alpine ships fix (matches frontend-container.yml)
+
+  e2e:
+    needs: [api, frontend]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: write
+    uses: hwinther/reusable-workflows/.github/workflows/playwright-e2e.yml@c14eb75f61df1e0344a70d6e8ce2210406a5fea0 # v1.60.0
+    with:
+      compose_file: docker-compose.e2e.yml
+      playwright_working_directory: tests/playwright
+      playwright_cache_enabled: true
+      image_artifacts_json: |
+        {"API_IMAGE":"${{ needs.api.outputs.image_artifact }}",
+         "FRONTEND_IMAGE":"${{ needs.frontend.outputs.image_artifact }}"}

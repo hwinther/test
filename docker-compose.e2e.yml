@@ -1,0 +1,96 @@
+# Stack used by the pr-e2e workflow and for local Playwright runs against built images.
+# Image refs come from env vars so the same file works for any digest:
+#   API_IMAGE=ghcr.io/<owner>/<repo>/api@sha256:...
+#   FRONTEND_IMAGE=ghcr.io/<owner>/<repo>/frontend@sha256:...
+#
+# Host port mapping: api on 5155 (PUBLIC_API_BASE_URL points browsers here),
+# frontend on 5173 (matches playwright baseURL).
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: blogging
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d blogging"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  rabbitmq:
+    image: rabbitmq:4-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  api:
+    image: ${API_IMAGE}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Blogging: "postgres://postgres:postgres@postgres:5432/blogging"
+      ConnectionStrings__Redis: "redis://:guest@redis:6379/0"
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__Port: "5672"
+      RabbitMq__UserName: guest
+      RabbitMq__Password: guest
+      RabbitMq__VirtualHost: "/"
+      Oidc__Authority: https://auth.wsh.no
+      Oidc__Audience: pxce-api
+      Cors__AllowedOrigins__0: http://localhost:5173
+      OTEL_SDK_DISABLED: "true"
+    ports:
+      - "5155:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # mcr.microsoft.com/dotnet/aspnet:10.0 has no curl baked in; the api also runs
+  # EF migrations on startup so /healthz only goes green once that completes.
+  # Sidecar polls from outside and gates the frontend on api readiness.
+  api-ready:
+    image: curlimages/curl:8.10.1
+    depends_on:
+      api:
+        condition: service_started
+    command: ["sh", "-c", "until curl -fsS http://api:8080/healthz; do sleep 1; done"]
+    restart: "no"
+
+  frontend:
+    image: ${FRONTEND_IMAGE}
+    environment:
+      PUBLIC_API_BASE_URL: http://localhost:5155/
+      NODE_ENV: production
+      OTEL_SDK_DISABLED: "true"
+    ports:
+      - "5173:3000"
+    # Distroless image has no shell/curl/wget — use node directly. /nodejs/bin/node
+    # is the absolute path inside gcr.io/distroless/nodejs*; node 22+ has global fetch.
+    healthcheck:
+      test: ["CMD", "/nodejs/bin/node", "-e", "fetch('http://localhost:3000/healthz').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    depends_on:
+      api-ready:
+        condition: service_completed_successfully
