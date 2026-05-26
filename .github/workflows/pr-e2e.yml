@@ -77,6 +77,8 @@ jobs:
       compose_file: docker-compose.e2e.yml
       playwright_working_directory: tests/playwright
       playwright_cache_enabled: true
+      # playwright.config.ts ships 5 browser projects; only run chromium in CI to match playwright_browsers default.
+      playwright_run_command: "npx playwright test --project=chromium"
       image_artifacts_json: |
         {"API_IMAGE":"${{ needs.api.outputs.image_artifact }}",
          "FRONTEND_IMAGE":"${{ needs.frontend.outputs.image_artifact }}"}
