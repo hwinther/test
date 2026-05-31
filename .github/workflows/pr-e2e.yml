@@ -72,7 +72,7 @@ jobs:
       contents: read
       packages: read
       pull-requests: write
-    uses: hwinther/reusable-workflows/.github/workflows/playwright-e2e.yml@c14eb75f61df1e0344a70d6e8ce2210406a5fea0 # v1.60.0
+    uses: hwinther/reusable-workflows/.github/workflows/playwright-e2e.yml@f72dbfff5f226a3fc3035daa2eb29dde3464582e # v1.62.0
     with:
       compose_file: docker-compose.e2e.yml
       playwright_working_directory: tests/playwright
