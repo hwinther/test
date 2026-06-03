@@ -1,3 +1,9 @@
 <Project>
 	<Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../../src/backend'))" />
+
+	<!-- coverlet.MTP filters: whitelist first-party assemblies so the cobertura report doesn't include Refit/Docker.DotNet/Testcontainers/Moq/etc. -->
+	<PropertyGroup>
+		<Include>[WebApi]*,[ApiClient]*</Include>
+		<ExcludeByFile>**/Migrations/*.cs</ExcludeByFile>
+	</PropertyGroup>
 </Project>
