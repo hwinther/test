@@ -24,7 +24,6 @@ updates:
 - package-ecosystem: "docker"
   directories:
   - "/.github/actions/rover-terraform-action"
-  - "/src/backend/WebApi"
   - "/src/frontend"
   open-pull-requests-limit: 20
   target-branch: "main"
@@ -74,9 +73,8 @@ updates:
     day: "sunday"
   assignees:
   - "hwinther"
-  ignore:
-  - dependency-name: "*"
-    update-types: [ "version-update:semver-patch" ]
+  cooldown:
+    default-days: 7
   groups:
     types:
       patterns:
@@ -126,9 +124,8 @@ updates:
     day: "sunday"
   assignees:
   - "hwinther"
-  ignore:
-  - dependency-name: "*"
-    update-types: [ "version-update:semver-patch" ]
+  cooldown:
+    default-days: 7
   groups:
     types:
       patterns:
