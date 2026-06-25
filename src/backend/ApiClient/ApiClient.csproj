@@ -10,7 +10,7 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="Refit" Version="11.0.0" />
+    <PackageReference Include="Refit" Version="12.0.0" />
   </ItemGroup>
 
 </Project>
