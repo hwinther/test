@@ -2,6 +2,11 @@ name: "Publish api container to GHCR"
 
 on:
   workflow_dispatch:
+    inputs:
+      grype_fail_build:
+        description: "Fail the build if Grype finds vulnerabilities"
+        type: boolean
+        default: true
   push:
     tags:
       - "v*"
@@ -37,4 +42,4 @@ jobs:
       project_file: WebApi/WebApi.csproj
       container_registry: ghcr.io
       container_image_name_postfix: api
-      grype_fail_build: never # TODO: Reset this after opentelemetry packages have been updated
+      grype_fail_build: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.grype_fail_build == 'false' && 'never' || 'auto' }}
