@@ -14,12 +14,6 @@
           "Microsoft.Testing.Platform": "2.2.2"
         }
       },
-      "Microsoft.Testing.Platform": {
-        "type": "Direct",
-        "requested": "[2.2.3, )",
-        "resolved": "2.2.3",
-        "contentHash": "LhM1/Qoi8Ams5QcD4r3f09CSOono9iQr3NEJQItFtyzWB55nWTgEOsVqXqMWWWIwk3nkPqc+XfnlJmp8xUI5fg=="
-      },
       "xunit.v3.mtp-v2": {
         "type": "Direct",
         "requested": "[3.2.2, )",
@@ -139,6 +133,11 @@
           "Microsoft.Testing.Platform": "2.0.2"
         }
       },
+      "Microsoft.Testing.Platform": {
+        "type": "Transitive",
+        "resolved": "2.2.2",
+        "contentHash": "9mUsTOri0aVqBX7/EJwqVJxVwdOzGUVJqK1H2EMfIl9xxJuSdqhfAlJbukl/iNugvi4+cmQs/LI8PLTDUT9P1A=="
+      },
       "Microsoft.Testing.Platform.MSBuild": {
         "type": "Transitive",
         "resolved": "2.0.2",
@@ -152,10 +151,35 @@
         "resolved": "5.0.0",
         "contentHash": "dDoKi0PnDz31yAyETfRntsLArTlVAVzUzCIvvEDsDsucrl33Dl8pIJG06ePTJTI3tGpeyHS9Cq7Foc/s4EeKcg=="
       },
+      "ReactiveUI.Disposables": {
+        "type": "Transitive",
+        "resolved": "5.6.0",
+        "contentHash": "yzIoFgb43KXXynWgUgS5FoJ6KG4XIAFFWksk05K53qb160wCIZOq+aHsJrMuePSDEm/MoFk1lBkN0TRWQ9MtBQ=="
+      },
+      "ReactiveUI.Primitives": {
+        "type": "Transitive",
+        "resolved": "5.6.0",
+        "contentHash": "qnxP2/RH+PYhzMQBMKnFzci/GO3N+eeQe5bZczoVgSGdTFsMYCuUXCfElgHGFvnlbYfiKfdWD0UdrrwMqr8y8Q==",
+        "dependencies": {
+          "ReactiveUI.Disposables": "5.6.0",
+          "ReactiveUI.Primitives.Core": "5.6.0"
+        }
+      },
+      "ReactiveUI.Primitives.Core": {
+        "type": "Transitive",
+        "resolved": "5.6.0",
+        "contentHash": "HrFby67lgpToIp4ZQEjsihyU073Fg6/jzgOHGgGV1BMYbQgHf7G/F3tQKss/4e5aJFsnom1mMhywpEax3TKKiw==",
+        "dependencies": {
+          "ReactiveUI.Disposables": "5.6.0"
+        }
+      },
       "Refit": {
         "type": "Transitive",
-        "resolved": "11.0.0",
-        "contentHash": "1ihqzvS3AV2PxVMSrOgN53HbCPz13Q7BoNl6gKkUXtSxzcU6sqYYzGSH4mFBaPZJ9zNcQqf2athEibGaq84z9A=="
+        "resolved": "12.0.0",
+        "contentHash": "eJWs1m24UYaDhZXSaWXMXywCvY2V79hpXFQ35p+MmX1heX6WYkGdU1tAsGdiMhKSvpsar/BHaAhKqQKG8MKYFg==",
+        "dependencies": {
+          "ReactiveUI.Primitives": "5.6.0"
+        }
       },
       "xunit.analyzers": {
         "type": "Transitive",
@@ -217,7 +241,7 @@
       "apiclient": {
         "type": "Project",
         "dependencies": {
-          "Refit": "[11.0.0, )"
+          "Refit": "[12.0.0, )"
         }
       }
     },
