@@ -10,7 +10,7 @@ name: "Prune GHCR images"
 #   delete versions only when each package has "Inherit access from source
 #   repository" enabled. If deletion 403s, set repo secret GHCR_PRUNE_TOKEN to
 #   a PAT with `delete:packages` (and `read:packages` if you want auto-discovery
-#   to enumerate private user packages). Passed through via secrets: inherit.
+#   to enumerate private user packages). Forwarded explicitly as GHCR_PRUNE_TOKEN.
 
 on:
   workflow_dispatch:
@@ -46,12 +46,15 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: hwinther/reusable-workflows/.github/workflows/prune-ghcr.yml@f65228ea4276b3ff26409146ccd1191c728c811a # v1.65.0
+    uses: hwinther/reusable-workflows/.github/workflows/prune-ghcr.yml@a0e722a6a3002b2095899c71861906262160b125 # v2.0.0
     with:
-      dry_run: ${{ github.event_name == 'schedule' && false || inputs.dry_run }}
+      dry_run: ${{ github.event_name == 'schedule' && 'false' || inputs.dry_run }}
       # Schedule events don't expose `inputs`, so mirror the workflow_dispatch
       # default as a single-line comma string. Keep this in sync with the
       # `images` input default above.
       images: ${{ inputs.images || 'test/api,test/frontend' }}
       package_namespace_prefix: test/
-    secrets: inherit
+    secrets:
+      # Reusable workflow declares only GHCR_PRUNE_TOKEN (required: false; falls
+      # back to GITHUB_TOKEN). GITHUB_TOKEN is auto-provided, not forwarded.
+      GHCR_PRUNE_TOKEN: ${{ secrets.GHCR_PRUNE_TOKEN }}
