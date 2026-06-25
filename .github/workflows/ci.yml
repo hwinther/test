@@ -20,7 +20,11 @@ jobs:
       packages: read
     uses: hwinther/reusable-workflows/.github/workflows/pr-build.yml@a0e722a6a3002b2095899c71861906262160b125 # v2.0.0
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
-    secrets: inherit
+    secrets:
+      # pr-build.yml declares only these two (both required: false; each falls back
+      # to GITHUB_TOKEN when unset). GITHUB_TOKEN is auto-provided, not forwarded.
+      npm_auth_token: ${{ secrets.npm_auth_token }}
+      nuget_auth_token: ${{ secrets.nuget_auth_token }}
     with:
       node_enabled: true
       node_working_directory: "src/frontend"

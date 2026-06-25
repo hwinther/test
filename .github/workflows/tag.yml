@@ -48,13 +48,15 @@ jobs:
       - name: Create tag
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         if: ${{ steps.check-changes.outputs.has_diff == 'true' }}
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
         with:
           github-token: ${{ secrets.WORKFLOW_TOKEN }}
           script: |
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'refs/tags/v${{ steps.version.outputs.version }}',
+              ref: `refs/tags/v${process.env.VERSION}`,
               sha: context.sha
             })
 
@@ -62,6 +64,7 @@ jobs:
         id: update-pr-test
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          V_VERSION: ${{ steps.version.outputs.v-version }}
         if: ${{ steps.check-changes.outputs.has_diff == 'true' && github.ref == 'refs/heads/test' }}
         run: |
           # Debug output:
@@ -71,7 +74,7 @@ jobs:
           echo "pr_number=$pr_number"
           echo "pr_number=$pr_number" >> "$GITHUB_OUTPUT"
 
-          gh pr edit $pr_number --title "Merge test changes to main - ${{ steps.version.outputs.v-version }}"
+          gh pr edit "$pr_number" --title "Merge test changes to main - $V_VERSION"
 
       - name: Create or update version tag comment in promotion PR (test)
         uses: im-open/update-pr-comment@add297ea3bc82b349c880eb70a1c2d7d5eaff93d # v2.0.0
