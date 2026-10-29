@@ -24,4 +24,4 @@ COPY ./package.json /app/
 COPY --from=production-dependencies-env /app/node_modules /app/node_modules
 COPY --from=build-env /app/build /app/build
 ENV NODE_ENV=production
-CMD ["./node_modules/@react-router/serve/bin.js", "./build/server/index.js"]
+CMD ["./node_modules/@react-router/serve/bin.cjs", "./build/server/index.js"]

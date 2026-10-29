@@ -1,6 +1,6 @@
 import { PassThrough } from 'node:stream'
 
-import type { AppLoadContext, EntryContext } from 'react-router'
+import type { EntryContext, RouterContextProvider } from 'react-router'
 import { createReadableStreamFromReadable } from '@react-router/node'
 import { ServerRouter } from 'react-router'
 import { isbot } from 'isbot'
@@ -20,7 +20,7 @@ export const streamTimeout = 5_000
  * @param {number} responseStatusCode - The initial HTTP status code for the response.
  * @param {Headers} responseHeaders - The HTTP headers for the response.
  * @param {EntryContext} routerContext - The React Router entry context.
- * @param {AppLoadContext} loadContext - The app-level load context.
+ * @param {RouterContextProvider} loadContext - The app-level load context (React Router 8 enables middleware by default).
  * @returns {Response | Promise<Response>} The streamed HTML response.
  */
 export default function handleRequest(
@@ -28,7 +28,7 @@ export default function handleRequest(
   responseStatusCode: number,
   responseHeaders: Headers,
   routerContext: EntryContext,
-  loadContext: AppLoadContext,
+  loadContext: RouterContextProvider,
 ) {
   if (request.method.toUpperCase() === 'HEAD') {
     return new Response(null, {
@@ -48,7 +48,7 @@ export default function handleRequest(
  * @param {number} responseStatusCode - The initial HTTP status code.
  * @param {Headers} responseHeaders - The HTTP headers for the response.
  * @param {EntryContext} routerContext - The React Router entry context.
- * @param {AppLoadContext} _loadContext - The app-level load context (unused).
+ * @param {RouterContextProvider} _loadContext - The app-level load context (unused).
  * @returns {Promise<Response>} The streamed HTML response.
  */
 async function renderHtmlResponse(
@@ -56,7 +56,7 @@ async function renderHtmlResponse(
   responseStatusCode: number,
   responseHeaders: Headers,
   routerContext: EntryContext,
-  _loadContext: AppLoadContext,
+  _loadContext: RouterContextProvider,
 ): Promise<Response> {
   return new Promise((resolve, reject) => {
     let shellRendered = false
