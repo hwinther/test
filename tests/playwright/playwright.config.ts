@@ -44,13 +44,13 @@ export default defineConfig({
   reporter: process.env.CI
     ? [
         ['dot'],
-        ['json', { outputFile: './playwright-report/test-results.json' }],
+        ['json', { outputFile: './playwright-report/results.json' }],
         ['html', { open: 'never' }],
       ]
     : [
         ['list'],
         ['html', { open: 'on-failure' }],
-        ['json', { outputFile: './playwright-report/test-results.json' }],
+        ['json', { outputFile: './playwright-report/results.json' }],
       ],
 
   /* Retry on CI only */
