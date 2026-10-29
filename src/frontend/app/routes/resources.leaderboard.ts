@@ -14,7 +14,9 @@ let redis: RedisClient | null = null
 async function getRedis(): Promise<RedisClient> {
   if (!redis) {
     const url = process.env.REDIS_URL ?? 'redis://localhost:6379'
-    redis = createClient({ url })
+    // node-redis 6 speaks RESP3 by default (Valkey 9 supports it) and then enables Redis Enterprise
+    // maintenance notifications; Valkey has no such thing, so keep them off as in v5.
+    redis = createClient({ url, maintNotifications: 'disabled' })
     redis.on('error', (err: Error) => {
       console.warn('[leaderboard] Redis connection error:', err.message)
     })

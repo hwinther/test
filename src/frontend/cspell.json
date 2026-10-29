@@ -40,7 +40,9 @@
     "Botvar",
     "healthz",
     "wshno",
-    "innerhtml"
+    "innerhtml",
+    "Valkey",
+    "maint"
   ],
   "ignorePaths": ["node_modules/**", "*.lock"]
 }
