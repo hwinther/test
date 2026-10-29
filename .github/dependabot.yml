@@ -73,9 +73,15 @@ updates:
     day: "sunday"
   assignees:
   - "hwinther"
-  cooldown:
-    default-days: 7
+  ignore:
+  # typescript-eslint, which @wshno/eslint-config builds on, supports TypeScript <6.1. Drop this once a
+  # typescript-eslint release widens that range.
+  - dependency-name: "typescript"
+    versions: [">=6.1"]
   groups:
+    wshno:
+      patterns:
+      - "@wshno/*"
     types:
       patterns:
       - "@types/*"
@@ -124,9 +130,15 @@ updates:
     day: "sunday"
   assignees:
   - "hwinther"
-  cooldown:
-    default-days: 7
+  ignore:
+  # typescript-eslint, which @wshno/eslint-config builds on, supports TypeScript <6.1. Drop this once a
+  # typescript-eslint release widens that range.
+  - dependency-name: "typescript"
+    versions: [">=6.1"]
   groups:
+    wshno:
+      patterns:
+      - "@wshno/*"
     types:
       patterns:
       - "@types/*"
