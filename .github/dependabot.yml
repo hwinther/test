@@ -75,7 +75,18 @@ updates:
   - "hwinther"
   cooldown:
     default-days: 7
+    # Our own packages: take a release as soon as it's approved.
+    exclude:
+    - "@wshno/*"
+  ignore:
+  # typescript-eslint, which @wshno/eslint-config builds on, supports TypeScript <6.1. Drop this once a
+  # typescript-eslint release widens that range.
+  - dependency-name: "typescript"
+    versions: [">=6.1"]
   groups:
+    wshno:
+      patterns:
+      - "@wshno/*"
     types:
       patterns:
       - "@types/*"
@@ -126,7 +137,18 @@ updates:
   - "hwinther"
   cooldown:
     default-days: 7
+    # Our own packages: take a release as soon as it's approved.
+    exclude:
+    - "@wshno/*"
+  ignore:
+  # typescript-eslint, which @wshno/eslint-config builds on, supports TypeScript <6.1. Drop this once a
+  # typescript-eslint release widens that range.
+  - dependency-name: "typescript"
+    versions: [">=6.1"]
   groups:
+    wshno:
+      patterns:
+      - "@wshno/*"
     types:
       patterns:
       - "@types/*"
