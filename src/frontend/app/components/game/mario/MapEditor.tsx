@@ -1,6 +1,6 @@
 import { type JSX, useCallback, useEffect, useRef, useState } from 'react'
 
-import type { LevelData } from './level-format'
+import type { LevelData, LevelTile } from './level-format'
 
 import { LevelLoader } from './level-loader'
 import './MapEditor.css'
@@ -41,15 +41,18 @@ export function MapEditor({ initialLevel, onClose, onPlayTest, onSave }: MapEdit
   const [cameraX, setCameraX] = useState(0)
   const [cameraY, setCameraY] = useState(0)
 
-  const getTileAtPosition = (x: number, y: number) => {
-    const tileX = Math.floor((x + cameraX) / level.dimensions.tileSize)
-    const tileY = Math.floor((y + cameraY) / level.dimensions.tileSize)
+  const getTileAtPosition = useCallback(
+    (x: number, y: number) => {
+      const tileX = Math.floor((x + cameraX) / level.dimensions.tileSize)
+      const tileY = Math.floor((y + cameraY) / level.dimensions.tileSize)
 
-    if (tileY >= 0 && tileY < level.tiles.length && tileX >= 0 && tileX < level.tiles[0].length) {
-      return { tileX, tileY }
-    }
-    return null
-  }
+      if (tileY >= 0 && tileY < level.tiles.length && tileX >= 0 && tileX < level.tiles[0].length) {
+        return { tileX, tileY }
+      }
+      return null
+    },
+    [cameraX, cameraY, level.dimensions.tileSize, level.tiles],
+  )
 
   const placeTile = useCallback((tileX: number, tileY: number, tool: Tool) => {
     setLevel((prevLevel) => {
@@ -87,7 +90,7 @@ export function MapEditor({ initialLevel, onClose, onPlayTest, onSave }: MapEdit
         newLevel.tiles[tileY][tileX] = {
           id: `tile-${tileY}-${tileX}`,
           properties: tool === 'brick' ? { breakable: true } : undefined,
-          type: tool as any,
+          type: tool as LevelTile['type'],
         }
       }
 
@@ -109,7 +112,7 @@ export function MapEditor({ initialLevel, onClose, onPlayTest, onSave }: MapEdit
         placeTile(tilePos.tileX, tilePos.tileY, selectedTool)
       }
     },
-    [selectedTool, placeTile, cameraX, cameraY, level.dimensions.tileSize],
+    [selectedTool, placeTile, getTileAtPosition],
   )
 
   const handleMouseDown = useCallback(

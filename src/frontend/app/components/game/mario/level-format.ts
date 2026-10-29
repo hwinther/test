@@ -20,7 +20,7 @@ export interface LevelData {
   objects: {
     collectibles: Array<{
       id: string
-      properties?: Record<string, any>
+      properties?: Record<string, unknown>
       type: string
       value: number
       x: number
@@ -28,14 +28,14 @@ export interface LevelData {
     }>
     enemies: Array<{
       id: string
-      properties?: Record<string, any>
+      properties?: Record<string, unknown>
       type: string
       x: number // in tiles
       y: number
     }>
     spawners: Array<{
       id: string
-      properties?: Record<string, any>
+      properties?: Record<string, unknown>
       type: 'enemy' | 'item' | 'player'
       x: number
       y: number
@@ -52,7 +52,7 @@ export interface LevelData {
 export interface LevelTile {
   id: string
   properties?: {
-    [key: string]: any
+    [key: string]: unknown
     breakable?: boolean
     collectibleType?: 'coin' | 'mushroom'
     enemyType?: 'goomba' | 'koopa' | 'piranha'

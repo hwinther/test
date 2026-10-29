@@ -36,10 +36,6 @@ export function ChatModal(): JSX.Element {
   }, [messages, open])
 
   useEffect(() => {
-    if (open) setUnread(0)
-  }, [open])
-
-  useEffect(() => {
     if (open) inputRef.current?.focus()
   }, [open])
 
@@ -64,7 +60,10 @@ export function ChatModal(): JSX.Element {
       <button
         aria-label="Open chat"
         className="fixed bottom-5 right-5 z-50 flex items-center justify-center w-13 h-13 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg transition-colors cursor-pointer"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setUnread(0)
+          setOpen(true)
+        }}
       >
         <span className="text-xl">💬</span>
         {unread > 0 && (
@@ -93,10 +92,10 @@ export function ChatModal(): JSX.Element {
         {messages.length === 0 && (
           <p className="text-center text-neutral-400 text-xs mt-6">No messages yet. Say hi!</p>
         )}
-        {messages.map((msg, i) => {
+        {messages.map((msg) => {
           const isMe = msg.author === myName
           return (
-            <div key={i} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+            <div key={`${msg.timestamp}-${msg.author}`} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
               {!isMe && <span className="text-xs text-neutral-400 mb-0.5 px-1">{msg.author}</span>}
               <div
                 className={`max-w-[85%] rounded-2xl px-3 py-1.5 break-words ${

@@ -45,7 +45,7 @@ export function ShipMarket({ gameState, onBuyShip }: ShipMarketProps): JSX.Eleme
               disabled={gameState.money < ship.cost} 
               onClick={() => onBuyShip(ship.type)}
             >
-              Buy ${ship.cost.toLocaleString()}
+              Buy {`$${ship.cost.toLocaleString()}`}
             </button>
           </div>
         ))}

@@ -44,7 +44,7 @@ interface BaseGameProps {
 export function BaseMaritimeGame({ gameType, onComplete, ship }: BaseGameProps): JSX.Element {
   const completionRef = useRef(false)
   const [gameState, setGameState] = useState<BaseGameState>(() => getInitialGameState(gameType))
-  const [keys, setKeys] = useState<Set<string>>(new Set())
+  const [keys, setKeys] = useState<Set<string>>(() => new Set())
 
   const checkCollision = useCallback((x: number, y: number): boolean => {
     return gameState.obstacles.some(obstacle => 
@@ -126,8 +126,8 @@ export function BaseMaritimeGame({ gameType, onComplete, ship }: BaseGameProps):
         const deltaX = Math.cos(radians) * newSpeed
         const deltaY = Math.sin(radians) * newSpeed
 
-        let newX = prev.shipX + deltaX
-        let newY = prev.shipY + deltaY
+        const newX = prev.shipX + deltaX
+        const newY = prev.shipY + deltaY
 
         // Boundary checks
         const boundedX = Math.max(0, Math.min(500 - 30, newX))
@@ -188,11 +188,16 @@ export function BaseMaritimeGame({ gameType, onComplete, ship }: BaseGameProps):
     return () => clearInterval(timeTimer)
   }, [])
 
+  // The completion delay must survive this effect re-running every second (timeLeft is a dependency),
+  // so the timer is only cleared on unmount.
+  const completionTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  useEffect(() => () => clearTimeout(completionTimerRef.current), [])
+
   useEffect(() => {
     if (gameState.docked && !completionRef.current) {
       completionRef.current = true
       // Show success message for 2 seconds before completing
-      setTimeout(() => {
+      completionTimerRef.current = setTimeout(() => {
         const bonus = Math.floor((gameState.timeLeft / 60) * 2000) + 500
         const penalty = gameState.hasCollided ? 5000 : 0 // $5000 penalty for collision damage
         onComplete(true, bonus, penalty)
@@ -219,7 +224,7 @@ export function BaseMaritimeGame({ gameType, onComplete, ship }: BaseGameProps):
       }))
       
       // Wait a moment to show the message, then complete
-      setTimeout(() => {
+      completionTimerRef.current = setTimeout(() => {
         onComplete(isTowed, 0, penalty) // Towed ships are considered successful
       }, 2000)
     }

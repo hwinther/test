@@ -1,13 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, type RenderOptions } from '@testing-library/react'
-import { vi } from 'vitest'
 
 interface IExtendedRenderOptions extends RenderOptions {
   //withRouter?: boolean
   //routerHistory?: string[]
   //withRedux?: boolean
   //mockAxiosCalls?: any
-  mockAuthContext?: boolean | null
   //mockInitialState?: any
   withQueryProvider?: boolean | null
 }
@@ -35,12 +33,6 @@ const setupComponent = (ui: React.JSX.Element, renderOptions?: IExtendedRenderOp
   if (renderOptions == null) return ui
   let componentTree = ui
   if (renderOptions.withQueryProvider !== false) componentTree = wrapInQueryProvider(componentTree)
-  if (renderOptions.mockAuthContext !== false) {
-    // TODO: also remove it afterAll
-    vi.mock('~/auth.context', () => ({
-      useAuthDispatch: () => vi.fn(),
-    }))
-  }
   return componentTree
 }
 

@@ -7,7 +7,9 @@
     "nocheck",
     "streetsidesoftware",
     "textbox",
-    "viewports"
+    "viewports",
+    "healthz",
+    "wshno"
   ],
   "ignorePaths": [
     "node_modules/**",
