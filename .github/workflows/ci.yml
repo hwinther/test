@@ -27,6 +27,7 @@ jobs:
       nuget_auth_token: ${{ secrets.nuget_auth_token }}
     with:
       node_enabled: true
+      node_version: "26.x"
       node_working_directory: "src/frontend"
       dotnet_enabled: true
       dotnet_working_directory: "src/backend"
