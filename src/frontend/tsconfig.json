@@ -4,7 +4,6 @@
   "compilerOptions": {
     "types": ["node", "vite/client", "vitest/globals"],
     "rootDirs": [".", "./.react-router/types"],
-    "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"],
       "~test/*": ["./test/*"]
