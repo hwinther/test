@@ -73,11 +73,6 @@ updates:
     day: "sunday"
   assignees:
   - "hwinther"
-  cooldown:
-    default-days: 7
-    # Our own packages: take a release as soon as it's approved.
-    exclude:
-    - "@wshno/*"
   ignore:
   # typescript-eslint, which @wshno/eslint-config builds on, supports TypeScript <6.1. Drop this once a
   # typescript-eslint release widens that range.
@@ -135,11 +130,6 @@ updates:
     day: "sunday"
   assignees:
   - "hwinther"
-  cooldown:
-    default-days: 7
-    # Our own packages: take a release as soon as it's approved.
-    exclude:
-    - "@wshno/*"
   ignore:
   # typescript-eslint, which @wshno/eslint-config builds on, supports TypeScript <6.1. Drop this once a
   # typescript-eslint release widens that range.
