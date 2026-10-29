@@ -69,16 +69,11 @@ jobs:
           echo "Using ref: $REF"
           echo "ref=$REF" >> "$GITHUB_OUTPUT"
 
-      - name: Dispatch API container workflow
+      # One workflow builds both images and then the signed manifests artifact, which needs both
+      # digests.
+      - name: Dispatch container + manifests workflow
         env:
           GH_TOKEN: ${{ github.token }}
           REF: ${{ steps.ref.outputs.ref }}
           GRYPE_FAIL_BUILD: ${{ inputs.container_grype_fail_build }}
-        run: gh workflow run api-container.yml --ref "$REF" -f grype_fail_build="$GRYPE_FAIL_BUILD"
-
-      - name: Dispatch frontend container workflow
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REF: ${{ steps.ref.outputs.ref }}
-          GRYPE_FAIL_BUILD: ${{ inputs.container_grype_fail_build }}
-        run: gh workflow run frontend-container.yml --ref "$REF" -f grype_fail_build="$GRYPE_FAIL_BUILD"
+        run: gh workflow run container.yml --ref "$REF" -f grype_fail_build="$GRYPE_FAIL_BUILD"
