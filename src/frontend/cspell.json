@@ -38,7 +38,9 @@
     "botvar",
     "bugvar",
     "Botvar",
-    "healthz"
+    "healthz",
+    "wshno",
+    "innerhtml"
   ],
   "ignorePaths": ["node_modules/**", "*.lock"]
 }

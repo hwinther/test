@@ -1,23 +1,19 @@
 import cspellESLintPluginRecommended from '@cspell/eslint-plugin/recommended'
-import eslintConfigLove from 'eslint-config-love'
-import eslintConfigPrettier from 'eslint-config-prettier'
+import { base, ignores, node, playwright } from '@wshno/eslint-config'
 import perfectionist from 'eslint-plugin-perfectionist'
-import eslintPluginSonarJs from 'eslint-plugin-sonarjs'
 
+// @wshno/eslint-config (JS/TS and SonarJS recommended, Node globals, Playwright rules for tests/), plus this
+// suite's sorting and spell checking.
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  { files: ['**/*.js', '**/*.ts', '**/*.tsx'] },
-  { ignores: ['node_modules/*', 'dist/*', '*.lock'] },
-  {
-    plugins: {
-      eslintPluginSonarJs,
-    },
-  },
+  ...ignores,
+  { ignores: ['playwright-report/**', 'test-results/**', 'tests-examples/**', '*.lock'] },
+  ...base,
+  ...node,
+  ...playwright(['tests/**/*.ts']),
   perfectionist.configs['recommended-natural'],
   cspellESLintPluginRecommended,
-  eslintPluginSonarJs.configs.recommended,
   {
-    ...eslintConfigLove,
     rules: {
       '@cspell/spellchecker': [
         'warn',
@@ -27,10 +23,6 @@ export default [
           configFile: new URL('./cspell.json', import.meta.url).toString(),
         },
       ],
-      '@typescript-eslint/no-magic-numbers': 'off',
-      '@typescript-eslint/triple-slash-reference': 'off',
-      'import/no-absolute-path': 'off',
     },
   },
-  eslintConfigPrettier,
 ]

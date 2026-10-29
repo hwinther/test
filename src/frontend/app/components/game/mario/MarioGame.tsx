@@ -76,7 +76,7 @@ export function MarioGame({
   const gameOverHandledRef = useRef(false)
   const leaderboardVariantRef = useRef<'complete' | 'gameOver'>('gameOver')
 
-  const lastTimeRef = useRef(performance.now())
+  const lastTimeRef = useRef(0) // set when the loop starts
   const accRef = useRef(0)
   const rafRef = useRef(0)
 

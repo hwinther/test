@@ -1,5 +1,3 @@
-import type matchers from '@testing-library/jest-dom/matchers'
-
 import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { setupServer } from 'msw/node'
@@ -29,7 +27,3 @@ afterEach(() => {
   cleanup()
   server.resetHandlers()
 })
-
-declare module 'vitest' {
-  interface Assertion<T = any> extends jest.Matchers<void, T>, matchers.TestingLibraryMatchers<T, void> {}
-}

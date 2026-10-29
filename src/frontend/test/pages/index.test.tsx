@@ -4,6 +4,6 @@ import { render, screen } from '~test/testUtils'
 import Page from '~/routes/home'
 
 it('renders welcome message', () => {
-  render(<Page />, { mockAuthContext: true, withQueryProvider: true })
+  render(<Page />, { withQueryProvider: true })
   expect(screen.getByText('Home')).toBeInTheDocument()
 })

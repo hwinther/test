@@ -11,7 +11,7 @@ import {
  * @returns {string} API origin with trailing slash.
  */
 export function getApiBaseUrl(): string {
-  // eslint-disable-next-line sonarjs/different-types-comparison -- SSR: window is undefined on the server
+  // SSR: window is undefined on the server
   if (globalThis.window !== undefined) {
     const fromWindow = readPublicRuntimeConfigFromWindow()?.apiBaseUrl?.trim()
     if (fromWindow) return fromWindow.endsWith('/') ? fromWindow : `${fromWindow}/`
@@ -56,18 +56,19 @@ export const customInstance = async <T>(
   url: string,
   config?: AxiosRequestConfig & RequestInit,
 ): Promise<T> => {
-  const source = Axios.CancelToken.source()
-  const { body, ...rest } = config ?? {}
+  // AbortController rather than Axios's deprecated CancelToken; a signal from the caller still aborts.
+  const controller = new AbortController()
+  const { body, signal, ...rest } = config ?? {}
   const promise = AXIOS_INSTANCE({
     ...rest,
     url,
     ...(body !== undefined ? { data: body } : {}),
-    cancelToken: source.token,
+    signal: signal ? AbortSignal.any([signal, controller.signal]) : controller.signal,
   }).then(({ data }) => data)
 
   // @ts-expect-error cancel is not in the type definition
   promise.cancel = () => {
-    source.cancel('Query was cancelled by Vue Query')
+    controller.abort('Query was cancelled')
   }
 
   return await promise
@@ -75,4 +76,4 @@ export const customInstance = async <T>(
 
 export default customInstance
 
-export interface ErrorType<Error> extends AxiosError<Error> {}
+export type ErrorType<Error> = AxiosError<Error>

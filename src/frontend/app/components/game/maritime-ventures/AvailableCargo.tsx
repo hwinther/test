@@ -43,7 +43,7 @@ export function AvailableCargo({ availableCargo, gameState, onAcceptCargo }: Ava
           <div className="cargo-card" key={cargo.id}>
             <h4>{cargo.type}</h4>
             <p>From: {origin?.name} → {destination?.name}</p>
-            <p>Weight: {cargo.weight}t | Value: ${cargo.value.toLocaleString()}</p>
+            <p>Weight: {cargo.weight}t | Value: {`$${cargo.value.toLocaleString()}`}</p>
             <p>Time Limit: {cargo.timeLimit} days</p>
             
             {shipsAtPort.length > 0 ? (

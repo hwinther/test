@@ -1,38 +1,20 @@
 import cspellESLintPluginRecommended from '@cspell/eslint-plugin/recommended'
-import eslintConfigLove from 'eslint-config-love'
-import eslintConfigPrettier from 'eslint-config-prettier'
+import wshno, { testingLibrary, vitest } from '@wshno/eslint-config'
 import jsDoc from 'eslint-plugin-jsdoc'
-//import perfectionist from 'eslint-plugin-perfectionist'
-import eslintPluginSonarJs from 'eslint-plugin-sonarjs'
 
+// @wshno/eslint-config (JS/TS and SonarJS recommended, @eslint-react, React Refresh, React Router,
+// Vitest and Testing Library), plus this repo's spell checking and JSDoc rules.
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  { files: ['**/*.js', '**/*.ts', '**/*.tsx'] },
+  ...wshno,
+  ...vitest(),
+  ...testingLibrary(),
   {
-    ignores: [
-      'node_modules/*',
-      'build/*',
-      'dist/*',
-      'coverage/*',
-      '.react-router/*',
-      '*.lock',
-      'app/api/endpoints/**',
-      'app/api/models/**',
-      'vite.config.ts',
-    ],
+    ignores: ['*.lock', 'app/api/endpoints/**', 'app/api/models/**', 'vite.config.ts'],
   },
-  {
-    plugins: {
-      eslintPluginSonarJs,
-      jsDoc,
-    },
-  },
-  //perfectionist.configs['recommended-natural'],
   cspellESLintPluginRecommended,
-  eslintPluginSonarJs.configs.recommended,
   jsDoc.configs['flat/recommended'],
   {
-    ...eslintConfigLove,
     rules: {
       '@cspell/spellchecker': [
         'warn',
@@ -42,14 +24,20 @@ export default [
           configFile: new URL('./cspell.json', import.meta.url).toString(),
         },
       ],
-      '@typescript-eslint/no-magic-numbers': 'off',
-      '@typescript-eslint/no-unnecessary-condition': 'off',
-      '@typescript-eslint/prefer-destructuring': 'off',
-      '@typescript-eslint/triple-slash-reference': 'off',
-      'import/no-absolute-path': 'off',
-      'sonarjs/cognitive-complexity': 'off',
-      'sonarjs/todo-tag': 'off',
     },
   },
-  eslintConfigPrettier,
+  {
+    // Test helpers aren't hot-reloaded.
+    files: ['test/**'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
+  {
+    // The compiler resolves the types in JSDoc tags; jsdoc's own check doesn't know DOM or lib types.
+    files: ['**/*.{ts,tsx}'],
+    rules: {
+      'jsdoc/no-undefined-types': 'off',
+    },
+  },
 ]

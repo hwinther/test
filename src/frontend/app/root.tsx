@@ -29,7 +29,7 @@ const queryClient = new QueryClient()
  * @returns {Promise<{publicRuntime: PublicRuntimeConfig}>} Public runtime config for the browser.
  */
 export async function loader(): Promise<{ publicRuntime: PublicRuntimeConfig }> {
-  // eslint-disable-next-line sonarjs/different-types-comparison -- SSR: globalThis.window is undefined on the server
+  // SSR: globalThis.window is undefined on the server
   if (globalThis.window !== undefined) {
     const w = globalThis.window as Window & {
       __TEST_PUBLIC__?: PublicRuntimeConfig
@@ -66,9 +66,11 @@ function PublicRuntimeConfigScript() {
   const data = useRouteLoaderData('root')
   const cfg = data?.publicRuntime
   if (!cfg) return null
-  const json = JSON.stringify(cfg)
+  // Escape `<` so a value containing `</script>` can't close the tag early.
+  const json = JSON.stringify(cfg).replaceAll('<', '\\u003c')
   return (
     <script
+      // eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml -- inline config for the browser, escaped above
       dangerouslySetInnerHTML={{
         __html: `window.__TEST_PUBLIC__=${json};`,
       }}

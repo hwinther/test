@@ -44,4 +44,6 @@ export function AuthProvider({ children }: { readonly children: ReactNode }) {
   )
 }
 
+// A re-exported hook next to the provider: edits here reload the page instead of hot-swapping.
+// eslint-disable-next-line react-refresh/only-export-components
 export { useAuth }

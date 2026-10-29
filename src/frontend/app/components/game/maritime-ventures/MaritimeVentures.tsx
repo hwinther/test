@@ -214,7 +214,7 @@ export function MaritimeVentures({ onClose }: MaritimeVenturesProps): JSX.Elemen
       <div className="game-header">
         <h1>Maritime Ventures</h1>
         <div className="game-stats">
-          <span>Money: ${gameState.money.toLocaleString()}</span>
+          <span>Money: {`$${gameState.money.toLocaleString()}`}</span>
           <span>Day: {gameState.gameTime}</span>
           <span>Jobs: {gameState.completedJobs}</span>
           <span>Reputation: {gameState.reputation}%</span>
@@ -232,7 +232,7 @@ export function MaritimeVentures({ onClose }: MaritimeVenturesProps): JSX.Elemen
             <div className="current-port">
               <h3>Current Port: {currentPortData?.name}</h3>
               <p>Country: {currentPortData?.country}</p>
-              <p>Docking Fee: ${currentPortData?.dockingFee}</p>
+              <p>Docking Fee: {`$${currentPortData?.dockingFee}`}</p>
             </div>
 
             <div className="your-ships">

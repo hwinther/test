@@ -34,7 +34,7 @@ export function RescueGame({ onComplete, ship }: RescueGameProps): JSX.Element {
     ]
   })
 
-  const [keys, setKeys] = useState<Set<string>>(new Set())
+  const [keys, setKeys] = useState<Set<string>>(() => new Set())
 
   const checkRescue = useCallback((boatX: number, boatY: number, currentSurvivors: RescueGameState['survivors']) => {
     const updatedSurvivors = currentSurvivors.map(survivor => {
