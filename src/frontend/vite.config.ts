@@ -11,7 +11,14 @@ export default defineConfig({
   server: {
     port: 5173,
   },
-  plugins: [tailwindcss(), mkcert(), ...(process.env.VITEST ? [] : [reactRouter()])],
+  plugins: [
+    tailwindcss(),
+    // Local HTTPS for `npm run dev` only. The plugin looks up the mkcert release on the GitHub API
+    // whenever Vite starts a server, which `react-router build` does too, and that lookup fails in
+    // CI and Docker builds.
+    ...(process.env.npm_lifecycle_event === 'dev' ? [mkcert()] : []),
+    ...(process.env.VITEST ? [] : [reactRouter()]),
+  ],
   build: {
     sourcemap: true,
   },
