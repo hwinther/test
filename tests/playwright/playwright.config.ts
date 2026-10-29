@@ -44,13 +44,14 @@ export default defineConfig({
   reporter: process.env.CI
     ? [
         ['dot'],
-        ['json', { outputFile: './playwright-report/test-results.json' }],
+        // html clears its output folder (playwright-report) when it writes, so it must come before json.
         ['html', { open: 'never' }],
+        ['json', { outputFile: './playwright-report/results.json' }],
       ]
     : [
         ['list'],
         ['html', { open: 'on-failure' }],
-        ['json', { outputFile: './playwright-report/test-results.json' }],
+        ['json', { outputFile: './playwright-report/results.json' }],
       ],
 
   /* Retry on CI only */
