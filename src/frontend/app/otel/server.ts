@@ -28,7 +28,7 @@ export function startNodeOpenTelemetry(): void {
         exporter: new OTLPMetricExporter(),
       }),
     ],
-    logRecordProcessors: [new BatchLogRecordProcessor(new OTLPLogExporter())],
+    logRecordProcessors: [new BatchLogRecordProcessor({ exporter: new OTLPLogExporter() })],
     instrumentations: [
       getNodeAutoInstrumentations({
         '@opentelemetry/instrumentation-fs': { enabled: false },

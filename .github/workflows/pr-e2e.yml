@@ -45,7 +45,7 @@ jobs:
       project_file: WebApi/WebApi.csproj
       container_registry: ghcr.io
       container_image_name_postfix: api
-      grype_fail_build: never # TODO: Reset once opentelemetry packages have been updated (matches api-container.yml)
+      grype_fail_build: auto
 
   frontend:
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
@@ -63,7 +63,7 @@ jobs:
       container_image_name_postfix: frontend
       build_context: src/frontend
       dockerfile: src/frontend/Dockerfile
-      grype_fail_build: never # TODO: Reset once node:24-alpine ships fix (matches frontend-container.yml)
+      grype_fail_build: auto
 
   e2e:
     needs: [api, frontend]
