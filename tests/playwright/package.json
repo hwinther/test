@@ -22,7 +22,7 @@
   "prettier": "@wshno/prettier-config",
   "devDependencies": {
     "@cspell/eslint-plugin": "10.4.0",
-    "@playwright/test": "1.60.0",
+    "@playwright/test": "1.64.1",
     "@types/node": "26.6.5",
     "@wshno/eslint-config": "0.2.0",
     "@wshno/prettier-config": "0.1.1",
