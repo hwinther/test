@@ -133,4 +133,4 @@ Integration tests use `Microsoft.AspNetCore.Mvc.Testing` (`WebApplicationFactory
 
 ### CI/CD pipeline
 
-Docker images are built and pushed to the container registry on merge. Deployment is handled by Dependabot: when a new image is published, Dependabot opens a PR updating the image tag in the relevant environment manifests, promoting changes through dev → test → prod.
+Releases (`tag-and-release.yml`) dispatch `container.yml` at the tag, which builds and pushes the api and frontend images and then a signed OCI artifact of the rendered `deploy/` manifests (`ghcr.io/hwinther/test/manifests:<version>`). The cluster repo (hwinther/proxmox) runs that artifact through Flux; the test environment follows the newest release. `deploy/README.md` is the contract between the two (variables, Secrets, resource names); `manifest-diff.yml` posts the rendered diff on PRs that touch `deploy/`.
