@@ -14,7 +14,7 @@ const server = setupServer(
 
 // Start server before all tests
 beforeAll(() => {
-  server.listen({ onUnhandledRequest: 'error' })
+  server.listen({ onUnhandledFrame: 'error' })
 })
 
 //  Close server after all tests
