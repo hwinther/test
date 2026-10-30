@@ -28,7 +28,8 @@ on:
         type: string
         default: >-
           test/api,
-          test/frontend
+          test/frontend,
+          test/manifests
   schedule:
     # Sundays 03:00 UTC. Cron always runs live (dry_run forced to false).
     - cron: "0 3 * * 0"
@@ -36,6 +37,7 @@ on:
 permissions:
   contents: read
   packages: write
+  pull-requests: read
 
 concurrency:
   group: prune-ghcr
@@ -46,13 +48,16 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: hwinther/reusable-workflows/.github/workflows/prune-ghcr.yml@00fef736b925dfc7b70ab0476276ae1f59e1683b # v2.0.1
+      pull-requests: read
+    uses: hwinther/reusable-workflows/.github/workflows/prune-ghcr.yml@890802b1a0a1921dcd64867c4fbe4037b8260c00 # v2.5.0
     with:
-      dry_run: ${{ github.event_name == 'schedule' && 'false' || inputs.dry_run }}
+      # Scheduled runs prune for real; manual runs use the input. The old expression handed the
+      # required boolean input a string on a schedule, so no scheduled run ever started.
+      dry_run: ${{ github.event_name != 'schedule' && inputs.dry_run }}
       # Schedule events don't expose `inputs`, so mirror the workflow_dispatch
       # default as a single-line comma string. Keep this in sync with the
       # `images` input default above.
-      images: ${{ inputs.images || 'test/api,test/frontend' }}
+      images: ${{ inputs.images || 'test/api,test/frontend,test/manifests' }}
       package_namespace_prefix: test/
     secrets:
       # Reusable workflow declares only GHCR_PRUNE_TOKEN (required: false; falls
