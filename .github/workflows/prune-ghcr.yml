@@ -49,7 +49,7 @@ jobs:
       contents: read
       packages: write
       pull-requests: read
-    uses: hwinther/reusable-workflows/.github/workflows/prune-ghcr.yml@cb23e4da7afd630b87b027beae6c22941c4d8ea9 # fix/prune-ghcr-pr-tags
+    uses: hwinther/reusable-workflows/.github/workflows/prune-ghcr.yml@3881abc2801fec9ecc95d6fb93a7e7b6f02296b8 # fix/prune-ghcr-pr-tags
     with:
       # Scheduled runs prune for real; manual runs use the input. The old expression handed the
       # required boolean input a string on a schedule, so no scheduled run ever started.
