@@ -13,8 +13,8 @@
       "path": "../src/frontend",
     },
     {
-      "name": "playwright",
-      "path": "../tests/playwright",
+      "name": "e2e",
+      "path": "../tests/e2e",
     },
     {
       "name": "pdf-training",

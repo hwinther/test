@@ -20,7 +20,7 @@ frontend:
 
 playwright:
   - changed-files:
-      - any-glob-to-any-file: "tests/playwright/**"
+      - any-glob-to-any-file: "tests/e2e/**"
 
 dependencies:
   - changed-files:

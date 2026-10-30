@@ -11,7 +11,7 @@ on:
       - "deploy/**"
       - "src/backend/**"
       - "src/frontend/**"
-      - "tests/playwright/**"
+      - "tests/e2e/**"
       - "docker-compose.e2e.yml"
       - ".github/workflows/pr-e2e.yml"
   push:
@@ -20,7 +20,7 @@ on:
     paths:
       - "src/backend/**"
       - "src/frontend/**"
-      - "tests/playwright/**"
+      - "tests/e2e/**"
       - "docker-compose.e2e.yml"
       - ".github/workflows/pr-e2e.yml"
 
@@ -101,7 +101,7 @@ jobs:
     uses: hwinther/reusable-workflows/.github/workflows/playwright-e2e.yml@c1e80ad637dcdd38bb6de0f447475c40a8625141 # v2.9.0
     with:
       compose_file: docker-compose.e2e.yml
-      playwright_working_directory: tests/playwright
+      playwright_working_directory: tests/e2e
       node_version: "26.x"
       playwright_cache_enabled: true
       node_modules_cache_enabled: true

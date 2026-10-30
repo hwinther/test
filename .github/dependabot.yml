@@ -122,7 +122,7 @@ updates:
       - "@cspell/*"
 
 - package-ecosystem: "npm"
-  directory: "/tests/playwright"
+  directory: "/tests/e2e"
   open-pull-requests-limit: 20
   target-branch: "main"
   schedule:
