@@ -1,5 +1,6 @@
+# Dependency stages copy only the manifests, so a source change keeps the npm ci layers cached.
 FROM node:26-alpine AS development-dependencies-env
-COPY . /app
+COPY ./package.json package-lock.json /app/
 WORKDIR /app
 RUN npm ci
 
@@ -11,8 +12,8 @@ RUN npm ci --omit=dev
 FROM node:26-alpine AS build-env
 ARG APP_VERSION=unknown
 ARG GIT_SHA=unknown
-COPY . /app/
 COPY --from=development-dependencies-env /app/node_modules /app/node_modules
+COPY . /app/
 WORKDIR /app
 ENV VITE_APP_VERSION=${APP_VERSION}
 ENV VITE_GIT_SHA=${GIT_SHA}
