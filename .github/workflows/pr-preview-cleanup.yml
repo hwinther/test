@@ -22,6 +22,7 @@ jobs:
       target_repo: hwinther/proxmox
       preview_base_path: clusters/production/apps/previews/test
       pr_number: ${{ github.event.pull_request.number }}
+      app_name: test
     secrets:
       app_id: ${{ secrets.PROXMOX_GITOPS_APP_ID }}
       app_private_key: ${{ secrets.PROXMOX_GITOPS_APP_PRIVATE_KEY }}
