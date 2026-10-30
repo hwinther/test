@@ -1,10 +1,10 @@
 {
-  "name": "playwright",
+  "name": "e2e",
   "version": "0.0.1",
   "private": true,
   "main": "index.js",
   "license": "MIT",
-  "description": "playwright test project",
+  "description": "End-to-end tests (Playwright) against the built images",
   "repository": "https://github.com/hwinther/test",
   "author": "hwinther",
   "engines": {
@@ -22,9 +22,9 @@
   "prettier": "@wshno/prettier-config",
   "devDependencies": {
     "@cspell/eslint-plugin": "10.4.0",
-    "@playwright/test": "1.64.1",
     "@types/node": "26.6.5",
     "@wshno/eslint-config": "0.2.0",
+    "@wshno/playwright-config": "0.1.0",
     "@wshno/prettier-config": "0.1.1",
     "@wshno/tsconfig": "0.1.1",
     "dotenv": "18.0.9",
