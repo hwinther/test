@@ -48,6 +48,8 @@ quotes, so a number or boolean would come out as the wrong YAML type.
 | `RABBITMQ_VHOST` | (required) | RabbitMQ virtual host |
 | `RABBITMQ_SECRET` | (required) | Name of the Secret with the RabbitMQ `username` and `password` |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | (required) | API OTLP gRPC collector endpoint |
+| `OTEL_EXPORTER_OTLP_HTTP_ENDPOINT` | empty | Frontend SSR server OTLP/HTTP collector endpoint (traces, logs incl. CSP violation reports); empty exports nowhere |
+| `CSP_MODE` | `report-only` | `report-only` sends the frontend CSP as Content-Security-Policy-Report-Only; `enforce` blocks |
 | `APP_ENVIRONMENT` | `test` | `deployment.environment` resource attribute |
 | `HOMEPAGE_NAME` | `Test (repo sample)` | gethomepage.dev tile name |
 

@@ -63,6 +63,21 @@ spec:
           value: "https://${APP_HOST}/v1/traces"
         - name: PUBLIC_OTEL_SERVICE_NAME
           value: test-frontend
+        # The SSR server's own traces and logs (CSP violation reports among them), over OTLP/HTTP.
+        # Empty leaves the SDK on its localhost default, i.e. exporting nowhere.
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "${OTEL_EXPORTER_OTLP_HTTP_ENDPOINT:=}"
+        # Tells environments apart in Loki/Prometheus (service_namespace), as in api.yaml.
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: "service.namespace=$(POD_NAMESPACE),deployment.environment=${APP_ENVIRONMENT:=test}"
+        # report-only: the CSP is sent as Content-Security-Policy-Report-Only (reported, not
+        # enforced). enforce: sent as Content-Security-Policy.
+        - name: CSP_MODE
+          value: "${CSP_MODE:=report-only}"
         - name: REDIS_URL
           valueFrom:
             secretKeyRef:
