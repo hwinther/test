@@ -7,6 +7,8 @@ import { isbot } from 'isbot'
 import type { RenderToPipeableStreamOptions } from 'react-dom/server' // cspell:ignore Pipeable
 import { renderToPipeableStream } from 'react-dom/server'
 
+import { NonceContext } from '~/lib/nonce'
+import { applyDocumentCsp, applySecurityHeaders, createNonce } from '~/lib/security-headers.server'
 import { startNodeOpenTelemetry } from '~/otel/server'
 import { withSsrRequestSpan } from '~/otel/ssr-request'
 
@@ -30,6 +32,8 @@ export default function handleRequest(
   routerContext: EntryContext,
   loadContext: RouterContextProvider,
 ) {
+  applySecurityHeaders(responseHeaders)
+
   if (request.method.toUpperCase() === 'HEAD') {
     return new Response(null, {
       status: responseStatusCode,
@@ -61,6 +65,10 @@ async function renderHtmlResponse(
   return new Promise((resolve, reject) => {
     let shellRendered = false
     const userAgent = request.headers.get('user-agent')
+    // One nonce per document: on the CSP header, React Router's scripts (via <ServerRouter nonce>),
+    // React's streaming scripts (renderToPipeableStream), and the app's own (NonceContext).
+    const nonce = createNonce()
+    applyDocumentCsp(responseHeaders, nonce)
 
     const readyOption: keyof RenderToPipeableStreamOptions =
       (userAgent && isbot(userAgent)) || routerContext.isSpaMode ? 'onAllReady' : 'onShellReady'
@@ -71,8 +79,11 @@ async function renderHtmlResponse(
     )
 
     const { pipe, abort } = renderToPipeableStream(
-      <ServerRouter context={routerContext} url={request.url} />,
+      <NonceContext value={nonce}>
+        <ServerRouter context={routerContext} url={request.url} nonce={nonce} />
+      </NonceContext>,
       {
+        nonce,
         [readyOption]() {
           shellRendered = true
           const body = new PassThrough({
@@ -107,4 +118,14 @@ async function renderHtmlResponse(
       },
     )
   })
+}
+
+/**
+ * Data requests (client navigations, fetchers) get the same headers; the CSP is for documents.
+ * @param {Response} response - The data response React Router is about to send.
+ * @returns {Response} The same response, with the security headers.
+ */
+export function handleDataRequest(response: Response): Response {
+  applySecurityHeaders(response.headers)
+  return response
 }

@@ -9,4 +9,6 @@ export default [
   route('auth/callback', 'routes/auth.callback.tsx'),
   // Under `/resources/*` so ingress can reserve `/api` and `/swagger` for the .NET Web API.
   route('resources/leaderboard', 'routes/resources.leaderboard.ts'),
+  // Browsers POST CSP violation reports here (lib/security-headers.server.ts).
+  route('csp-report', 'routes/csp-report.tsx'),
 ] satisfies RouteConfig

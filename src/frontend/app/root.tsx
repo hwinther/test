@@ -14,6 +14,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AuthProvider } from '~/auth.context'
 import { PageLayout } from '~/components/PageLayout'
 import { SiteFooter } from '~/components/SiteFooter'
+import { useNonce } from '~/lib/nonce'
 import {
   DEFAULT_PUBLIC_API_BASE_URL,
   type PublicRuntimeConfig,
@@ -64,12 +65,14 @@ export async function loader(): Promise<{ publicRuntime: PublicRuntimeConfig }> 
  */
 function PublicRuntimeConfigScript() {
   const data = useRouteLoaderData('root')
+  const nonce = useNonce()
   const cfg = data?.publicRuntime
   if (!cfg) return null
   // Escape `<` so a value containing `</script>` can't close the tag early.
   const json = JSON.stringify(cfg).replaceAll('<', '\\u003c')
   return (
     <script
+      nonce={nonce}
       // eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml -- inline config for the browser, escaped above
       dangerouslySetInnerHTML={{
         __html: `window.__TEST_PUBLIC__=${json};`,
