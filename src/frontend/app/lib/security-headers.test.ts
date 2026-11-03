@@ -15,6 +15,14 @@ describe('contentSecurityPolicy', () => {
   })
 })
 
+describe('contentSecurityPolicy connect-src', () => {
+  it('allows the configured API and traces origins and the OIDC authority', () => {
+    vi.stubEnv('PUBLIC_API_BASE_URL', 'http://localhost:5155')
+    vi.stubEnv('PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT', 'http://localhost:5155/v1/traces')
+    expect(contentSecurityPolicy('n')).toContain("connect-src 'self' http://localhost:5155 https://auth.wsh.no;")
+  })
+})
+
 describe('createNonce', () => {
   it('is fresh for every call', () => {
     expect(createNonce()).not.toBe(createNonce())

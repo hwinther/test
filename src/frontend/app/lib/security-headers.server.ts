@@ -1,5 +1,7 @@
 import { randomBytes } from 'node:crypto'
 
+import { readApiBaseUrlFromProcessEnv } from '~/public-runtime-config'
+
 /** The path browsers POST CSP violation reports to (routes/csp-report.tsx). */
 export const CSP_REPORT_PATH = '/csp-report'
 
@@ -22,9 +24,10 @@ export function createNonce(): string {
  *   No 'unsafe-inline' and no 'unsafe-eval'.
  * - Styles: same origin. style-src-attr allows inline style attributes, which SSR renders from
  *   React's `style` props. Inline <style> elements stay blocked.
- * - connect-src: the API, OTLP traces and the leaderboard are same origin; the OIDC client in
- *   auth.context.tsx fetches discovery and tokens from the authority. frame-src lets its silent
- *   renew fall back to an iframe.
+ * - connect-src: same origin (the leaderboard), the browser's configured API and OTLP traces origins
+ *   (same host when deployed, a separate port in the e2e stack), and the OIDC authority, which the
+ *   client in auth.context.tsx fetches discovery and tokens from. frame-src lets its silent renew fall
+ *   back to an iframe.
  * - Reports go to CSP_REPORT_PATH, via report-to (Chromium) and report-uri (Firefox).
  * @param {string} nonce - This request's nonce, from {@link createNonce}.
  * @returns {string} The policy header value.
@@ -36,7 +39,7 @@ export function contentSecurityPolicy(nonce: string): string {
     "style-src 'self'",
     "style-src-attr 'unsafe-inline'",
     "img-src 'self' data:",
-    `connect-src 'self' ${OIDC_AUTHORITY}`,
+    `connect-src ${["'self'", ...browserApiOrigins(), OIDC_AUTHORITY].join(' ')}`,
     `frame-src ${OIDC_AUTHORITY}`,
     "object-src 'none'",
     "base-uri 'none'",
@@ -45,6 +48,29 @@ export function contentSecurityPolicy(nonce: string): string {
     `report-uri ${CSP_REPORT_PATH}`,
     'report-to csp',
   ].join('; ')
+}
+
+/**
+ * Origins the browser calls besides its own: the API and the OTLP traces endpoint, as configured for
+ * the root loader (root.tsx). Deduplicated; a missing or malformed URL is skipped.
+ * @returns {string[]} Origins such as https://test.test.wsh.no.
+ */
+function browserApiOrigins(): string[] {
+  const urls = [
+    readApiBaseUrlFromProcessEnv(),
+    process.env.PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT?.trim() ||
+      process.env.VITE_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT?.trim(),
+  ]
+  const origins = new Set<string>()
+  for (const url of urls) {
+    if (!url) continue
+    try {
+      origins.add(new URL(url).origin)
+    } catch {
+      // Not a URL: nothing the browser could connect to.
+    }
+  }
+  return [...origins]
 }
 
 /**
