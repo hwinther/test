@@ -29,7 +29,9 @@ on:
         default: >-
           test/api,
           test/frontend,
-          test/manifests
+          test/e2e,
+          test/manifests,
+          test/quality
   schedule:
     # Sundays 03:00 UTC. Cron always runs live (dry_run forced to false).
     - cron: "0 3 * * 0"
@@ -57,7 +59,7 @@ jobs:
       # Schedule events don't expose `inputs`, so mirror the workflow_dispatch
       # default as a single-line comma string. Keep this in sync with the
       # `images` input default above.
-      images: ${{ inputs.images || 'test/api,test/frontend,test/manifests' }}
+      images: ${{ inputs.images || 'test/api,test/frontend,test/e2e,test/manifests,test/quality' }}
       package_namespace_prefix: test/
     secrets:
       # Reusable workflow declares only GHCR_PRUNE_TOKEN (required: false; falls
