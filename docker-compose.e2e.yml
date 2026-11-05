@@ -5,6 +5,11 @@
 #
 # Host port mapping: api on 5155 (PUBLIC_API_BASE_URL points browsers here),
 # frontend on 5173 (matches playwright baseURL).
+#
+# The suite runs as the `playwright` service (profile e2e) from the image tests/e2e/Dockerfile
+# builds:  docker compose -f docker-compose.e2e.yml --profile e2e run --rm playwright
+# The api and the SSR frontend trace to `otel-collector`, which writes
+# tests/e2e/otel-out/traces.jsonl for the slow-call report in playwright-e2e.yml.
 
 services:
   postgres:
@@ -53,10 +58,12 @@ services:
       Oidc__Authority: https://auth.wsh.no
       Oidc__Audience: pxce-api
       Cors__AllowedOrigins__0: http://localhost:5173
-      OTEL_SDK_DISABLED: "true"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
     ports:
       - "5155:8080"
     depends_on:
+      otel-collector:
+        condition: service_started
       postgres:
         condition: service_healthy
       redis:
@@ -80,7 +87,7 @@ services:
     environment:
       PUBLIC_API_BASE_URL: http://localhost:5155/
       NODE_ENV: production
-      OTEL_SDK_DISABLED: "true"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
     ports:
       - "5173:3000"
     # Distroless image has no shell/curl/wget — use node directly. /nodejs/bin/node
@@ -94,3 +101,30 @@ services:
     depends_on:
       api-ready:
         condition: service_completed_successfully
+
+  # Receives the api's and SSR frontend's traces (and drops logs and metrics) while the suite runs.
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.163.2
+    user: "0:0"
+    command: ["--config=/etc/otelcol/collector.yaml"]
+    volumes:
+      - ./tests/e2e/otel/collector.yaml:/etc/otelcol/collector.yaml:ro
+      - ./tests/e2e/otel-out:/out
+
+  # The Playwright suite (tests/e2e/Dockerfile on @wshno/playwright-config's runner image). Host
+  # network, so the specs reach the frontend on http://localhost:5173 and the api on :5155 exactly
+  # as a local `npx playwright test` does.
+  playwright:
+    image: ${E2E_IMAGE:-test-e2e:local}
+    profiles: [e2e]
+    network_mode: host
+    environment:
+      - CI
+      - BASE_URL
+    # Reports land in tests/e2e/ on the host, where the workflow's summary and upload look for them.
+    volumes:
+      - ./tests/e2e/playwright-report:/e2e/playwright-report
+      - ./tests/e2e/test-results:/e2e/test-results
+    depends_on:
+      frontend:
+        condition: service_healthy

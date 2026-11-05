@@ -62,6 +62,18 @@ npx playwright test --project=chromium   # single browser
 npx playwright test tests/my.spec.ts     # single file
 ```
 
+CI runs the suite as it runs locally against the built images: `tests/e2e/Dockerfile` bakes it into
+an image on `ghcr.io/wshno/playwright-config` (Chromium only, same version as the lock file), run as
+the `playwright` service of `docker-compose.e2e.yml`. The api and SSR frontend trace to the stack's
+OTel collector (`tests/e2e/otel-out/traces.jsonl`), and the PR comment lists API requests and SQL
+queries over 2 s.
+
+```bash
+docker build -t test-e2e:local tests/e2e
+API_IMAGE=... FRONTEND_IMAGE=... docker compose -f docker-compose.e2e.yml up -d --wait
+API_IMAGE=... FRONTEND_IMAGE=... docker compose -f docker-compose.e2e.yml --profile e2e run --rm playwright
+```
+
 ## Local infrastructure
 
 The backend requires Postgres, RabbitMQ, and Redis running locally. Start Postgres via podman:
