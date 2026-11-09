@@ -78,10 +78,11 @@ In the target namespace:
 
 `kubectl kustomize deploy` shows the manifests. For the contract check and kubeconform, as CI runs
 them, use the action's script from a hwinther/reusable-workflows checkout (needs kubectl and
-kubeconform on `PATH`). The HTTPRoute is validated against the datree CRDs-catalog schema, so set
-`KUBECONFORM_ARGS_CI` to the `kubeconform_args` value in `.github/workflows/container.yml`:
+kubeconform on `PATH`). The action's default kubeconform flags include the datree CRDs-catalog,
+which validates the HTTPRoute; set `KUBECONFORM_ARGS` to the same flags locally (see the
+`kubeconform_args` default in the action's action.yml):
 
 ```bash
-KUBECONFORM_ARGS="$KUBECONFORM_ARGS_CI" RENDERS='test.yaml=deploy' \
+RENDERS='test.yaml=deploy' \
   bash ../reusable-workflows/.github/actions/manifests/scripts/render-all.sh . /tmp/manifests /tmp/renders.txt validate
 ```

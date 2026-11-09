@@ -259,7 +259,7 @@ jobs:
 
       - name: Render, validate, push and sign
         id: push
-        uses: hwinther/reusable-workflows/.github/actions/manifests@baae133de5cf8489108bd7e8bed86b5fa558a846 # v2.27.1
+        uses: hwinther/reusable-workflows/.github/actions/manifests@8c38ac948f4c1f7cc6658c8a3ca4b3c12326df15 # v2.27.2
         with:
           mode: push
           artifact: ghcr.io/hwinther/test/manifests
@@ -268,8 +268,6 @@ jobs:
             ghcr.io/hwinther/test/api:${{ needs.api.outputs.version }}@${{ needs.push-api.outputs.image_digest }}
             ghcr.io/hwinther/test/frontend:${{ needs.frontend.outputs.version }}@${{ needs.push-frontend.outputs.image_digest }}
           renders: test.yaml=deploy
-          # HTTPRoute (Gateway API CRD) has no built-in kubeconform schema; validate it against the datree catalog.
-          kubeconform_args: "-strict -summary -schema-location default -schema-location https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json"
 
   # Deploys an ephemeral preview env to the homelab cluster via GitOps. The reusable workflow
   # mints a GitHub App installation token, clones hwinther/proxmox, renders the per-PR overlay
