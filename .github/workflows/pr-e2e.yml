@@ -9,6 +9,7 @@ on:
     paths:
       # deploy/ too: a PR labelled deploy-feature previews its manifest changes.
       - "deploy/**"
+      - ".github/manifest-renders.txt"
       - "src/backend/**"
       - "src/frontend/**"
       - "tests/e2e/**"
@@ -259,7 +260,7 @@ jobs:
 
       - name: Render, validate, push and sign
         id: push
-        uses: hwinther/reusable-workflows/.github/actions/manifests@163d37a45bfc3e65cf1145edc7db6570acc3db97 # v2.28.0
+        uses: hwinther/reusable-workflows/.github/actions/manifests@1fa5882e8aa1048af78492baf016f5a7b310be11 # v2.29.0
         with:
           mode: push
           artifact: ghcr.io/hwinther/test/manifests
@@ -267,7 +268,7 @@ jobs:
           images: |
             ghcr.io/hwinther/test/api:${{ needs.api.outputs.version }}@${{ needs.push-api.outputs.image_digest }}
             ghcr.io/hwinther/test/frontend:${{ needs.frontend.outputs.version }}@${{ needs.push-frontend.outputs.image_digest }}
-          renders: test.yaml=deploy
+          renders_file: .github/manifest-renders.txt
 
   # Deploys an ephemeral preview env to the homelab cluster via GitOps. The reusable workflow
   # mints a GitHub App installation token, clones hwinther/proxmox, renders the per-PR overlay
