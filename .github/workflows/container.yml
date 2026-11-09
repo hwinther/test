@@ -43,6 +43,9 @@ jobs:
       project_file: WebApi/WebApi.csproj
       container_registry: ghcr.io
       container_image_name_postfix: api
+      # The GitHub Release already exists when tag-and-release dispatches this workflow, and attaching
+      # the SBOMs to it needs contents: write. They stay available as workflow artifacts.
+      release_asset_upload_enabled: false
       grype_fail_build: ${{ github.event.inputs.grype_fail_build == 'false' && 'never' || 'auto' }}
 
   frontend:
@@ -58,6 +61,9 @@ jobs:
     with:
       container_registry: ghcr.io
       container_image_name_postfix: frontend
+      # The GitHub Release already exists when tag-and-release dispatches this workflow, and attaching
+      # the SBOMs to it needs contents: write. They stay available as workflow artifacts.
+      release_asset_upload_enabled: false
       build_context: src/frontend
       dockerfile: src/frontend/Dockerfile
       grype_fail_build: ${{ github.event.inputs.grype_fail_build == 'false' && 'never' || 'auto' }}
@@ -81,7 +87,7 @@ jobs:
       # Signed in this job (a composite action runs in the caller's job), so the identity is this
       # workflow's. A single file at the root: the Flux Kustomization applies everything under its path.
       - name: Render, validate, push and sign
-        uses: hwinther/reusable-workflows/.github/actions/manifests@baae133de5cf8489108bd7e8bed86b5fa558a846 # v2.27.1
+        uses: hwinther/reusable-workflows/.github/actions/manifests@163d37a45bfc3e65cf1145edc7db6570acc3db97 # v2.28.0
         with:
           mode: push
           artifact: ghcr.io/hwinther/test/manifests
@@ -90,5 +96,3 @@ jobs:
             ghcr.io/hwinther/test/api:${{ needs.frontend.outputs.version }}@${{ needs.api.outputs.image_digest }}
             ghcr.io/hwinther/test/frontend:${{ needs.frontend.outputs.version }}@${{ needs.frontend.outputs.image_digest }}
           renders: test.yaml=deploy
-          # HTTPRoute (Gateway API CRD) has no built-in kubeconform schema; validate it against the datree catalog.
-          kubeconform_args: "-strict -summary -schema-location default -schema-location https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json"
