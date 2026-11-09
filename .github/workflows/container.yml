@@ -87,7 +87,7 @@ jobs:
       # Signed in this job (a composite action runs in the caller's job), so the identity is this
       # workflow's. A single file at the root: the Flux Kustomization applies everything under its path.
       - name: Render, validate, push and sign
-        uses: hwinther/reusable-workflows/.github/actions/manifests@8c38ac948f4c1f7cc6658c8a3ca4b3c12326df15 # v2.27.2
+        uses: hwinther/reusable-workflows/.github/actions/manifests@163d37a45bfc3e65cf1145edc7db6570acc3db97 # v2.28.0
         with:
           mode: push
           artifact: ghcr.io/hwinther/test/manifests
