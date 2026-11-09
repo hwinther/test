@@ -35,3 +35,5 @@ jobs:
         with:
           mode: diff
           renders: test.yaml=deploy
+          # HTTPRoute (Gateway API CRD) has no built-in kubeconform schema; validate it against the datree catalog.
+          kubeconform_args: "-strict -summary -schema-location default -schema-location https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json"

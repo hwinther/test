@@ -1,0 +1,46 @@
+# One host: /api, /swagger and /hubs (SignalR) go to the API, everything else to the SSR frontend.
+# Attaches to the cluster's platform Gateway (listener `web`); the target namespace must be allowed to
+# attach routes to it. The gethomepage.dev annotations are inert on clusters without homepage.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: test
+  annotations:
+    # Homepage otherwise derives the link from the first rule (/api); pin the frontend root.
+    gethomepage.dev/href: "https://${APP_HOST}/"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: Apps
+    gethomepage.dev/name: "${HOMEPAGE_NAME:=Test (repo sample)}"
+    gethomepage.dev/siteMonitor: "https://${APP_HOST}"
+    gethomepage.dev/icon: mdi-application-outline
+    gethomepage.dev/description: Sample test app (API under /api/; Swagger under /swagger)
+    # Both Deployments back this host.
+    gethomepage.dev/pod-selector: app in (test-frontend, test-api)
+spec:
+  parentRefs:
+  - name: "${GATEWAY_NAME:=traefik}"
+    namespace: "${GATEWAY_NAMESPACE:=traefik}"
+    sectionName: "${GATEWAY_LISTENER:=web}"
+  hostnames:
+  - "${APP_HOST}"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /api
+    - path:
+        type: PathPrefix
+        value: /swagger
+    - path:
+        type: PathPrefix
+        value: /hubs
+    backendRefs:
+    - name: test-api
+      port: 8080
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: test-frontend
+      port: 8080

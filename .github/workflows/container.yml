@@ -90,3 +90,5 @@ jobs:
             ghcr.io/hwinther/test/api:${{ needs.frontend.outputs.version }}@${{ needs.api.outputs.image_digest }}
             ghcr.io/hwinther/test/frontend:${{ needs.frontend.outputs.version }}@${{ needs.frontend.outputs.image_digest }}
           renders: test.yaml=deploy
+          # HTTPRoute (Gateway API CRD) has no built-in kubeconform schema; validate it against the datree catalog.
+          kubeconform_args: "-strict -summary -schema-location default -schema-location https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json"

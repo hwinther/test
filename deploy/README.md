@@ -1,6 +1,6 @@
 # deploy/
 
-Workload manifests for the test app: the API, the SSR frontend, and the Ingress. On every release,
+Workload manifests for the test app: the API, the SSR frontend, and the HTTPRoute. On every release,
 the `manifests` job in `.github/workflows/container.yml` runs the `manifests` action from
 hwinther/reusable-workflows, which:
 
@@ -17,6 +17,8 @@ The cluster repo (hwinther/proxmox) consumes the artifact through a Flux `OCIRep
 that isn't in here:
 
 - the namespace (via `targetNamespace`) and network policies;
+- a Gateway API Gateway the HTTPRoute can attach to (`GATEWAY_*` below), whose listener allows routes
+  from the target namespace;
 - the PostgreSQL database and role, and the Secrets and ConfigMap below;
 - the variable values below (via `postBuild.substitute`).
 
@@ -37,7 +39,7 @@ quotes, so a number or boolean would come out as the wrong YAML type.
 
 | Variable | Default | Used for |
 |---|---|---|
-| `APP_HOST` | (required) | Ingress host, the API base URL the browser uses, CORS origin and the browser OTLP endpoint, e.g. `test.test.wsh.no` |
+| `APP_HOST` | (required) | HTTPRoute hostname, the API base URL the browser uses, CORS origin and the browser OTLP endpoint, e.g. `test.test.wsh.no` |
 | `OIDC_AUTHORITY` | (required) | OIDC issuer for the API's JWT validation, e.g. `https://auth.wsh.no` (the frontend has it built in) |
 | `OIDC_AUDIENCE` | `pxce-api` | API JWT audience |
 | `PG_HOST` | (required) | PostgreSQL read-write service |
@@ -52,6 +54,9 @@ quotes, so a number or boolean would come out as the wrong YAML type.
 | `CSP_MODE` | `report-only` | `report-only` sends the frontend CSP as Content-Security-Policy-Report-Only; `enforce` blocks |
 | `APP_ENVIRONMENT` | `test` | `deployment.environment` resource attribute |
 | `HOMEPAGE_NAME` | `Test (repo sample)` | gethomepage.dev tile name |
+| `GATEWAY_NAME` | `traefik` | Gateway the HTTPRoute attaches to |
+| `GATEWAY_NAMESPACE` | `traefik` | Namespace of that Gateway |
+| `GATEWAY_LISTENER` | `web` | Gateway listener (`sectionName`) |
 
 ### Secrets and ConfigMaps
 
@@ -67,15 +72,16 @@ In the target namespace:
 ### Resource names
 
 `Deployment/test-api`, `Service/test-api`, `Deployment/test-frontend`, `Service/test-frontend`,
-`Ingress/test`. Flux prunes anything that disappears from the artifact, so rename deliberately.
+`HTTPRoute/test`. Flux prunes anything that disappears from the artifact, so rename deliberately.
 
 ## Render locally
 
 `kubectl kustomize deploy` shows the manifests. For the contract check and kubeconform, as CI runs
 them, use the action's script from a hwinther/reusable-workflows checkout (needs kubectl and
-kubeconform on `PATH`):
+kubeconform on `PATH`). The HTTPRoute is validated against the datree CRDs-catalog schema, so set
+`KUBECONFORM_ARGS_CI` to the `kubeconform_args` value in `.github/workflows/container.yml`:
 
 ```bash
-RENDERS='test.yaml=deploy' \
+KUBECONFORM_ARGS="$KUBECONFORM_ARGS_CI" RENDERS='test.yaml=deploy' \
   bash ../reusable-workflows/.github/actions/manifests/scripts/render-all.sh . /tmp/manifests /tmp/renders.txt validate
 ```
