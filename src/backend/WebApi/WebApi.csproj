@@ -8,7 +8,9 @@
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
     <InheritDocEnabled>true</InheritDocEnabled>
     <EnableSdkContainerDebugging>True</EnableSdkContainerDebugging>
-    <ContainerBaseImage>mcr.microsoft.com/dotnet/aspnet:10.0</ContainerBaseImage>
+    <!-- Chiseled (no shell, no apt): far fewer OS packages for grype to flag. -extra adds ICU and tzdata.
+         Same app user (uid 1654) as the full aspnet image, which deploy/api.yaml runs as. -->
+    <ContainerBaseImage>mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled-extra</ContainerBaseImage>
     <ContainerRuntimeIdentifier>linux-x64</ContainerRuntimeIdentifier>
   </PropertyGroup>
 
