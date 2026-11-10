@@ -1,7 +1,11 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+# Dependabot version updates. https://docs.github.com/code-security/dependabot
+#
+# GLOB TEST (2026-11-10, for the per-stack templates in wshno/devops): every ecosystem except
+# github-actions finds its manifests with `directories: ["/**"]` instead of a hand-kept list, and npm is
+# one block with the union of the groups (a group that matches nothing does nothing). The pip block is
+# a probe: this repo has no Python, so it shows what Dependabot does with a glob that matches nothing.
+# Expected: docker in /src/frontend, /tests/e2e and /.github/actions/rover-terraform-action; npm in
+# /src/frontend and /tests/e2e; nuget in /src/backend (solution) or per project.
 
 version: 2
 updates:
@@ -14,6 +18,8 @@ updates:
   schedule:
     interval: "weekly"
     day: "sunday"
+  cooldown:
+    default-days: 7
   assignees:
   - "hwinther"
   groups:
@@ -23,23 +29,27 @@ updates:
 
 - package-ecosystem: "docker"
   directories:
-  - "/.github/actions/rover-terraform-action"
-  - "/src/frontend"
+  - "/**"
   open-pull-requests-limit: 20
   target-branch: "main"
   schedule:
     interval: "weekly"
     day: "sunday"
+  cooldown:
+    default-days: 7
   assignees:
   - "hwinther"
 
 - package-ecosystem: "nuget"
-  directory: "/src/backend"
+  directories:
+  - "/**"
   open-pull-requests-limit: 20
   target-branch: "main"
   schedule:
     interval: "weekly"
     day: "sunday"
+  cooldown:
+    default-days: 7
   assignees:
   - "hwinther"
   groups:
@@ -65,12 +75,15 @@ updates:
       - "OpenTelemetry.*"
 
 - package-ecosystem: "npm"
-  directory: "/src/frontend"
+  directories:
+  - "/**"
   open-pull-requests-limit: 20
   target-branch: "main"
   schedule:
     interval: "weekly"
     day: "sunday"
+  cooldown:
+    default-days: 7
   assignees:
   - "hwinther"
   ignore:
@@ -90,6 +103,7 @@ updates:
       - "eslint"
       - "eslint-*"
       - "@eslint/*"
+      - "typescript-eslint"
       - "@typescript-eslint/*"
       - "*/eslint-plugin"
       - "*/eslint-plugin-*"
@@ -116,41 +130,6 @@ updates:
     opentelemetry:
       patterns:
       - "@opentelemetry/*"
-    code-quality:
-      patterns:
-      - "prettier"
-      - "@cspell/*"
-
-- package-ecosystem: "npm"
-  directory: "/tests/e2e"
-  open-pull-requests-limit: 20
-  target-branch: "main"
-  schedule:
-    interval: "weekly"
-    day: "sunday"
-  assignees:
-  - "hwinther"
-  ignore:
-  # typescript-eslint, which @wshno/eslint-config builds on, supports TypeScript <6.1. Drop this once a
-  # typescript-eslint release widens that range.
-  - dependency-name: "typescript"
-    versions: [">=6.1"]
-  groups:
-    wshno:
-      patterns:
-      - "@wshno/*"
-    types:
-      patterns:
-      - "@types/*"
-    eslint:
-      patterns:
-      - "eslint"
-      - "@eslint/*"
-      - "eslint-*"
-      - "typescript-eslint"
-      - "@typescript-eslint/*"
-      - "*/eslint-plugin"
-      - "*/eslint-plugin-*"
     playwright:
       patterns:
       - "@playwright/*"
@@ -162,3 +141,14 @@ updates:
       patterns:
       - "dotenv"
       - "globals"
+
+# Probe: no Python in this repo. Remove after the test.
+- package-ecosystem: "pip"
+  directories:
+  - "/**"
+  target-branch: "main"
+  schedule:
+    interval: "weekly"
+    day: "sunday"
+  cooldown:
+    default-days: 7
