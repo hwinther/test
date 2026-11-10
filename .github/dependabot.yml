@@ -1,11 +1,10 @@
-# Dependabot version updates. https://docs.github.com/code-security/dependabot
+# Synced from wshno/devops settings-sync/files/dependabot/dotnet-node.yml (built by
+# settings-sync/dependabot/build.py): change it there. Stack: GitHub Actions, Docker, NuGet, npm.
 #
-# GLOB TEST, round 2 (2026-11-10, for the per-stack templates in wshno/devops). Round 1 showed
-# `/**` is not recursive: npm and pip failed with "/** not found", docker and nuget expanded it to the
-# top-level directories only and silently checked nothing. Now single-level wildcards, one per depth:
-# "/", "/*", "/*/*". Expected: docker in /src/frontend, /tests/e2e; npm in /src/frontend, /tests/e2e;
-# nuget in /src/backend and /shared/NugetDistSample. Open question: are expanded directories without a
-# manifest skipped (docker did in round 1) or an error?
+# Directories are single-level wildcards, one per depth ("/", "/*", "/*/*"); directories without a
+# manifest are skipped. Cooldown: 7 days, 14 for GitHub Actions, so the synced workflows are updated
+# in wshno/devops (Renovate, 7 days) and synced before Dependabot here proposes the same bump.
+# Groups: a dependency goes to the FIRST group that matches; groups that match nothing are harmless.
 
 version: 2
 updates:
@@ -14,7 +13,25 @@ updates:
   - "/"
   - "/.github/actions/*"
   open-pull-requests-limit: 20
-  target-branch: "main"
+  schedule:
+    interval: "weekly"
+    day: "sunday"
+  cooldown:
+    default-days: 14
+  assignees:
+  - "hwinther"
+  groups:
+    reusable-workflows:
+      patterns:
+      - "hwinther/reusable-workflows*"
+
+- package-ecosystem: "docker"
+  directories:
+  - "/"
+  - "/*"
+  - "/*/*"
+  - "/.github/actions/*"
+  open-pull-requests-limit: 20
   schedule:
     interval: "weekly"
     day: "sunday"
@@ -23,24 +40,9 @@ updates:
   assignees:
   - "hwinther"
   groups:
-    reusable-workflows:
+    base-images:
       patterns:
-      - "hwinther/reusable-workflows/*"
-
-- package-ecosystem: "docker"
-  directories:
-  - "/"
-  - "/*"
-  - "/*/*"
-  open-pull-requests-limit: 20
-  target-branch: "main"
-  schedule:
-    interval: "weekly"
-    day: "sunday"
-  cooldown:
-    default-days: 7
-  assignees:
-  - "hwinther"
+      - "*"
 
 - package-ecosystem: "nuget"
   directories:
@@ -48,7 +50,6 @@ updates:
   - "/*"
   - "/*/*"
   open-pull-requests-limit: 20
-  target-branch: "main"
   schedule:
     interval: "weekly"
     day: "sunday"
@@ -56,24 +57,37 @@ updates:
     default-days: 7
   assignees:
   - "hwinther"
+  # update-dotnet-lockfiles triggers the synced dependabot-update-dotnet-lockfiles.yml, which
+  # regenerates every project's packages.lock.json (Dependabot only rewrites the bumped project's,
+  # so projects referencing it fail the locked-mode restore, NU1004). Setting labels replaces
+  # Dependabot's defaults, so those are listed too.
+  labels:
+  - "dependencies"
+  - ".NET"
+  - "update-dotnet-lockfiles"
   groups:
-    microsoft:
+    roslyn:
       patterns:
-      - "Microsoft.*"
-    swashbuckle:
-      patterns:
-      - "Swashbuckle.*"
-    xunit:
+      - "Microsoft.CodeAnalysis.*"
+    testing:
       patterns:
       - "xunit"
       - "xunit.*"
-    nunit:
-      patterns:
       - "nunit"
       - "nunit.*"
-    coverlet:
-      patterns:
+      - "NUnit*"
       - "coverlet.*"
+      - "Microsoft.Testing.*"
+      - "Microsoft.NET.Test.Sdk"
+    microsoft:
+      patterns:
+      - "Microsoft.*"
+      - "System.*"
+      exclude-patterns:
+      - "Microsoft.OpenApi"
+    swashbuckle:
+      patterns:
+      - "Swashbuckle.*"
     opentelemetry:
       patterns:
       - "OpenTelemetry.*"
@@ -84,7 +98,6 @@ updates:
   - "/*"
   - "/*/*"
   open-pull-requests-limit: 20
-  target-branch: "main"
   schedule:
     interval: "weekly"
     day: "sunday"
@@ -93,6 +106,8 @@ updates:
   assignees:
   - "hwinther"
   ignore:
+  - dependency-name: "*"
+    update-types: [ "version-update:semver-patch" ]
   # typescript-eslint, which @wshno/eslint-config builds on, supports TypeScript <6.1. Drop this once a
   # typescript-eslint release widens that range.
   - dependency-name: "typescript"
@@ -101,49 +116,77 @@ updates:
     wshno:
       patterns:
       - "@wshno/*"
-    types:
-      patterns:
-      - "@types/*"
-    eslint:
-      patterns:
       - "eslint"
-      - "eslint-*"
-      - "@eslint/*"
-      - "typescript-eslint"
-      - "@typescript-eslint/*"
-      - "*/eslint-plugin"
-      - "*/eslint-plugin-*"
+      - "prettier"
+    react-router:
+      patterns:
+      - "react-router"
+      - "react-router-*"
+      - "@react-router/*"
     react:
       patterns:
       - "react"
       - "react-*"
       - "@types/react*"
-    testing:
-      patterns:
-      - "@testing-library/*"
-      - "vitest"
-      - "@vitest/*"
-      - "jsdom"
-      - "msw"
     vite:
       patterns:
       - "vite"
       - "vite-*"
       - "@vitejs/*"
+    testing:
+      patterns:
+      - "vitest"
+      - "@vitest/*"
+      - "@testing-library/*"
+      - "jsdom"
+      - "msw"
+    playwright:
+      patterns:
+      - "@playwright/*"
+      - "playwright*"
     tanstack:
       patterns:
       - "@tanstack/*"
     opentelemetry:
       patterns:
       - "@opentelemetry/*"
-    playwright:
+    stryker:
       patterns:
-      - "@playwright/*"
+      - "@stryker-mutator/*"
+    astro:
+      patterns:
+      - "astro"
+      - "@astrojs/*"
+    ui-libraries:
+      patterns:
+      - "bootstrap*"
+      - "d3*"
+      - "@visx/*"
+      - "@icon/*"
+      - "jquery*"
+      - "datatables*"
+    eslint:
+      patterns:
+      - "eslint-*"
+      - "@eslint/*"
+      - "typescript-eslint"
+      - "@typescript-eslint/*"
+      - "@eslint-react/*"
+      - "*/eslint-plugin"
+      - "*/eslint-plugin-*"
+      - "globals"
+    types:
+      patterns:
+      - "@types/*"
+    build-tools:
+      patterns:
+      - "typescript"
+      - "typescript-*"
+      - "orval"
+      - "openapi-typescript-codegen"
     code-quality:
       patterns:
-      - "prettier"
       - "@cspell/*"
     utilities:
       patterns:
       - "dotenv"
-      - "globals"
