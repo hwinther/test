@@ -1,11 +1,9 @@
 # Dependabot version updates. https://docs.github.com/code-security/dependabot
 #
-# GLOB TEST, round 2 (2026-11-10, for the per-stack templates in wshno/devops). Round 1 showed
-# `/**` is not recursive: npm and pip failed with "/** not found", docker and nuget expanded it to the
-# top-level directories only and silently checked nothing. Now single-level wildcards, one per depth:
-# "/", "/*", "/*/*". Expected: docker in /src/frontend, /tests/e2e; npm in /src/frontend, /tests/e2e;
-# nuget in /src/backend and /shared/NugetDistSample. Open question: are expanded directories without a
-# manifest skipped (docker did in round 1) or an error?
+# Manifests are found with single-level wildcards, one per depth ("/", "/*", "/*/*"); listed or
+# expanded directories without a manifest are skipped, but a block that finds none at all fails
+# (dependency_file_not_found). `**` is NOT recursive (it behaves like one level). Deeper paths, like the
+# composite actions under .github/actions/, are listed explicitly. Tested 2026-11-10 (#1325, #1326).
 
 version: 2
 updates:
@@ -32,6 +30,7 @@ updates:
   - "/"
   - "/*"
   - "/*/*"
+  - "/.github/actions/*"
   open-pull-requests-limit: 20
   target-branch: "main"
   schedule:
