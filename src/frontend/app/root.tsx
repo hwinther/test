@@ -25,6 +25,12 @@ import '~/components/PageLayout.css'
 const queryClient = new QueryClient()
 
 /**
+ * The document title for every route that doesn't set its own (axe: document-title).
+ * @returns {Route.MetaDescriptors} The default title.
+ */
+export const meta: Route.MetaFunction = () => [{ title: 'Test' }]
+
+/**
  * Root loader that reads public runtime config (API base URL, OTEL endpoints)
  * from env vars on the server and exposes them to the browser via window injection.
  * @returns {Promise<{publicRuntime: PublicRuntimeConfig}>} Public runtime config for the browser.
