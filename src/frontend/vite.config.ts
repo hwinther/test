@@ -28,7 +28,31 @@ export default defineConfig({
     setupFiles: './test/setupTests.ts',
     mockReset: true,
     include: ['app/**/*.{test,spec}.{ts,tsx}', 'test/**/*.{test,spec}.{ts,tsx}'],
-    coverage: { enabled: true, provider: 'istanbul', reporter: ['cobertura', 'lcov', 'html', 'json'] },
+    coverage: {
+      enabled: true,
+      provider: 'istanbul',
+      reporter: ['cobertura', 'lcov', 'html', 'json'],
+      // Every source file counts, not only the ones a test imports (Vitest's default), so an untested
+      // file shows up as 0 %. Unit tests own the logic (components, hooks, lib, the API client's own
+      // code); routes are the e2e suite's, which measures them (tests/e2e/playwright.config.ts leaves
+      // out the rest of this list too). Also left out: orval's generated client and models, the mocks,
+      // bootstrapping, OTel setup, and the two games (throwaway code, to be rewritten).
+      include: ['app/**/*.{ts,tsx}'],
+      exclude: [
+        'app/**/*.{test,spec}.{ts,tsx}',
+        'app/**/*.d.ts',
+        'app/api/endpoints/**',
+        'app/api/models/**',
+        'app/mock.ts',
+        'app/entry.*',
+        'app/root.tsx',
+        'app/routes.ts',
+        'app/otel/**',
+        'app/components/game/mario/**',
+        'app/components/game/maritime-ventures/**',
+        'app/routes/**',
+      ],
+    },
     reporters: ['verbose', 'github-actions', 'junit', 'json'],
     outputFile: {
       junit: './coverage/junit-report.xml',

@@ -9,6 +9,11 @@ config()
  * Shared defaults (reporters, retries, forbidOnly, baseURL from BASE_URL, trace/video) come from
  * @wshno/playwright-config; only what differs is set here. See https://playwright.dev/docs/test-configuration.
  */
+// Repo-relative paths the coverage leaves out: orval's generated client and models, the mocks,
+// bootstrapping, OTel setup and the two games (throwaway code). The unit coverage leaves out the same.
+const E2E_COVERAGE_EXCLUDE =
+  /^src\/frontend\/app\/(api\/(endpoints|models)\/|mock\.ts$|entry\.|root\.tsx$|routes\.ts$|otel\/|components\/game\/(mario|maritime-ventures)\/)/
+
 export default definePlaywrightConfig({
   /* Configure projects for major browsers */
   projects: [
@@ -43,7 +48,12 @@ export default definePlaywrightConfig({
     ? [
         ...ciReporters,
         monocartReporter({
-          coverage: { layout: { root: 'src/frontend', sourceDirs: ['app'] }, origin: process.env.BASE_URL },
+          coverage: {
+            // The same files as the unit coverage (src/frontend/vite.config.ts), routes included: those
+            // are this suite's to cover.
+            layout: { exclude: E2E_COVERAGE_EXCLUDE, root: 'src/frontend', sourceDirs: ['app'] },
+            origin: process.env.BASE_URL,
+          },
           name: 'test E2E',
         }),
       ]
