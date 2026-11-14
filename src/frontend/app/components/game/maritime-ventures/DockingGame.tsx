@@ -17,11 +17,5 @@ interface DockingGameProps {
  * @returns {JSX.Element} JSX element for the docking game
  */
 export function DockingGame({ onComplete, ship }: DockingGameProps): JSX.Element {
-  return (
-    <BaseMaritimeGame
-      gameType="docking"
-      onComplete={onComplete}
-      ship={ship}
-    />
-  )
+  return <BaseMaritimeGame gameType="docking" onComplete={onComplete} ship={ship} />
 }

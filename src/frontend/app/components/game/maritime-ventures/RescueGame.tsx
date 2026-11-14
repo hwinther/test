@@ -24,37 +24,34 @@ export function RescueGame({ onComplete, ship }: RescueGameProps): JSX.Element {
       { id: 'survivor2', rescued: false, x: 300, y: 150 },
       { id: 'survivor3', rescued: false, x: 450, y: 200 },
       { id: 'survivor4', rescued: false, x: 200, y: 250 },
-      { id: 'survivor5', rescued: false, x: 400, y: 300 }
+      { id: 'survivor5', rescued: false, x: 400, y: 300 },
     ],
     timeLeft: 90,
     waves: [
       { height: 20, x: 0, y: 100 },
       { height: 25, x: 150, y: 200 },
-      { height: 30, x: 350, y: 150 }
-    ]
+      { height: 30, x: 350, y: 150 },
+    ],
   })
 
   const [keys, setKeys] = useState<Set<string>>(() => new Set())
 
   const checkRescue = useCallback((boatX: number, boatY: number, currentSurvivors: RescueGameState['survivors']) => {
-    const updatedSurvivors = currentSurvivors.map(survivor => {
+    const updatedSurvivors = currentSurvivors.map((survivor) => {
       if (!survivor.rescued) {
-        const distance = Math.sqrt(
-          Math.pow(boatX - survivor.x, 2) + 
-          Math.pow(boatY - survivor.y, 2)
-        )
+        const distance = Math.sqrt(Math.pow(boatX - survivor.x, 2) + Math.pow(boatY - survivor.y, 2))
         if (distance < 25) {
           return { ...survivor, rescued: true }
         }
       }
       return survivor
     })
-    
+
     let rescuedCount = 0
     for (const survivor of updatedSurvivors) {
       if (survivor.rescued) rescuedCount++
     }
-    
+
     return { rescuedCount, survivors: updatedSurvivors }
   }, [])
 
@@ -64,14 +61,14 @@ export function RescueGame({ onComplete, ship }: RescueGameProps): JSX.Element {
       if (['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp'].includes(event.key)) {
         event.preventDefault()
       }
-      setKeys(prev => new Set(prev).add(event.key))
+      setKeys((prev) => new Set(prev).add(event.key))
     }
 
     const handleKeyUp = (event: KeyboardEvent) => {
       if (['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp'].includes(event.key)) {
         event.preventDefault()
       }
-      setKeys(prev => {
+      setKeys((prev) => {
         const newKeys = new Set(prev)
         newKeys.delete(event.key)
         return newKeys
@@ -89,7 +86,7 @@ export function RescueGame({ onComplete, ship }: RescueGameProps): JSX.Element {
 
   useEffect(() => {
     const gameLoop = setInterval(() => {
-      setGameState(prev => {
+      setGameState((prev) => {
         if (prev.timeLeft <= 0) return prev
 
         let newX = prev.boatX
@@ -109,7 +106,7 @@ export function RescueGame({ onComplete, ship }: RescueGameProps): JSX.Element {
           boatX: newX,
           boatY: newY,
           rescuedCount: rescueResult.rescuedCount,
-          survivors: rescueResult.survivors
+          survivors: rescueResult.survivors,
         }
       })
     }, 16) // ~60 FPS for smooth movement
@@ -120,9 +117,9 @@ export function RescueGame({ onComplete, ship }: RescueGameProps): JSX.Element {
   useEffect(() => {
     // Separate timer for game time countdown
     const timeTimer = setInterval(() => {
-      setGameState(prev => ({
+      setGameState((prev) => ({
         ...prev,
-        timeLeft: Math.max(0, prev.timeLeft - 1)
+        timeLeft: Math.max(0, prev.timeLeft - 1),
       }))
     }, 1000) // 1 second intervals for time countdown
 
@@ -143,14 +140,16 @@ export function RescueGame({ onComplete, ship }: RescueGameProps): JSX.Element {
     <div className="rescue-game">
       <div className="game-info">
         <h2>Rescue Mission - {ship.name}</h2>
-        <p>Time: {gameState.timeLeft}s | Rescued: {gameState.rescuedCount}/{gameState.survivors.length}</p>
+        <p>
+          Time: {gameState.timeLeft}s | Rescued: {gameState.rescuedCount}/{gameState.survivors.length}
+        </p>
         <p>Use arrow keys to navigate and rescue all survivors!</p>
       </div>
-      
+
       <div className="game-area">
         {/* Ocean background */}
         <div className="ocean" />
-        
+
         {/* Waves */}
         {gameState.waves.map((wave) => (
           <div
@@ -160,11 +159,11 @@ export function RescueGame({ onComplete, ship }: RescueGameProps): JSX.Element {
               height: wave.height,
               left: wave.x,
               top: wave.y,
-              width: wave.height * 3
+              width: wave.height * 3,
             }}
           />
         ))}
-        
+
         {/* Survivors */}
         {gameState.survivors.map((survivor) => (
           <div
@@ -172,17 +171,17 @@ export function RescueGame({ onComplete, ship }: RescueGameProps): JSX.Element {
             key={survivor.id}
             style={{
               left: survivor.x - 10,
-              top: survivor.y - 10
+              top: survivor.y - 10,
             }}
           />
         ))}
-        
+
         {/* Rescue boat */}
         <div
           className="rescue-boat"
           style={{
             left: gameState.boatX - 15,
-            top: gameState.boatY - 10
+            top: gameState.boatY - 10,
           }}
         />
       </div>

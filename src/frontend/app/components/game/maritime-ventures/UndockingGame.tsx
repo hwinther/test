@@ -34,16 +34,12 @@ function UndockingGame({ onComplete, onExit, ship }: UndockingGameProps): JSX.El
     location: 'harbour',
     name: 'Default Ship',
     speed: 5,
-    type: 'cargo'
+    type: 'cargo',
   }
 
   return (
     <div style={{ position: 'relative' }}>
-      <BaseMaritimeGame
-        gameType="undocking"
-        onComplete={handleComplete}
-        ship={gameShip}
-      />
+      <BaseMaritimeGame gameType="undocking" onComplete={handleComplete} ship={gameShip} />
       <button
         onClick={onExit}
         style={{
@@ -56,7 +52,7 @@ function UndockingGame({ onComplete, onExit, ship }: UndockingGameProps): JSX.El
           padding: '10px 20px',
           position: 'absolute',
           right: '10px',
-          top: '10px'
+          top: '10px',
         }}
         type="button"
       >

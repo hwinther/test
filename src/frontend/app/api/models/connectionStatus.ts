@@ -5,10 +5,10 @@
  */
 export interface ConnectionStatus {
   /** Whether the connection is available. */
-  connected: boolean;
+  connected: boolean
   /**
-     * Error message if the connection failed, otherwise null.
-     * @nullable
-     */
-  error?: string | null;
+   * Error message if the connection failed, otherwise null.
+   * @nullable
+   */
+  error?: string | null
 }

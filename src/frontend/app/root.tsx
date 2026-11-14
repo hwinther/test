@@ -1,12 +1,4 @@
-import {
-  isRouteErrorResponse,
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useRouteLoaderData,
-} from 'react-router'
+import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteLoaderData } from 'react-router'
 
 import type { Route } from './+types/root'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -57,10 +49,7 @@ export async function loader(): Promise<{ publicRuntime: PublicRuntimeConfig }> 
         process.env.PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT?.trim() ||
         process.env.VITE_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT?.trim() ||
         '',
-      otelServiceName:
-        process.env.PUBLIC_OTEL_SERVICE_NAME?.trim() ||
-        process.env.VITE_OTEL_SERVICE_NAME?.trim() ||
-        '',
+      otelServiceName: process.env.PUBLIC_OTEL_SERVICE_NAME?.trim() || process.env.VITE_OTEL_SERVICE_NAME?.trim() || '',
     },
   }
 }
@@ -144,10 +133,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
   if (isRouteErrorResponse(error)) {
     message = error.status === 404 ? '404' : 'Error'
-    details =
-      error.status === 404
-        ? 'The requested page could not be found.'
-        : error.statusText || details
+    details = error.status === 404 ? 'The requested page could not be found.' : error.statusText || details
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message
     stack = error.stack

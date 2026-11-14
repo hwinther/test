@@ -45,11 +45,10 @@ public class ServiceController(ILogger<ServiceController> logger) : ControllerBa
     /// </summary>
     /// <returns></returns>
     [HttpGet("status", Name = "Status")]
-    public async Task<Ok<ServiceStatus>> Status(
-        [FromServices] BloggingContext? bloggingContext,
-        [FromServices] IRabbitMqConnectionFactory rabbitMqConnectionFactory,
-        [FromServices] IConnectionMultiplexer? redis,
-        CancellationToken cancellationToken)
+    public async Task<Ok<ServiceStatus>> Status([FromServices] BloggingContext? bloggingContext,
+                                                [FromServices] IRabbitMqConnectionFactory rabbitMqConnectionFactory,
+                                                [FromServices] IConnectionMultiplexer? redis,
+                                                CancellationToken cancellationToken)
     {
         logger.LogInformation("Status was called");
 
@@ -63,23 +62,34 @@ public class ServiceController(ILogger<ServiceController> logger) : ControllerBa
         {
             Postgres = postgresTask.Result,
             RabbitMq = rabbitMqTask.Result,
-            Redis = redisTask.Result,
+            Redis = redisTask.Result
         });
     }
 
     private static async Task<ConnectionStatus> CheckPostgresAsync(BloggingContext? context, CancellationToken cancellationToken)
     {
         if (context is null)
-            return new ConnectionStatus { Connected = false, Error = "Not configured" };
+            return new ConnectionStatus
+            {
+                Connected = false,
+                Error = "Not configured"
+            };
 
         try
         {
             var canConnect = await context.Database.CanConnectAsync(cancellationToken);
-            return new ConnectionStatus { Connected = canConnect };
+            return new ConnectionStatus
+            {
+                Connected = canConnect
+            };
         }
         catch (Exception ex)
         {
-            return new ConnectionStatus { Connected = false, Error = ex.Message };
+            return new ConnectionStatus
+            {
+                Connected = false,
+                Error = ex.Message
+            };
         }
     }
 
@@ -88,27 +98,47 @@ public class ServiceController(ILogger<ServiceController> logger) : ControllerBa
         try
         {
             await using var connection = await factory.CreateConnectionAsync();
-            return new ConnectionStatus { Connected = connection.IsOpen };
+            return new ConnectionStatus
+            {
+                Connected = connection.IsOpen
+            };
         }
         catch (Exception ex)
         {
-            return new ConnectionStatus { Connected = false, Error = ex.Message };
+            return new ConnectionStatus
+            {
+                Connected = false,
+                Error = ex.Message
+            };
         }
     }
 
     private static async Task<ConnectionStatus> CheckRedisAsync(IConnectionMultiplexer? multiplexer)
     {
         if (multiplexer is null)
-            return new ConnectionStatus { Connected = false, Error = "Not configured" };
+            return new ConnectionStatus
+            {
+                Connected = false,
+                Error = "Not configured"
+            };
 
         try
         {
-            await multiplexer.GetDatabase().PingAsync();
-            return new ConnectionStatus { Connected = true };
+            await multiplexer.GetDatabase()
+                             .PingAsync();
+
+            return new ConnectionStatus
+            {
+                Connected = true
+            };
         }
         catch (Exception ex)
         {
-            return new ConnectionStatus { Connected = false, Error = ex.Message };
+            return new ConnectionStatus
+            {
+                Connected = false,
+                Error = ex.Message
+            };
         }
     }
 }

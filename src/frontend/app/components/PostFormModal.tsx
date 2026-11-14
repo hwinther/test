@@ -55,7 +55,9 @@ export function PostFormModal({ blogId, post, onClose }: PostFormModalProps): JS
     <dialog
       ref={dialogRef}
       className="rounded-xl shadow-2xl p-0 backdrop:bg-black/50 w-full max-w-lg"
-      onClick={(e) => { if (e.target === e.currentTarget) dialogRef.current?.close() }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) dialogRef.current?.close()
+      }}
     >
       <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200 dark:border-neutral-700">
         <h2 className="text-lg font-semibold">{isEdit ? 'Edit post' : 'New post'}</h2>

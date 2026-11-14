@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 
 if (args.Length == 2)
@@ -10,7 +11,7 @@ if (args.Length == 2)
     Console.WriteLine($"MsbuildDir: {msbuildDir}");
     Console.WriteLine($"ProjectDir: {projectDir}");
 
-    var projectSignature = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(projectDir));
+    var projectSignature = Convert.ToBase64String(Encoding.UTF8.GetBytes(projectDir));
     var cachePath = Path.Combine(msbuildDir, "..", $"cached-run-{projectSignature}");
     if (Path.Exists(cachePath))
     {

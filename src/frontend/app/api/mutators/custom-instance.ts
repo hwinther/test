@@ -52,10 +52,7 @@ AXIOS_INSTANCE.interceptors.request.use((config) => {
  * @param {AxiosRequestConfig & RequestInit} [config] - Merged Axios/fetch config from the generated client.
  * @returns {Promise<T>} Resolved response body.
  */
-export const customInstance = async <T>(
-  url: string,
-  config?: AxiosRequestConfig & RequestInit,
-): Promise<T> => {
+export const customInstance = async <T>(url: string, config?: AxiosRequestConfig & RequestInit): Promise<T> => {
   // AbortController rather than Axios's deprecated CancelToken; a signal from the caller still aborts.
   const controller = new AbortController()
   const { body, signal, ...rest } = config ?? {}

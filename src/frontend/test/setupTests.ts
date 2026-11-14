@@ -6,11 +6,7 @@ import { afterAll, afterEach, beforeAll } from 'vitest'
 import { getBloggingMock } from '~/api/endpoints/blogging/blogging.msw'
 import { getSendMessageMock } from '~/api/endpoints/send-message/send-message.msw'
 import { getServiceMock } from '~/api/endpoints/service/service.msw'
-const server = setupServer(
-  ...getBloggingMock(),
-  ...getSendMessageMock(),
-  ...getServiceMock(),
-)
+const server = setupServer(...getBloggingMock(), ...getSendMessageMock(), ...getServiceMock())
 
 // Start server before all tests
 beforeAll(() => {

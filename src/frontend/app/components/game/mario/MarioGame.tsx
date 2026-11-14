@@ -93,10 +93,7 @@ export function MarioGame({
   const restartOrAdvance = useCallback(() => {
     const st = gameStateRef.current
     const seq = levelSequence
-    const canNext =
-      seq !== undefined &&
-      st.gameStatus === 'complete' &&
-      sequenceIndexRef.current < seq.length - 1
+    const canNext = seq !== undefined && st.gameStatus === 'complete' && sequenceIndexRef.current < seq.length - 1
 
     if (canNext && seq) {
       sequenceIndexRef.current++
@@ -126,13 +123,16 @@ export function MarioGame({
     showLeaderboardRef.current = false
   }, [currentLevel, customLevel, levelSequence, spriteTheme])
 
-  const handlePlayTestLevel = useCallback((level: LevelData) => {
-    setCurrentLevel(level)
-    gameStateRef.current = createInitialGameState(level, { spriteTheme })
-    sequenceIndexRef.current = 0
-    completeNotifiedRef.current = false
-    setEditorMode(false)
-  }, [spriteTheme])
+  const handlePlayTestLevel = useCallback(
+    (level: LevelData) => {
+      setCurrentLevel(level)
+      gameStateRef.current = createInitialGameState(level, { spriteTheme })
+      sequenceIndexRef.current = 0
+      completeNotifiedRef.current = false
+      setEditorMode(false)
+    },
+    [spriteTheme],
+  )
 
   const handleSaveLevel = useCallback((level: LevelData) => {
     setCurrentLevel(level)
@@ -188,9 +188,7 @@ export function MarioGame({
 
       const seq = levelSequenceRef.current
       const hasNextCampaignLevel =
-        gameStateRef.current.gameStatus === 'complete' &&
-        seq !== undefined &&
-        sequenceIndexRef.current < seq.length - 1
+        gameStateRef.current.gameStatus === 'complete' && seq !== undefined && sequenceIndexRef.current < seq.length - 1
       drawGame(canvas, gameStateRef.current, { hasNextCampaignLevel })
       rafRef.current = requestAnimationFrame(loop)
     }
@@ -261,7 +259,11 @@ export function MarioGame({
           width={MARIO_CANVAS_WIDTH}
         />
         {showLeaderboard && (
-          <LeaderboardOverlay onDone={restartOrAdvance} score={gameStateRef.current.score} variant={leaderboardVariantRef.current} />
+          <LeaderboardOverlay
+            onDone={restartOrAdvance}
+            score={gameStateRef.current.score}
+            variant={leaderboardVariantRef.current}
+          />
         )}
       </div>
 

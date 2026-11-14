@@ -1,7 +1,9 @@
 <Project>
-	<Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../../src/backend'))" />
-	<!-- coverlet.MTP picks up testconfig.json next to the test assembly. The shared file lives in tests/backend/ and is linked into each test project's output. -->
-	<ItemGroup Condition="'$(IsTestProject)' == 'true'">
-		<None Include="$(MSBuildThisFileDirectory)testconfig.json" Link="testconfig.json" CopyToOutputDirectory="PreserveNewest" />
-	</ItemGroup>
+  <Import
+    Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../../src/backend'))" />
+  <!-- coverlet.MTP picks up testconfig.json next to the test assembly. The shared file lives in tests/backend/ and is linked into each test project's output. -->
+  <ItemGroup Condition="'$(IsTestProject)' == 'true'">
+    <None Include="$(MSBuildThisFileDirectory)testconfig.json" Link="testconfig.json"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

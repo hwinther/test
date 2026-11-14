@@ -10,7 +10,7 @@ interface ShipMarketProps {
 const shipTypes = [
   { capacity: 1000, cost: 50000, name: 'Cargo Ship', speed: 15, type: 'cargo' as const },
   { capacity: 1500, cost: 80000, name: 'Container Ship', speed: 18, type: 'container' as const },
-  { capacity: 2000, cost: 120000, name: 'Tanker', speed: 12, type: 'tanker' as const }
+  { capacity: 2000, cost: 120000, name: 'Tanker', speed: 12, type: 'tanker' as const },
 ]
 
 /**
@@ -25,13 +25,13 @@ export function ShipMarket({ gameState, onBuyShip }: ShipMarketProps): JSX.Eleme
     <div className="ship-market">
       <h3>Ship Market</h3>
       <div className="ship-market-cards">
-        {shipTypes.map(ship => (
+        {shipTypes.map((ship) => (
           <div className="ship-market-card" key={ship.type}>
-            <div 
+            <div
               className={`ship-preview ${ship.type}-ship`}
-              style={{ 
+              style={{
                 transform: `scaleX(${getShipScale(ship.capacity)})`,
-                transformOrigin: 'left center'
+                transformOrigin: 'left center',
               }}
             ></div>
             <div className="ship-details">
@@ -40,9 +40,9 @@ export function ShipMarket({ gameState, onBuyShip }: ShipMarketProps): JSX.Eleme
               <p>Speed: {ship.speed} knots</p>
               <p>Best for: {getBestForText(ship.type)}</p>
             </div>
-            <button 
+            <button
               className="buy-ship-btn"
-              disabled={gameState.money < ship.cost} 
+              disabled={gameState.money < ship.cost}
               onClick={() => onBuyShip(ship.type)}
             >
               Buy {`$${ship.cost.toLocaleString()}`}

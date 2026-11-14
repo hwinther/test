@@ -19,7 +19,11 @@ export default function BlogDetail(): React.JSX.Element {
   const enabled = auth.isAuthenticated && !Number.isNaN(numericId)
 
   const { data: blogRaw, error: blogError, isLoading: blogIsLoading } = useGetBlog(numericId, { query: { enabled } })
-  const { data: postsRaw, error: postsError, isLoading: postsIsLoading } = useGetPosts(numericId, { query: { enabled } })
+  const {
+    data: postsRaw,
+    error: postsError,
+    isLoading: postsIsLoading,
+  } = useGetPosts(numericId, { query: { enabled } })
   const blog = unwrapOrvalBody<BlogDto>(blogRaw)
   const posts = unwrapOrvalBody<PostDto[]>(postsRaw)
 

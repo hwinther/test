@@ -46,7 +46,11 @@ function Page(): JSX.Element {
 
   if (showMarioGame) {
     return (
-      <MarioGame levelSequence={LevelLoader.createDefaultLevelSequence()} onClose={() => setShowMarioGame(false)} spriteTheme={marioTheme} />
+      <MarioGame
+        levelSequence={LevelLoader.createDefaultLevelSequence()}
+        onClose={() => setShowMarioGame(false)}
+        spriteTheme={marioTheme}
+      />
     )
   }
 
@@ -63,13 +67,19 @@ function Page(): JSX.Element {
         </button>
         <button
           className="rounded-lg bg-red-600 px-5 py-2.5 text-white font-medium hover:bg-red-700 transition-colors cursor-pointer"
-          onClick={() => { setMarioTheme('classic'); setShowMarioGame(true) }}
+          onClick={() => {
+            setMarioTheme('classic')
+            setShowMarioGame(true)
+          }}
         >
           Play Mario Clone
         </button>
         <button
           className="rounded-lg bg-purple-600 px-5 py-2.5 text-white font-medium hover:bg-purple-700 transition-colors cursor-pointer"
-          onClick={() => { setMarioTheme('botvar'); setShowMarioGame(true) }}
+          onClick={() => {
+            setMarioTheme('botvar')
+            setShowMarioGame(true)
+          }}
         >
           Play Botvar Theme
         </button>
@@ -77,7 +87,8 @@ function Page(): JSX.Element {
 
       {versionInfo != null && (
         <p className="text-xs text-neutral-500 dark:text-neutral-400">
-          Version: {versionInfo.informationalVersion} · Env: {versionInfo.environmentName} · Mode: {import.meta.env.MODE}
+          Version: {versionInfo.informationalVersion} · Env: {versionInfo.environmentName} · Mode:{' '}
+          {import.meta.env.MODE}
         </p>
       )}
     </div>

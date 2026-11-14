@@ -38,7 +38,9 @@ export function UserProfileModal({ onClose }: UserProfileModalProps): JSX.Elemen
     <dialog
       ref={dialogRef}
       className="rounded-xl shadow-2xl p-0 backdrop:bg-black/50 w-full max-w-md"
-      onClick={(e) => { if (e.target === e.currentTarget) dialogRef.current?.close() }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) dialogRef.current?.close()
+      }}
     >
       <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200 dark:border-neutral-700">
         <h2 className="text-lg font-semibold">Profile</h2>
@@ -100,9 +102,7 @@ function Row({ label, value, mono = false, children }: RowProps): JSX.Element | 
   return (
     <div>
       <dt className="text-neutral-500 dark:text-neutral-400 mb-0.5">{label}</dt>
-      <dd className={mono ? 'font-mono text-xs break-all' : ''}>
-        {children ?? value}
-      </dd>
+      <dd className={mono ? 'font-mono text-xs break-all' : ''}>{children ?? value}</dd>
     </div>
   )
 }

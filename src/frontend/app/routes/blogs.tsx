@@ -60,10 +60,7 @@ export default function Blogs(): React.JSX.Element {
         <ul className="divide-y divide-neutral-200 dark:divide-neutral-700">
           {blogs.map((blog: BlogDto) => (
             <li key={blog.blogId} className="flex items-center justify-between py-3 gap-4">
-              <Link
-                to={`/blogs/${blog.blogId}`}
-                className="min-w-0"
-              >
+              <Link to={`/blogs/${blog.blogId}`} className="min-w-0">
                 <span className="font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-200">
                   {blog.title}
                 </span>

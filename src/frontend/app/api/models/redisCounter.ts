@@ -5,5 +5,5 @@
  */
 export interface RedisCounter {
   /** The current counter value. */
-  value: number;
+  value: number
 }
