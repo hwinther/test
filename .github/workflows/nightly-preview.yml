@@ -29,7 +29,7 @@ jobs:
       actions: read
       pull-requests: write
       issues: write
-    uses: hwinther/reusable-workflows/.github/workflows/nightly-preview-e2e.yml@f55297593d7ac787485fedaf3cb83b63030bc629 # v2.36.0
+    uses: hwinther/reusable-workflows/.github/workflows/nightly-preview-e2e.yml@8b08a959630464cef264fef5b518e1ce39d7d769 # v2.37.0
     with:
       app_name: test
       # The frontend's health route, which needs no session.
