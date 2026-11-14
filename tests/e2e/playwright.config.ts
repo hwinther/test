@@ -15,6 +15,9 @@ const E2E_COVERAGE_EXCLUDE =
   /^src\/frontend\/app\/(api\/(endpoints|models)\/|mock\.ts$|entry\.|root\.tsx$|routes\.ts$|otel\/|components\/game\/(mario|maritime-ventures)\/)/
 
 export default definePlaywrightConfig({
+  // Against a deployed env (BASE_URL, the nightly preview), skip what only holds for the app itself,
+  // such as bodies the NAXSI edge rejects first.
+  grepInvert: process.env.BASE_URL ? /@local-only/ : undefined,
   /* Configure projects for major browsers */
   projects: [
     {
