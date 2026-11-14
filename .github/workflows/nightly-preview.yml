@@ -1,0 +1,47 @@
+name: Nightly preview E2E
+
+# Every night: deploys main (manifests:main, pushed and signed by pr-e2e.yml on every merge) to an
+# ephemeral preview env, test-nightly.preview.wsh.no, runs the e2e suite against it, then tears it
+# down. Unlike the compose run in pr-e2e.yml this goes through the real chain: the OPNsense/NAXSI edge,
+# Traefik and TLS, Flux's signature check, the network policies and a fresh preview database.
+# A failure opens (or comments on) an issue labelled `nightly-preview`; the next green run closes it.
+# The steps live in reusable-workflows' nightly-preview-e2e.yml.
+#
+# Needs pr-e2e.yml's PROXMOX_GITOPS_* app. The suite signs in nowhere, so no e2e user or environment.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 02:00 UTC: after ClutterStock's (01:00) and romslig's (01:30) nightly runs.
+    - cron: "0 2 * * *"
+
+permissions: {}
+
+concurrency:
+  group: nightly-preview
+  cancel-in-progress: false
+
+jobs:
+  nightly:
+    permissions:
+      contents: read
+      packages: read
+      actions: read
+      pull-requests: write
+      issues: write
+    uses: hwinther/reusable-workflows/.github/workflows/nightly-preview-e2e.yml@f55297593d7ac787485fedaf3cb83b63030bc629 # v2.36.0
+    with:
+      app_name: test
+      # The frontend's health route, which needs no session.
+      health_path: /healthz
+      db_name: test_nightly
+      client_id: ${{ vars.PROXMOX_GITOPS_CLIENT_ID }}
+      playwright_working_directory: tests/e2e
+      # No secrets live in an environment for this suite.
+      environment: ""
+      # The config also lists Firefox, WebKit and mobile projects; the runner image has Chromium only
+      # (pr-e2e.yml's compose run limits itself the same way, in the e2e image's CMD).
+      playwright_run_command: npx playwright test --project=chromium
+      coverage_paths_json: '["monocart-coverage"]'
+    secrets:
+      app_private_key: ${{ secrets.PROXMOX_GITOPS_APP_PRIVATE_KEY }}
