@@ -11,9 +11,4 @@ export default {
   // keeps a future <Form> or useFetcher from failing only once deployed (as it did in ClutterStock).
   // Hosts only: cross-site origins are still refused. Local dev is plain http on both sides.
   allowedActionOrigins: ['test.test.wsh.no', '*.preview.wsh.no'],
-  // The whole route manifest in the first document instead of lazy discovery through
-  // /__manifest?paths=/,/about,/blogs. The OPNsense NAXSI edge scores the commas in that query and
-  // blocks it from the third path on (a 200 "Request Denied" page, so hydration logs "Failed to fetch
-  // manifest patches"). Found by the nightly preview e2e run; the manifest is small for this app.
-  routeDiscovery: { mode: 'initial' },
 } satisfies Config
