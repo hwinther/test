@@ -108,7 +108,9 @@ test.describe('CSP report endpoint', () => {
     expect(reportTo.status()).toBe(204)
   })
 
-  test('answers 204 to a malformed body and 405 to a GET', async ({ request }) => {
+  // @local-only: the NAXSI edge in front of deployed envs rejects the malformed body (403) before it
+  // reaches the app, so this only holds against the compose stack.
+  test('answers 204 to a malformed body and 405 to a GET @local-only', async ({ request }) => {
     const malformed = await request.post('/csp-report', {
       data: '{not json',
       headers: { 'content-type': 'application/csp-report' },
