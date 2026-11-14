@@ -8,7 +8,10 @@ public sealed class OidcOptions
     /// <summary>Name of the configuration section.</summary>
     public const string SectionName = "Oidc";
 
-    /// <summary>Issuer / authority base URL — OIDC discovery is fetched from <c>{Authority}/.well-known/openid-configuration</c>.</summary>
+    /// <summary>
+    ///     Issuer / authority base URL — OIDC discovery is fetched from
+    ///     <c>{Authority}/.well-known/openid-configuration</c>.
+    /// </summary>
     public string Authority { get; set; } = "https://auth.wsh.no";
 
     /// <summary>OAuth 2.0 client_id registered with the identity provider. Used by Swagger UI to initiate the PKCE flow.</summary>

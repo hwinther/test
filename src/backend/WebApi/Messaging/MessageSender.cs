@@ -132,5 +132,5 @@ public interface IMessageSender
     ///     Sends a message to a RabbitMQ queue
     /// </summary>
     /// <returns>A string representing the message that was sent.</returns>
-    public Task<string> SendMessageAsync();
+    Task<string> SendMessageAsync();
 }

@@ -26,7 +26,5 @@ export default function AuthCallback() {
     )
   }
 
-  return (
-    <div className="p-8 text-center text-neutral-500">Completing sign-in…</div>
-  )
+  return <div className="p-8 text-center text-neutral-500">Completing sign-in…</div>
 }

@@ -1,10 +1,6 @@
 import type { Enemy, MarioGameResult, MarioGameState, Player } from './mario-types'
 
-import {
-  MARIO_CANVAS_HEIGHT,
-  MARIO_CANVAS_WIDTH,
-  themeColors,
-} from './mario-game-logic'
+import { MARIO_CANVAS_HEIGHT, MARIO_CANVAS_WIDTH, themeColors } from './mario-game-logic'
 import { type SpriteSet, getSprites } from './mario-sprites'
 
 /**
@@ -346,11 +342,7 @@ export function drawGame(canvas: HTMLCanvasElement, state: MarioGameState, drawO
           const flagScore = Math.floor(100 + heightRatio * 4900)
           ctx.fillText(`+${flagScore}`, particle.x, particle.y)
         } else {
-          ctx.fillText(
-            '+' + (state.collectibles.find((c) => c.type === 'coin')?.value || 100),
-            particle.x,
-            particle.y,
-          )
+          ctx.fillText('+' + (state.collectibles.find((c) => c.type === 'coin')?.value || 100), particle.x, particle.y)
         }
         break
       case 'explosion':

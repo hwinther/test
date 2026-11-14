@@ -135,7 +135,9 @@ export function LeaderboardOverlay({ onDone, score, variant = 'gameOver' }: Lead
         })}
 
         {error && <p className="leaderboard-error">{error}</p>}
-        <p className="leaderboard-continue">{variant === 'complete' ? 'PRESS ENTER TO PLAY AGAIN' : 'PRESS R TO RESTART'}</p>
+        <p className="leaderboard-continue">
+          {variant === 'complete' ? 'PRESS ENTER TO PLAY AGAIN' : 'PRESS R TO RESTART'}
+        </p>
       </div>
     </div>
   )

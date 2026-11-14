@@ -41,7 +41,9 @@
 }
 
 @keyframes blink-prompt {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
 
 .leaderboard-name-input {
@@ -129,8 +131,12 @@
 }
 
 @keyframes glow-row {
-  from { background: rgba(255, 255, 0, 0.06); }
-  to   { background: rgba(255, 255, 0, 0.14); }
+  from {
+    background: rgba(255, 255, 0, 0.06);
+  }
+  to {
+    background: rgba(255, 255, 0, 0.14);
+  }
 }
 
 .leaderboard-rank {

@@ -1,6 +1,7 @@
 using System.Data;
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using WebApi.Database;
 using WebApi.Repository;
 
@@ -58,7 +59,7 @@ public class BloggingContextTests : IAsyncLifetime, IAsyncDisposable
     public void ConnectionState_ReturnsOpen()
     {
         // Given
-        using DbConnection connection = new Npgsql.NpgsqlConnection(_postgreSqlContainer.PostgreSqlContainer.GetConnectionString());
+        using DbConnection connection = new NpgsqlConnection(_postgreSqlContainer.PostgreSqlContainer.GetConnectionString());
 
         // When
         connection.Open();

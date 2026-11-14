@@ -4,7 +4,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 70%, #228B22 70%, #228B22 100%);
+  background: linear-gradient(to bottom, #87ceeb 0%, #87ceeb 70%, #228b22 70%, #228b22 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -22,7 +22,7 @@
 }
 
 .mario-game-header h1 {
-  color: #FF0000;
+  color: #ff0000;
   font-size: 2.5em;
   text-shadow: 2px 2px 0px #000000;
   margin: 0;
@@ -30,9 +30,9 @@
 }
 
 .close-button {
-  background: #FF6B6B;
+  background: #ff6b6b;
   border: 2px solid #000000;
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 1.5em;
   font-weight: bold;
   width: 40px;
@@ -46,7 +46,7 @@
 }
 
 .close-button:hover {
-  background: #FF4757;
+  background: #ff4757;
   transform: scale(1.1);
 }
 
@@ -60,7 +60,7 @@
 
 .mario-game-canvas {
   display: block;
-  background: #87CEEB;
+  background: #87ceeb;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
@@ -68,10 +68,10 @@
 
 .mario-game-controls {
   background: rgba(0, 0, 0, 0.8);
-  color: #FFFFFF;
+  color: #ffffff;
   padding: 15px 20px;
   border-radius: 8px;
-  border: 2px solid #FFD700;
+  border: 2px solid #ffd700;
   max-width: 600px;
   text-align: center;
 }
@@ -79,7 +79,7 @@
 .mario-game-controls h3 {
   margin-top: 0;
   margin-bottom: 15px;
-  color: #FFD700;
+  color: #ffd700;
   font-size: 1.2em;
 }
 
@@ -116,11 +116,11 @@
     width: 90vw;
     max-width: 800px;
   }
-  
+
   .mario-game-canvas-container {
     transform: scale(0.8);
   }
-  
+
   .mario-game-controls {
     max-width: 90vw;
     font-size: 0.8em;
@@ -131,11 +131,11 @@
   .mario-game {
     padding: 10px;
   }
-  
+
   .mario-game-header h1 {
     font-size: 1.8em;
   }
-  
+
   .mario-game-canvas-container {
     transform: scale(0.7);
   }

@@ -32,19 +32,19 @@ public interface IBlog
     ///     Gets or sets the unique identifier for the blog.
     /// </summary>
     /// <example>1</example>
-    public int BlogId { get; set; }
+    int BlogId { get; set; }
 
     /// <summary>
     ///     Gets or sets the title of the blog.
     /// </summary>
     /// <example>My blog title</example>
-    public string Title { get; set; }
+    string Title { get; set; }
 
     /// <summary>
     ///     Gets or sets the URL of the blog.
     /// </summary>
     /// <example>https://localhost/a-test-blog</example>
-    public string Url { get; set; }
+    string Url { get; set; }
 }
 
 /// <inheritdoc />
@@ -91,25 +91,25 @@ public interface IPost
     ///     Gets or sets the unique identifier for the post.
     /// </summary>
     /// <example>1</example>
-    public int PostId { get; set; }
+    int PostId { get; set; }
 
     /// <summary>
     ///     Gets or sets the title of the post.
     /// </summary>
     /// <example>Bob Loblaw's Law Blog</example>
-    public string Title { get; set; }
+    string Title { get; set; }
 
     /// <summary>
     ///     Gets or sets the content of the post.
     /// </summary>
     /// <example>Example blog post content</example>
-    public string Content { get; set; }
+    string Content { get; set; }
 
     /// <summary>
     ///     Gets or sets the unique identifier of the blog to which the post belongs.
     /// </summary>
     /// <example>1</example>
-    public int BlogId { get; set; }
+    int BlogId { get; set; }
 }
 
 /// <inheritdoc />

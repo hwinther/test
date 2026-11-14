@@ -23,8 +23,13 @@ public class RedisController(ILogger<RedisController> logger, IConnectionMultipl
     public async Task<Ok<RedisCounter>> GetCounter()
     {
         logger.LogInformation("GetCounter was called");
-        var value = await redis.GetDatabase().StringGetAsync(CounterKey);
-        return TypedResults.Ok(new RedisCounter { Value = value.HasValue ? (long)value : 0 });
+        var value = await redis.GetDatabase()
+                               .StringGetAsync(CounterKey);
+
+        return TypedResults.Ok(new RedisCounter
+        {
+            Value = value.HasValue ? (long) value : 0
+        });
     }
 
     /// <summary>
@@ -34,8 +39,13 @@ public class RedisController(ILogger<RedisController> logger, IConnectionMultipl
     public async Task<Ok<RedisCounter>> IncrementCounter()
     {
         logger.LogInformation("IncrementCounter was called");
-        var newValue = await redis.GetDatabase().StringIncrementAsync(CounterKey);
-        return TypedResults.Ok(new RedisCounter { Value = newValue });
+        var newValue = await redis.GetDatabase()
+                                  .StringIncrementAsync(CounterKey);
+
+        return TypedResults.Ok(new RedisCounter
+        {
+            Value = newValue
+        });
     }
 
     /// <summary>
@@ -45,7 +55,12 @@ public class RedisController(ILogger<RedisController> logger, IConnectionMultipl
     public async Task<Ok<RedisCounter>> ResetCounter()
     {
         logger.LogInformation("ResetCounter was called");
-        await redis.GetDatabase().KeyDeleteAsync(CounterKey);
-        return TypedResults.Ok(new RedisCounter { Value = 0 });
+        await redis.GetDatabase()
+                   .KeyDeleteAsync(CounterKey);
+
+        return TypedResults.Ok(new RedisCounter
+        {
+            Value = 0
+        });
     }
 }

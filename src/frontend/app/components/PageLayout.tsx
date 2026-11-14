@@ -25,9 +25,15 @@ function PageLayout({ children }: Readonly<{ children: React.ReactNode }>): Reac
     <>
       <nav className="flex items-center justify-between px-6 py-3 text-lg border-b border-neutral-200 dark:border-neutral-700">
         <div className="flex gap-6">
-          <NavLink className={navLinkClass} to="/" end>Home</NavLink>
-          <NavLink className={navLinkClass} to="/about">About</NavLink>
-          <NavLink className={navLinkClass} to="/blogs">Blogs</NavLink>
+          <NavLink className={navLinkClass} to="/" end>
+            Home
+          </NavLink>
+          <NavLink className={navLinkClass} to="/about">
+            About
+          </NavLink>
+          <NavLink className={navLinkClass} to="/blogs">
+            Blogs
+          </NavLink>
         </div>
         <div className="flex items-center gap-3 text-sm">
           {auth.isAuthenticated && (

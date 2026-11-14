@@ -20,9 +20,7 @@ export function ChatModal(): JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const myName =
-    auth.user?.profile.name ??
-    (auth.user?.profile.preferred_username as string | undefined) ??
-    auth.user?.profile.sub
+    auth.user?.profile.name ?? (auth.user?.profile.preferred_username as string | undefined) ?? auth.user?.profile.sub
 
   const handleMessage = useCallback((msg: ChatMessage) => {
     setMessages((prev) => [...prev, msg])
@@ -89,13 +87,14 @@ export function ChatModal(): JSX.Element {
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2 text-sm">
-        {messages.length === 0 && (
-          <p className="text-center text-neutral-400 text-xs mt-6">No messages yet. Say hi!</p>
-        )}
+        {messages.length === 0 && <p className="text-center text-neutral-400 text-xs mt-6">No messages yet. Say hi!</p>}
         {messages.map((msg) => {
           const isMe = msg.author === myName
           return (
-            <div key={`${msg.timestamp}-${msg.author}`} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+            <div
+              key={`${msg.timestamp}-${msg.author}`}
+              className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
+            >
               {!isMe && <span className="text-xs text-neutral-400 mb-0.5 px-1">{msg.author}</span>}
               <div
                 className={`max-w-[85%] rounded-2xl px-3 py-1.5 break-words ${

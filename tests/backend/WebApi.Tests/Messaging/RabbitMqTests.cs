@@ -14,17 +14,17 @@ public class RabbitMqTests : IAsyncLifetime, IAsyncDisposable
     private readonly RabbitMqContainer _rabbitMqContainer = new RabbitMqBuilder("rabbitmq:4.2-management-alpine").Build();
     private Activity _unitTestActivity = null!;
 
-    public async ValueTask InitializeAsync()
-    {
-        await _rabbitMqContainer.StartAsync();
-        _unitTestActivity = new Activity(nameof(RabbitMqTests));
-    }
-
     public async ValueTask DisposeAsync()
     {
         await _rabbitMqContainer.DisposeAsync();
         _unitTestActivity.Stop();
         _unitTestActivity.Dispose();
+    }
+
+    public async ValueTask InitializeAsync()
+    {
+        await _rabbitMqContainer.StartAsync();
+        _unitTestActivity = new Activity(nameof(RabbitMqTests));
     }
 
     [Fact]
@@ -51,6 +51,7 @@ public class RabbitMqTests : IAsyncLifetime, IAsyncDisposable
         {
             Uri = new Uri(_rabbitMqContainer.GetConnectionString())
         };
+
         var connectionFactoryMock = new Mock<IRabbitMqConnectionFactory>();
         connectionFactoryMock
             .Setup(f => f.CreateConnectionAsync())

@@ -16,17 +16,21 @@ public class ChatHub : Hub
     /// <param name="text">Raw message text from the client.</param>
     public async Task SendMessage(string text)
     {
-        var author = Context.User?.FindFirst("name")?.Value
-            ?? Context.User?.FindFirst("preferred_username")?.Value
-            ?? Context.User?.FindFirst(ClaimTypes.Name)?.Value
-            ?? Context.User?.FindFirst("sub")?.Value
-            ?? "Unknown";
+        var author = Context.User?.FindFirst("name")
+                            ?.Value
+                     ?? Context.User?.FindFirst("preferred_username")
+                               ?.Value
+                     ?? Context.User?.FindFirst(ClaimTypes.Name)
+                               ?.Value
+                     ?? Context.User?.FindFirst("sub")
+                               ?.Value
+                     ?? "Unknown";
 
         var message = new ChatMessage
         {
             Author = author,
             Text = text.Trim(),
-            Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         };
 
         await Clients.All.SendAsync("ReceiveMessage", message);

@@ -7,7 +7,7 @@ const INITIAL_PORTS = [
   { country: 'UK', difficulty: 2, dockingFee: 800, id: 'london', name: 'London' },
   { country: 'Japan', difficulty: 3, dockingFee: 1200, id: 'tokyo', name: 'Tokyo' },
   { country: 'Germany', difficulty: 2, dockingFee: 700, id: 'hamburg', name: 'Hamburg' },
-  { country: 'Singapore', difficulty: 4, dockingFee: 1500, id: 'singapore', name: 'Singapore' }
+  { country: 'Singapore', difficulty: 4, dockingFee: 1500, id: 'singapore', name: 'Singapore' },
 ]
 
 interface WorldMapProps {
@@ -32,7 +32,7 @@ export function WorldMap({ gameState, onClose, onPortSelection, travelingShip }:
       <div className="world-map">
         <h2>Select Destination for {travelingShip.name}</h2>
         <p>Travel Cost: $2,000</p>
-        
+
         <div className="ocean-map">
           {/* Ocean background with waves */}
           <div className="ocean-background">
@@ -40,7 +40,7 @@ export function WorldMap({ gameState, onClose, onPortSelection, travelingShip }:
             <div className="wave wave-2"></div>
             <div className="wave wave-3"></div>
           </div>
-          
+
           {/* Continents */}
           <div className="continent north-america">
             <div className="continent-shape"></div>
@@ -51,9 +51,9 @@ export function WorldMap({ gameState, onClose, onPortSelection, travelingShip }:
           <div className="continent asia">
             <div className="continent-shape"></div>
           </div>
-          
+
           {/* Port markers positioned on the map */}
-          {INITIAL_PORTS.map(port => (
+          {INITIAL_PORTS.map((port) => (
             <button
               className={`port-marker port-${port.id}`}
               disabled={gameState.money < 2000}
@@ -65,13 +65,13 @@ export function WorldMap({ gameState, onClose, onPortSelection, travelingShip }:
               <div className="port-label">{port.name}</div>
             </button>
           ))}
-          
+
           {/* Current ship position indicator */}
           <div className={`ship-marker traveling-ship-${travelingShip.location.replace('-docked', '')}`}>
             <div className="ship-icon">🚢</div>
           </div>
         </div>
-        
+
         <div className="world-map-actions">
           <button className="cancel-travel-btn" onClick={onClose}>
             Cancel Travel

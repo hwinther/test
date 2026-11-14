@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -60,7 +61,7 @@ var healthChecks = builder.Services.AddHealthChecks();
 var signalRBuilder = builder.Services
                             .AddSignalR()
                             .AddJsonProtocol(static opts =>
-                                                 opts.PayloadSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase);
+                                                 opts.PayloadSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase);
 
 // OpenAPI generation (`dotnet swagger tofile` uses ASPNETCORE_ENVIRONMENT=Swagger) does not need SQL Server.
 var registerDataAccess = !builder.Environment.IsEnvironment("Swagger");
@@ -206,7 +207,9 @@ builder.Services.AddSwaggerGen(options =>
 
     options.AddSecurityRequirement(static doc => new OpenApiSecurityRequirement
     {
-        { new OpenApiSecuritySchemeReference("oidc", doc), [] }
+        {
+            new OpenApiSecuritySchemeReference("oidc", doc), []
+        }
     });
 });
 
