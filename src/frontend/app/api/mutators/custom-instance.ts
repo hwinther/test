@@ -50,25 +50,28 @@ AXIOS_INSTANCE.interceptors.request.use((config) => {
  * @template T - Response body type.
  * @param {string} url - Request path (relative to baseURL).
  * @param {AxiosRequestConfig & RequestInit} [config] - Merged Axios/fetch config from the generated client.
- * @returns {Promise<T>} Resolved response body.
+ * @returns {Promise<T> & { cancel: () => void }} Resolved response body. `cancel()` aborts the request (the
+ *   orval/TanStack Query cancellation hook); it has to be on the very promise returned, so this is not `async`.
  */
-export const customInstance = async <T>(url: string, config?: AxiosRequestConfig & RequestInit): Promise<T> => {
+export const customInstance = <T>(
+  url: string,
+  config?: AxiosRequestConfig & RequestInit,
+): Promise<T> & { cancel: () => void } => {
   // AbortController rather than Axios's deprecated CancelToken; a signal from the caller still aborts.
   const controller = new AbortController()
   const { body, signal, ...rest } = config ?? {}
-  const promise = AXIOS_INSTANCE({
+  const promise = AXIOS_INSTANCE<T>({
     ...rest,
     url,
     ...(body !== undefined ? { data: body } : {}),
     signal: signal ? AbortSignal.any([signal, controller.signal]) : controller.signal,
   }).then(({ data }) => data)
 
-  // @ts-expect-error cancel is not in the type definition
-  promise.cancel = () => {
-    controller.abort('Query was cancelled')
-  }
-
-  return await promise
+  return Object.assign(promise, {
+    cancel: () => {
+      controller.abort('Query was cancelled')
+    },
+  })
 }
 
 export default customInstance
