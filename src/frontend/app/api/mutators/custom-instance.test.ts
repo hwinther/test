@@ -68,4 +68,12 @@ describe('customInstance', () => {
     caller.abort()
     expect(seen[0]!.signal?.aborted).toBe(true)
   })
+
+  it('aborts the request when the returned promise is cancelled', async () => {
+    const request = customInstance('/api/x')
+    request.cancel()
+    // Axios checks the signal before it sends, so a cancelled request never reaches the adapter.
+    await expect(request).rejects.toMatchObject({ name: 'CanceledError' })
+    expect(seen).toHaveLength(0)
+  })
 })
