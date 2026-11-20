@@ -3,9 +3,14 @@ name: Terraform - publish rover visualization docker image to ghcr repo
 on:
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   publish-docker-image:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # pushes ghcr.io/hwinther/test-rover
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
