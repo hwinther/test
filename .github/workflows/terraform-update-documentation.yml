@@ -9,9 +9,14 @@ on:
 env:
   TERRAFORM_PATH: "templates/terraform"
 
+permissions: {}
+
 jobs:
   update-lockfiles:
     runs-on: ubuntu-latest
+    # The push uses WORKFLOW_TOKEN; GITHUB_TOKEN only needs to read.
+    permissions:
+      contents: read
     if: github.event.pull_request.user.login == 'dependabot[bot]'
     steps:
       - name: Checkout ${{ github.head_ref }}
