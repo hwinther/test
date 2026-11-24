@@ -1,6 +1,15 @@
 /* eslint-disable sonarjs/pseudo-random */
 import type { LevelData } from './level-format'
-import type { Enemy, Fireball, GameInputSnapshot, LevelTheme, MarioGameState, Player, SpriteTheme } from './mario-types'
+import type {
+  Enemy,
+  Fireball,
+  GameInputSnapshot,
+  LevelTheme,
+  MarioGameState,
+  Platform,
+  Player,
+  SpriteTheme,
+} from './mario-types'
 
 import { LevelLoader } from './level-loader'
 import { playMarioSound } from './mario-sounds'
@@ -18,7 +27,12 @@ const GRAVITY = 0.5
 const PLAYER_SPEED = 3
 const JUMP_FORCE = 12
 const RUN_MULTIPLIER = 1.5
-const JUMP_CUT_MULTIPLIER = 0.45
+const JUMP_RELEASE_SPEED = -4.5
+const MAX_FALL_SPEED = 16
+const GROUND_ACCELERATION = 0.8
+const AIR_ACCELERATION = 0.5
+const GROUND_DECELERATION = 0.85
+const AIR_DECELERATION = 0.25
 const COYOTE_MAX = 7
 const JUMP_BUFFER_MAX = 10
 const INVULN_MS = 2000
@@ -32,22 +46,6 @@ const BIG_H = 48
 const SCORE_STOMP_ENEMY = 200
 /** Points for defeating an enemy with a fireball or while invincible (star). */
 const SCORE_FIRE_OR_STAR_ENEMY = 200
-
-/**
- * True when the player is coming down onto the enemy’s head (not rising through or side-bumping).
- * @param {import('./mario-types').Player} player - Mario after movement this tick
- * @param {import('./mario-types').Enemy} enemy - Grounded enemy hitbox
- * @returns {boolean} Whether to treat contact as a stomp
- */
-function isStompFromAbove(player: Player, enemy: Enemy): boolean {
-  if (player.velocityY < -0.5) return false
-  const feet = player.y + player.height
-  const penetration = feet - enemy.y
-  const maxPen = Math.min(22, enemy.height * 0.65)
-  if (penetration < 0 || penetration > maxPen) return false
-  if (player.velocityY > 0) return true
-  return penetration <= 14
-}
 
 /**
  * Award score and floating “+pts” for an enemy defeat; increments `enemiesDefeated`.
@@ -87,32 +85,30 @@ function awardEnemyScore(
  * Advance simulation by one fixed tick: input, movement, collisions, entities, timers.
  * @param {import('./mario-types').MarioGameState} prev - State at the start of the tick
  * @param {import('./mario-types').GameInputSnapshot} input - Keyboard/gamepad snapshot for this tick
- * @param {number} now - `performance.now()` for invulnerability and star timers
  * @returns {import('./mario-types').MarioGameState} New state for the next frame
  */
-export function advanceGameState(prev: MarioGameState, input: GameInputSnapshot, now: number): MarioGameState {
-  if (prev.gameStatus === 'paused') {
-    return { ...prev, player: { ...prev.player, invulnerable: now < prev.invulnerableUntil } }
-  }
+export function advanceGameState(prev: MarioGameState, input: GameInputSnapshot): MarioGameState {
+  if (prev.gameStatus !== 'playing') return prev
 
-  if (prev.gameStatus !== 'playing') {
-    if (prev.pendingCompleteAt !== null && now >= prev.pendingCompleteAt) {
-      return { ...prev, gameStatus: 'complete', pendingCompleteAt: null }
+  const gameTime = prev.gameTime + FIXED_DT
+  const now = gameTime * 1000
+  if (prev.pendingCompleteAt !== null) {
+    if (now >= prev.pendingCompleteAt) {
+      return { ...prev, gameStatus: 'complete', gameTime, pendingCompleteAt: null }
     }
-    return prev
+    return { ...prev, gameTime }
   }
 
   const newState: MarioGameState = {
     ...prev,
-    collectibles: prev.collectibles.map((c) => ({ ...c })),
     enemies: prev.enemies.map((e) => ({ ...e })),
-    fireballs: prev.fireballs.map((f) => ({ ...f })),
+    fireballs: [...prev.fireballs],
+    gameTime,
     flagPole: {
       ...prev.flagPole,
       flag: { ...prev.flagPole.flag },
     },
-    particles: prev.particles.map((p) => ({ ...p })),
-    platforms: prev.platforms.map((p) => ({ ...p })),
+    particles: [...prev.particles],
     player: { ...prev.player },
   }
 
@@ -126,121 +122,14 @@ export function advanceGameState(prev: MarioGameState, input: GameInputSnapshot,
     newState.jumpBufferFrames = Math.max(0, newState.jumpBufferFrames - 1)
   }
 
-  const wasOnGround = player.onGround
-
-  if (wasOnGround) {
-    player.coyoteFrames = COYOTE_MAX
-  }
-
-  player.isRunning = input.run
-  const speed = player.isRunning ? PLAYER_SPEED * RUN_MULTIPLIER : PLAYER_SPEED
-
-  if (input.left) {
-    player.velocityX = -speed
-    player.facing = 'left'
-  } else if (input.right) {
-    player.velocityX = speed
-    player.facing = 'right'
-  } else {
-    player.velocityX *= 0.8
-  }
-
-  const canJump = player.onGround || player.coyoteFrames > 0
-  if (newState.jumpBufferFrames > 0 && canJump) {
-    player.velocityY = -JUMP_FORCE
-    player.isJumping = true
-    player.onGround = false
-    newState.jumpBufferFrames = 0
-    player.coyoteFrames = 0
-    playMarioSound('jump')
-  }
-
-  if (!input.jumpHeld && player.velocityY < 0) {
-    player.velocityY *= JUMP_CUT_MULTIPLIER
-  }
-
-  player.velocityY += GRAVITY
-
-  player.x += player.velocityX
-  player.y += player.velocityY
-
-  const platformsToRemove = new Set<string>()
-  player.onGround = false
-
-  for (const platform of newState.platforms) {
-    if (!platform.solid) continue
-    if (!checkCollision(player, platform)) continue
-
-    if (player.velocityY < 0 && player.y > platform.y) {
-      if (platform.breakable && player.powerUp !== 'small') {
-        platformsToRemove.add(platform.id)
-        player.y = platform.y + platform.height
-        player.velocityY = 0
-        newState.score += 50
-        playMarioSound('stomp')
-        for (let i = 0; i < 6; i++) {
-          newState.particles.push({
-            id: `brick-${platform.id}-${i}-${now}`,
-            life: 25,
-            maxLife: 25,
-            type: 'brick',
-            velocityX: (Math.random() - 0.5) * 5,
-            velocityY: -2 - Math.random() * 2,
-            x: platform.x + Math.random() * platform.width,
-            y: platform.y + platform.height / 2,
-          })
-        }
-        continue
-      }
-      player.y = platform.y + platform.height
-      player.velocityY = 0
-      continue
-    }
-
-    if (player.velocityY > 0 && player.y < platform.y) {
-      player.y = platform.y - player.height
-      player.velocityY = 0
-      player.onGround = true
-      player.isJumping = false
-      continue
-    }
-
-    if (player.velocityX > 0 && player.x < platform.x) {
-      player.x = platform.x - player.width
-    } else if (player.velocityX < 0 && player.x > platform.x) {
-      player.x = platform.x + platform.width
-    }
-  }
-
-  if (platformsToRemove.size > 0) {
-    newState.platforms = newState.platforms.filter((p) => !platformsToRemove.has(p.id))
-  }
-
-  if (player.x < 0) player.x = 0
-  if (player.x > newState.levelWidth - player.width) {
-    player.x = newState.levelWidth - player.width
-  }
-
-  if (!player.onGround) {
-    player.coyoteFrames = Math.max(0, player.coyoteFrames - 1)
-  }
+  setPlayerSizeForPower(player, newState.platforms)
+  updatePlayerMotion(newState, input, now)
+  newState.furthestX = Math.max(prev.furthestX, player.x)
 
   if (player.y > newState.levelHeight) {
-    player.lives--
-    playMarioSound('damage')
-    if (player.lives <= 0) {
-      newState.gameStatus = 'gameOver'
-    } else {
-      player.x = 50
-      player.y = 200
-      player.velocityX = 0
-      player.velocityY = 0
-      newState.invulnerableUntil = now + INVULN_MS
-    }
+    loseLife(newState, now)
+    return newState
   }
-
-  const targetCameraX = player.x - MARIO_CANVAS_WIDTH / 2
-  newState.cameraX = Math.max(0, Math.min(targetCameraX, newState.levelWidth - MARIO_CANVAS_WIDTH))
 
   if (newState.fireCooldownFrames > 0) newState.fireCooldownFrames--
 
@@ -266,7 +155,9 @@ export function advanceGameState(prev: MarioGameState, input: GameInputSnapshot,
 
   newState.fireballs = updateFireballs(newState, now)
 
-  newState.enemies = updateEnemies(newState, player, now, starActive)
+  newState.enemies = updateEnemies(newState, player, now, starActive, prev.player.y + prev.player.height)
+
+  if (player.lives !== prev.player.lives) return newState
 
   updateCollectibles(newState, player, now)
 
@@ -279,35 +170,218 @@ export function advanceGameState(prev: MarioGameState, input: GameInputSnapshot,
     }))
     .filter((particle) => particle.life > 0)
 
-  checkFlagPole(newState, player, now)
-
-  newState.gameTime += FIXED_DT
-
-  if (newState.gameStatus === 'playing' && newState.pendingCompleteAt !== null && now >= newState.pendingCompleteAt) {
-    newState.gameStatus = 'complete'
-    newState.pendingCompleteAt = null
+  if (newState.proofroom) {
+    updateProofroom(newState)
+  } else {
+    checkFlagPole(newState, player, now)
   }
 
-  if (newState.timeRemaining !== null) {
+  if (newState.timeRemaining !== null && newState.pendingCompleteAt === null) {
     newState.timeRemaining = Math.max(0, newState.timeRemaining - FIXED_DT)
-    if (newState.timeRemaining <= 0 && newState.gameStatus === 'playing') {
-      player.lives--
-      playMarioSound('damage')
-      if (player.lives <= 0) {
-        newState.gameStatus = 'gameOver'
-      } else {
-        newState.timeRemaining = newState.timeLimitMax
-        player.x = 50
-        player.y = 200
-        player.velocityX = 0
-        player.velocityY = 0
-        newState.invulnerableUntil = now + INVULN_MS
-      }
+    if (newState.timeRemaining <= 0) loseLife(newState, now)
+  }
+
+  newState.cameraX = playerCameraX(newState)
+  return newState
+}
+
+/**
+ * Collect the document corrections and enter the publication course through the approval exit.
+ * @param {MarioGameState} state - Mutable game state for this tick
+ */
+function updateProofroom(state: MarioGameState): void {
+  const room = state.proofroom
+  if (!room) return
+
+  const marks = room.marks.map((mark) => {
+    if (mark.collected || !checkCollision(state.player, mark)) return mark
+    playMarioSound('coin')
+    return { ...mark, collected: true }
+  })
+
+  if (marks.every(({ collected }) => collected) && checkCollision(state.player, room.exit)) {
+    playMarioSound('flag')
+    const { spawnPosition } = room.course
+    Object.assign(state, room.course)
+    state.furthestX = spawnPosition.x
+    Object.assign(state.player, spawnPosition, { coyoteFrames: 0, velocityX: 0, velocityY: 0 })
+    state.player.onGround = false
+    state.player.isJumping = false
+    state.jumpBufferFrames = 0
+    delete state.proofroom
+    return
+  }
+
+  state.proofroom = { ...room, marks }
+}
+
+/**
+ * Apply acceleration, buffered jumping and axis-separated collision for one player tick.
+ * @param {import('./mario-types').MarioGameState} state - Mutable game state
+ * @param {import('./mario-types').GameInputSnapshot} input - Input held this tick
+ * @param {number} now - Active simulation time in milliseconds
+ */
+function updatePlayerMotion(state: MarioGameState, input: GameInputSnapshot, now: number): void {
+  const player = state.player
+  if (player.onGround) player.coyoteFrames = COYOTE_MAX
+
+  const direction = Number(input.right) - Number(input.left)
+  const maxSpeed = input.run ? PLAYER_SPEED * RUN_MULTIPLIER : PLAYER_SPEED
+  const targetSpeed = direction * maxSpeed
+  const acceleration = player.onGround ? GROUND_ACCELERATION : AIR_ACCELERATION
+  const deceleration = player.onGround ? GROUND_DECELERATION : AIR_DECELERATION
+  const step = direction === 0 ? deceleration : acceleration
+  const speedDifference = targetSpeed - player.velocityX
+  player.velocityX += Math.max(-step, Math.min(step, speedDifference))
+  player.isRunning = input.run && direction !== 0
+  if (direction !== 0) player.facing = direction > 0 ? 'right' : 'left'
+
+  if (state.jumpBufferFrames > 0 && (player.onGround || player.coyoteFrames > 0)) {
+    player.velocityY = -JUMP_FORCE
+    player.isJumping = true
+    player.onGround = false
+    player.coyoteFrames = 0
+    state.jumpBufferFrames = 0
+    playMarioSound('jump')
+  }
+
+  if (player.isJumping && !input.jumpHeld) {
+    player.velocityY = Math.max(player.velocityY, JUMP_RELEASE_SPEED)
+  }
+  player.velocityY = Math.min(MAX_FALL_SPEED, player.velocityY + GRAVITY)
+
+  const solidPlatforms = state.platforms.filter((platform) => platform.solid)
+  const horizontalHit = sweptPlatform(player, solidPlatforms, 'x', player.velocityX)
+  if (horizontalHit) {
+    player.x = player.velocityX > 0 ? horizontalHit.x - player.width : horizontalHit.x + horizontalHit.width
+    player.velocityX = 0
+  } else {
+    const nextX = player.x + player.velocityX
+    player.x = Math.max(0, Math.min(nextX, state.levelWidth - player.width))
+    if (player.x !== nextX) player.velocityX = 0
+  }
+
+  const verticalHit = sweptPlatform(player, solidPlatforms, 'y', player.velocityY)
+  player.onGround = Boolean(verticalHit && player.velocityY > 0)
+  if (verticalHit) {
+    if (player.onGround) {
+      player.y = verticalHit.y - player.height
+      player.isJumping = false
+    } else {
+      player.y = verticalHit.y + verticalHit.height
+      if (verticalHit.breakable && player.powerUp !== 'small') breakBrick(state, verticalHit, now)
+    }
+    player.velocityY = 0
+  } else {
+    player.y += player.velocityY
+  }
+
+  if (!player.onGround) player.coyoteFrames = Math.max(0, player.coyoteFrames - 1)
+}
+
+/**
+ * Find the first solid edge crossed by an axis-aligned movement.
+ * @param {import('./mario-types').Player | import('./mario-types').Enemy} body - Entity before moving on this axis
+ * @param {import('./mario-types').Platform[]} platforms - Solid platforms
+ * @param {'x' | 'y'} axis - Movement axis
+ * @param {number} velocity - Signed displacement this tick
+ * @returns {import('./mario-types').Platform | undefined} Nearest platform hit
+ */
+function sweptPlatform(
+  body: Enemy | Player,
+  platforms: Platform[],
+  axis: 'x' | 'y',
+  velocity: number,
+): Platform | undefined {
+  if (velocity === 0) return undefined
+  const crossAxis = axis === 'x' ? 'y' : 'x'
+  const size = axis === 'x' ? 'width' : 'height'
+  const crossSize = axis === 'x' ? 'height' : 'width'
+  const leadingEdge = body[axis] + (velocity > 0 ? body[size] : 0)
+  const direction = Math.sign(velocity)
+  let nearest: Platform | undefined
+  let distance = Math.abs(velocity)
+
+  for (const platform of platforms) {
+    if (body[crossAxis] >= platform[crossAxis] + platform[crossSize]) continue
+    if (body[crossAxis] + body[crossSize] <= platform[crossAxis]) continue
+
+    const edge = platform[axis] + (velocity > 0 ? 0 : platform[size])
+    const gap = (edge - leadingEdge) * direction
+    if (gap >= 0 && gap <= distance) {
+      distance = gap
+      nearest = platform
     }
   }
+  return nearest
+}
 
-  newState.player = player
-  return newState
+/**
+ * Remove a brick hit from below and award points and particles.
+ * @param {import('./mario-types').MarioGameState} state - Mutable game state
+ * @param {import('./mario-types').Platform} brick - Impacted brick
+ * @param {number} now - Active simulation time in milliseconds
+ */
+function breakBrick(state: MarioGameState, brick: Platform, now: number): void {
+  state.platforms = state.platforms.filter((platform) => platform !== brick)
+  state.score += 50
+  playMarioSound('stomp')
+  for (let i = 0; i < 6; i++) {
+    state.particles.push({
+      id: `brick-${brick.id}-${i}-${now}`,
+      life: 25,
+      maxLife: 25,
+      type: 'brick',
+      velocityX: (Math.random() - 0.5) * 5,
+      velocityY: -2 - Math.random() * 2,
+      x: brick.x + Math.random() * brick.width,
+      y: brick.y + brick.height / 2,
+    })
+  }
+}
+
+/**
+ * Scroll to keep the player near the center where the level bounds allow it.
+ * @param {import('./mario-types').MarioGameState} state - Current game state
+ * @returns {number} Camera position in level pixels
+ */
+function playerCameraX(state: MarioGameState): number {
+  return Math.max(0, Math.min(state.player.x - MARIO_CANVAS_WIDTH / 2, state.levelWidth - MARIO_CANVAS_WIDTH))
+}
+
+/**
+ * Deduct a life and respawn the player at the level's configured start if lives remain.
+ * @param {import('./mario-types').MarioGameState} state - Mutable game state
+ * @param {number} now - Active simulation time in milliseconds
+ */
+function loseLife(state: MarioGameState, now: number): void {
+  const player = state.player
+  player.lives--
+  playMarioSound('damage')
+  if (player.lives <= 0) {
+    state.gameStatus = 'gameOver'
+    return
+  }
+
+  player.powerUp = 'small'
+  setPlayerSizeForPower(player)
+  player.x = state.spawnPosition.x
+  player.y = state.spawnPosition.y
+  player.velocityX = 0
+  player.velocityY = 0
+  player.facing = 'right'
+  player.onGround = false
+  player.isJumping = false
+  player.isRunning = false
+  player.coyoteFrames = 0
+  player.invulnerable = true
+  state.invulnerableUntil = now + INVULN_MS
+  state.starPowerUntil = 0
+  state.jumpBufferFrames = 0
+  state.fireballs = []
+  state.fireCooldownFrames = 0
+  state.timeRemaining = state.timeLimitMax
+  state.cameraX = playerCameraX(state)
 }
 
 /**
@@ -346,6 +420,7 @@ export function createInitialGameState(
     fireballs: [],
     fireCooldownFrames: 0,
     flagPole,
+    furthestX: player.x,
     gameStatus: 'playing',
     gameTime: 0,
     invulnerableUntil: 0,
@@ -359,6 +434,7 @@ export function createInitialGameState(
     platforms: parsed.platforms!,
     player,
     score: options?.score ?? 0,
+    spawnPosition: { x: player.x, y: player.y },
     spriteTheme: options?.spriteTheme ?? 'classic',
     starPowerUntil: 0,
     timeLimitMax: timeLimit,
@@ -391,7 +467,7 @@ export function themeColors(theme: LevelTheme): {
  * Handle one enemy/body hit: shrink power tier or lose a life; start invulnerability.
  * @param {import('./mario-types').MarioGameState} state - Mutable game state
  * @param {import('./mario-types').Player} player - Player entity
- * @param {number} now - Current `performance.now()` time
+ * @param {number} now - Active simulation time in milliseconds
  * @returns {void}
  */
 function applyPlayerDamage(state: MarioGameState, player: Player, now: number): void {
@@ -400,20 +476,17 @@ function applyPlayerDamage(state: MarioGameState, player: Player, now: number): 
   if (player.powerUp === 'fire') {
     player.powerUp = 'big'
     setPlayerSizeForPower(player)
+    player.invulnerable = true
     state.invulnerableUntil = now + INVULN_MS
     playMarioSound('damage')
   } else if (player.powerUp === 'big') {
     player.powerUp = 'small'
     setPlayerSizeForPower(player)
+    player.invulnerable = true
     state.invulnerableUntil = now + INVULN_MS
     playMarioSound('damage')
   } else {
-    player.lives--
-    state.invulnerableUntil = now + INVULN_MS
-    playMarioSound('damage')
-    if (player.lives <= 0) {
-      state.gameStatus = 'gameOver'
-    }
+    loseLife(state, now)
   }
 }
 
@@ -493,22 +566,18 @@ function defaultFlagPole(levelWidth: number, tileSize: number): MarioGameState['
 /**
  * Resize the player hitbox to match `powerUp` (small vs big/fire) and keep feet planted.
  * @param {import('./mario-types').Player} player - Mutable player entity
- * @returns {void}
+ * @param {import('./mario-types').Platform[]} [platforms] - Obstacles that can delay growth until there is room
  */
-function setPlayerSizeForPower(player: Player): void {
-  const wasH = player.height
-  if (player.powerUp === 'small') {
-    player.height = SMALL_H
-    player.width = PLAYER_W
-  } else {
-    player.height = BIG_H
-    player.width = PLAYER_W
+function setPlayerSizeForPower(player: Player, platforms?: Platform[]): void {
+  const height = player.powerUp === 'small' ? SMALL_H : BIG_H
+  if (player.height === height && player.width === PLAYER_W) return
+
+  const y = player.y + player.height - height
+  const bounds = { height, width: PLAYER_W, x: player.x, y }
+  if (height > player.height && platforms?.some((platform) => platform.solid && checkCollision(bounds, platform))) {
+    return
   }
-  if (player.height < wasH) {
-    player.y += wasH - player.height
-  } else if (player.height > wasH) {
-    player.y -= player.height - wasH
-  }
+  Object.assign(player, bounds)
 }
 
 /**
@@ -535,7 +604,7 @@ function updateCollectibles(state: MarioGameState, player: Player, now: number):
       case 'fireflower':
         if (player.powerUp === 'small') {
           player.powerUp = 'big'
-          setPlayerSizeForPower(player)
+          setPlayerSizeForPower(player, state.platforms)
         }
         player.powerUp = 'fire'
         playMarioSound('powerup')
@@ -543,12 +612,13 @@ function updateCollectibles(state: MarioGameState, player: Player, now: number):
       case 'mushroom':
         if (player.powerUp === 'small') {
           player.powerUp = 'big'
-          setPlayerSizeForPower(player)
+          setPlayerSizeForPower(player, state.platforms)
           playMarioSound('powerup')
         }
         break
       case 'star':
         state.starPowerUntil = now + STAR_MS
+        player.invulnerable = true
         playMarioSound('powerup')
         break
       default:
@@ -576,14 +646,21 @@ function updateCollectibles(state: MarioGameState, player: Player, now: number):
  * @param {import('./mario-types').Player} player - Player entity
  * @param {number} now - Used for damage invulnerability checks
  * @param {boolean} starActive - When true, contact defeats enemies without hurting Mario
+ * @param {number} previousFeet - Player foot position before moving
  * @returns {import('./mario-types').Enemy[]} Enemies still alive after this tick
  */
-function updateEnemies(state: MarioGameState, player: Player, now: number, starActive: boolean): Enemy[] {
-  const starKills = starActive
+function updateEnemies(
+  state: MarioGameState,
+  player: Player,
+  now: number,
+  starActive: boolean,
+  previousFeet: number,
+): Enemy[] {
+  const solidPlatforms = state.platforms.filter((platform) => platform.solid)
 
   const updated = state.enemies
     .map((enemy) => {
-      if (!enemy.alive) return enemy
+      if (!enemy.alive || state.gameStatus === 'gameOver') return enemy
       const updatedEnemy = { ...enemy }
 
       if (updatedEnemy.type === 'piranha') {
@@ -591,7 +668,7 @@ function updateEnemies(state: MarioGameState, player: Player, now: number, starA
         const phase = state.gameTime * 2.8
         updatedEnemy.y = anchor - 20 + Math.sin(phase) * 22
         if (checkCollision(player, updatedEnemy)) {
-          if (starKills) {
+          if (starActive) {
             updatedEnemy.alive = false
             awardEnemyScore(
               state,
@@ -608,69 +685,46 @@ function updateEnemies(state: MarioGameState, player: Player, now: number, starA
         return updatedEnemy
       }
 
-      updatedEnemy.velocityY += GRAVITY * 0.5
-      updatedEnemy.x += updatedEnemy.velocityX
-      updatedEnemy.y += updatedEnemy.velocityY
-
-      let onGround = false
-      for (const platform of state.platforms) {
-        if (checkCollision(updatedEnemy, platform) && platform.solid) {
-          if (updatedEnemy.velocityY > 0 && updatedEnemy.y < platform.y) {
-            updatedEnemy.y = platform.y - updatedEnemy.height
-            updatedEnemy.velocityY = 0
-            onGround = true
-          } else if (updatedEnemy.velocityX > 0 && updatedEnemy.x < platform.x) {
-            updatedEnemy.x = platform.x - updatedEnemy.width
-            updatedEnemy.velocityX *= -1
-            updatedEnemy.direction = updatedEnemy.direction === 'left' ? 'right' : 'left'
-          } else if (updatedEnemy.velocityX < 0 && updatedEnemy.x > platform.x) {
-            updatedEnemy.x = platform.x + platform.width
-            updatedEnemy.velocityX *= -1
-            updatedEnemy.direction = updatedEnemy.direction === 'left' ? 'right' : 'left'
-          }
-        }
+      const wall = sweptPlatform(updatedEnemy, solidPlatforms, 'x', updatedEnemy.velocityX)
+      if (wall) {
+        updatedEnemy.x = updatedEnemy.velocityX > 0 ? wall.x - updatedEnemy.width : wall.x + wall.width
+        updatedEnemy.velocityX *= -1
+      } else {
+        updatedEnemy.x += updatedEnemy.velocityX
       }
 
-      if (onGround) {
-        const lookAheadDistance = updatedEnemy.width
-        const lookAheadX =
-          updatedEnemy.velocityX > 0
-            ? updatedEnemy.x + updatedEnemy.width + lookAheadDistance
-            : updatedEnemy.x - lookAheadDistance
+      updatedEnemy.velocityY = Math.min(MAX_FALL_SPEED, updatedEnemy.velocityY + GRAVITY * 0.5)
+      const floor = sweptPlatform(updatedEnemy, solidPlatforms, 'y', updatedEnemy.velocityY)
+      if (floor) {
+        updatedEnemy.y = floor.y - updatedEnemy.height
+        updatedEnemy.velocityY = 0
 
-        let foundPlatform = false
-        for (const platform of state.platforms) {
-          if (
-            checkCollision({ height: 1, width: 1, x: lookAheadX, y: updatedEnemy.y + updatedEnemy.height }, platform) &&
-            platform.solid
-          ) {
-            foundPlatform = true
-            break
-          }
-        }
-
-        if (!foundPlatform) {
+        const edgeX = updatedEnemy.velocityX > 0 ? updatedEnemy.x + updatedEnemy.width : updatedEnemy.x - 1
+        const nextFoot = { height: 1, width: 1, x: edgeX, y: updatedEnemy.y + updatedEnemy.height }
+        if (!wall && !solidPlatforms.some((platform) => checkCollision(nextFoot, platform))) {
           updatedEnemy.velocityX *= -1
-          updatedEnemy.direction = updatedEnemy.direction === 'left' ? 'right' : 'left'
         }
+      } else {
+        updatedEnemy.y += updatedEnemy.velocityY
       }
 
       if (updatedEnemy.x < 0) {
         updatedEnemy.x = 0
         updatedEnemy.velocityX *= -1
-        updatedEnemy.direction = 'right'
       } else if (updatedEnemy.x > state.levelWidth - updatedEnemy.width) {
         updatedEnemy.x = state.levelWidth - updatedEnemy.width
         updatedEnemy.velocityX *= -1
-        updatedEnemy.direction = 'left'
       }
+
+      updatedEnemy.direction = updatedEnemy.velocityX > 0 ? 'right' : 'left'
 
       if (updatedEnemy.y > state.levelHeight) {
         updatedEnemy.alive = false
+        return updatedEnemy
       }
 
       if (checkCollision(player, updatedEnemy)) {
-        if (starKills) {
+        if (starActive) {
           updatedEnemy.alive = false
           awardEnemyScore(
             state,
@@ -690,9 +744,13 @@ function updateEnemies(state: MarioGameState, player: Player, now: number, starA
             x: updatedEnemy.x,
             y: updatedEnemy.y,
           })
-        } else if (isStompFromAbove(player, updatedEnemy)) {
+        } else if (player.velocityY >= 0 && previousFeet <= enemy.y && player.y + player.height >= updatedEnemy.y) {
           updatedEnemy.alive = false
+          player.y = updatedEnemy.y - player.height
           player.velocityY = -JUMP_FORCE / 2
+          player.isJumping = false
+          player.onGround = false
+          player.coyoteFrames = 0
           awardEnemyScore(
             state,
             SCORE_STOMP_ENEMY,

@@ -73,6 +73,15 @@ export type LevelTheme = 'castle' | 'overworld' | 'underground' | 'underwater'
 
 export type SpriteTheme = 'botvar' | 'classic'
 
+export interface BotvarProofroom {
+  course: Pick<
+    MarioGameState,
+    'collectibles' | 'enemies' | 'levelHeight' | 'levelWidth' | 'platforms' | 'spawnPosition'
+  >
+  exit: { height: number; width: number; x: number; y: number }
+  marks: { collected: boolean; height: number; width: number; x: number; y: number }[]
+}
+
 export interface MarioGameResult {
   coinsCollected: number
   completed: boolean
@@ -83,6 +92,8 @@ export interface MarioGameResult {
 }
 
 export interface MarioGameState {
+  /** Furthest position reached on this course, retained across falls and backtracking. */
+  furthestX: number
   cameraX: number
   coinsCollected: number
   collectibles: Collectible[]
@@ -93,6 +104,7 @@ export interface MarioGameState {
   flagPole: FlagPole
   gameStatus: 'complete' | 'gameOver' | 'paused' | 'playing'
   gameTime: number
+  /** Deadlines use active simulation milliseconds. */
   invulnerableUntil: number
   jumpBufferFrames: number
   level: number
@@ -103,7 +115,9 @@ export interface MarioGameState {
   pendingCompleteAt: null | number
   platforms: Platform[]
   player: Player
+  proofroom?: BotvarProofroom
   score: number
+  spawnPosition: { x: number; y: number }
   spriteTheme: SpriteTheme
   starPowerUntil: number
   timeLimitMax: null | number

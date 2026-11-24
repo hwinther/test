@@ -44,6 +44,7 @@
     "tailwindcss": "4.3.4"
   },
   "devDependencies": {
+    "@cspell/dict-nb-no": "3.0.0",
     "@cspell/eslint-plugin": "10.4.0",
     "@faker-js/faker": "10.6.0",
     "@react-router/dev": "8.5.1",

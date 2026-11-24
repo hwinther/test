@@ -3,6 +3,15 @@ export type PublicRuntimeConfig = {
   apiBaseUrl: string
   otelTracesEndpoint: string
   otelServiceName: string
+  sharedLeaderboardEnabled: boolean
+}
+
+/**
+ * Reads the frontend Redis URL. An empty value enables browser-local scores only.
+ * @returns {string | undefined} The configured Redis URL, if present.
+ */
+export function readLeaderboardRedisUrl(): string | undefined {
+  return process.env.REDIS_URL?.trim() || undefined
 }
 
 /** Default when no env override is set (local dev). */

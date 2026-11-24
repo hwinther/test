@@ -14,6 +14,7 @@ describe('getApiBaseUrl in the browser', () => {
       apiBaseUrl: ' https://api.test ',
       otelServiceName: '',
       otelTracesEndpoint: '',
+      sharedLeaderboardEnabled: false,
     }
     expect(getApiBaseUrl()).toBe('https://api.test/')
     globalThis.window.__TEST_PUBLIC__.apiBaseUrl = 'https://api.test/v/'

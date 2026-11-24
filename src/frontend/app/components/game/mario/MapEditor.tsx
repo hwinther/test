@@ -24,6 +24,22 @@ type Tool =
   | 'pipe'
   | 'player-spawn'
 
+const TOOL_LABELS: Record<Tool, string> = {
+  brick: 'Murstein',
+  cloud: 'Sky',
+  coin: 'Mynt',
+  'enemy-goomba': 'Goomba',
+  'enemy-koopa': 'Koopa',
+  eraser: 'Viskelær',
+  'flag-pole': 'Flaggstang',
+  ground: 'Bakke',
+  pipe: 'Rør',
+  'player-spawn': 'Startpunkt',
+}
+
+const TERRAIN_TOOLS: readonly Tool[] = ['ground', 'brick', 'cloud', 'pipe']
+const ENTITY_TOOLS: readonly Tool[] = ['enemy-goomba', 'enemy-koopa', 'player-spawn', 'flag-pole']
+
 /**
  * Renders the Mario-style map editor for creating and editing levels.
  * @param {MapEditorProps} root0 - Props object for the MapEditor component
@@ -203,7 +219,7 @@ export function MapEditor({ initialLevel, onClose, onPlayTest, onSave }: MapEdit
             ctx.fillStyle = '#FF0000'
             ctx.font = '12px Arial'
             ctx.textAlign = 'center'
-            ctx.fillText(tile.properties?.enemyType?.[0]?.toUpperCase() || 'E', x + tileSize / 2, y + tileSize / 2 + 4)
+            ctx.fillText(tile.properties?.enemyType?.[0]?.toUpperCase() || 'F', x + tileSize / 2, y + tileSize / 2 + 4)
             break
           case 'flag-pole':
             ctx.fillStyle = '#8B4513'
@@ -225,7 +241,7 @@ export function MapEditor({ initialLevel, onClose, onPlayTest, onSave }: MapEdit
             ctx.fillStyle = '#FFFFFF'
             ctx.font = '16px Arial'
             ctx.textAlign = 'center'
-            ctx.fillText('P', x + tileSize / 2, y + tileSize / 2 + 6)
+            ctx.fillText('S', x + tileSize / 2, y + tileSize / 2 + 6)
             break
         }
 
@@ -288,95 +304,95 @@ export function MapEditor({ initialLevel, onClose, onPlayTest, onSave }: MapEdit
         setLevel(levelData)
       } catch (error) {
         console.error('Failed to import level:', error)
-        alert('Invalid level file format')
+        alert('Ugyldig banefilformat')
       }
     }
     reader.readAsText(file)
   }
 
   const clearLevel = () => {
-    if (confirm('Are you sure you want to clear the entire level?')) {
+    if (confirm('Vil du tømme hele banen?')) {
       setLevel(LevelLoader.createEmptyLevel(level.dimensions.width, level.dimensions.height, level.dimensions.tileSize))
     }
   }
 
   return (
-    <div className="map-editor">
+    <div className="map-editor" lang="nb">
       <div className="map-editor-header">
-        <h1>Mario Map Editor</h1>
-        <button className="close-button" onClick={onClose}>
+        <h1>Mario-baneeditor</h1>
+        <button aria-label="Lukk baneeditoren" className="close-button" onClick={onClose}>
           ✕
         </button>
       </div>
 
       <div className="map-editor-toolbar">
         <div className="tool-section">
-          <h3>Terrain</h3>
-          {['ground', 'brick', 'cloud', 'pipe'].map((tool) => (
+          <h3>Terreng</h3>
+          {TERRAIN_TOOLS.map((tool) => (
             <button
               className={selectedTool === tool ? 'active' : ''}
               key={tool}
-              onClick={() => setSelectedTool(tool as Tool)}
-              title={tool}
+              onClick={() => setSelectedTool(tool)}
+              title={TOOL_LABELS[tool]}
             >
-              {tool}
+              {TOOL_LABELS[tool]}
             </button>
           ))}
         </div>
 
         <div className="tool-section">
-          <h3>Items</h3>
+          <h3>Gjenstander</h3>
           <button
             className={selectedTool === 'coin' ? 'active' : ''}
             onClick={() => setSelectedTool('coin')}
-            title="coin"
+            title={TOOL_LABELS.coin}
           >
-            coin
+            {TOOL_LABELS.coin}
           </button>
         </div>
 
         <div className="tool-section">
-          <h3>Entities</h3>
-          {['enemy-goomba', 'enemy-koopa', 'player-spawn', 'flag-pole'].map((tool) => (
+          <h3>Figurer og markører</h3>
+          {ENTITY_TOOLS.map((tool) => (
             <button
               className={selectedTool === tool ? 'active' : ''}
               key={tool}
-              onClick={() => setSelectedTool(tool as Tool)}
-              title={tool.replace('enemy-', '').replace('-', ' ')}
+              onClick={() => setSelectedTool(tool)}
+              title={TOOL_LABELS[tool]}
             >
-              {tool.replace('enemy-', '').replace('-', ' ')}
+              {TOOL_LABELS[tool]}
             </button>
           ))}
         </div>
 
         <div className="tool-section">
-          <h3>Tools</h3>
+          <h3>Verktøy</h3>
           <button
             className={selectedTool === 'eraser' ? 'active' : ''}
             onClick={() => setSelectedTool('eraser')}
-            title="eraser"
+            title={TOOL_LABELS.eraser}
           >
-            eraser
+            {TOOL_LABELS.eraser}
           </button>
         </div>
 
         <div className="tool-section">
-          <h3>Actions</h3>
-          <button onClick={saveLevel} title="Save level">
-            Save
+          <h3>Handlinger</h3>
+          <button onClick={saveLevel} title="Lagre banen">
+            Lagre
           </button>
-          <button onClick={playTestLevel} title="Play test this level">
-            Play Test
+          <button onClick={playTestLevel} title="Prøvespill banen">
+            Prøvespill
           </button>
-          <button onClick={exportLevel} title="Export as JSON file">
-            Export
+          <button onClick={exportLevel} title="Eksporter som JSON-fil">
+            Eksporter
           </button>
           <input accept=".json" id="import-file" onChange={importLevel} style={{ display: 'none' }} type="file" />
-          <button onClick={() => document.getElementById('import-file')?.click()} title="Import from JSON file">
-            Import
+          <button onClick={() => document.getElementById('import-file')?.click()} title="Importer fra JSON-fil">
+            Importer
           </button>
-          <button onClick={clearLevel} title="Clear entire level">
-            Clear
+          <button onClick={clearLevel} title="Tøm hele banen">
+            Tøm
           </button>
         </div>
       </div>
@@ -395,16 +411,16 @@ export function MapEditor({ initialLevel, onClose, onPlayTest, onSave }: MapEdit
         />
 
         <div className="camera-controls">
-          <button onClick={() => setCameraX((x) => Math.max(0, x - 64))} title="Pan left">
+          <button onClick={() => setCameraX((x) => Math.max(0, x - 64))} title="Flytt visningen til venstre">
             ←
           </button>
-          <button onClick={() => setCameraX((x) => x + 64)} title="Pan right">
+          <button onClick={() => setCameraX((x) => x + 64)} title="Flytt visningen til høyre">
             →
           </button>
-          <button onClick={() => setCameraY((y) => Math.max(0, y - 64))} title="Pan up">
+          <button onClick={() => setCameraY((y) => Math.max(0, y - 64))} title="Flytt visningen opp">
             ↑
           </button>
-          <button onClick={() => setCameraY((y) => y + 64)} title="Pan down">
+          <button onClick={() => setCameraY((y) => y + 64)} title="Flytt visningen ned">
             ↓
           </button>
           <button
@@ -412,9 +428,9 @@ export function MapEditor({ initialLevel, onClose, onPlayTest, onSave }: MapEdit
               setCameraX(0)
               setCameraY(0)
             }}
-            title="Reset camera"
+            title="Tilbakestill visningen"
           >
-            Home
+            Til start
           </button>
         </div>
       </div>
@@ -422,17 +438,17 @@ export function MapEditor({ initialLevel, onClose, onPlayTest, onSave }: MapEdit
       <div className="level-properties">
         <div className="property-group">
           <label>
-            Level Name:
+            Banenavn:
             <input
               onChange={(e) => setLevel((prev) => ({ ...prev, name: e.target.value }))}
-              placeholder="Level Name"
+              placeholder="Banenavn"
               type="text"
               value={level.name}
             />
           </label>
 
           <label>
-            Author:
+            Baneskaper:
             <input
               onChange={(e) =>
                 setLevel((prev) => ({
@@ -440,14 +456,14 @@ export function MapEditor({ initialLevel, onClose, onPlayTest, onSave }: MapEdit
                   metadata: { ...prev.metadata, author: e.target.value },
                 }))
               }
-              placeholder="Author Name"
+              placeholder="Navn på baneskaper"
               type="text"
               value={level.metadata.author}
             />
           </label>
 
           <label>
-            Difficulty:
+            Vanskelighetsgrad:
             <select
               onChange={(e) =>
                 setLevel((prev) => ({
@@ -457,23 +473,23 @@ export function MapEditor({ initialLevel, onClose, onPlayTest, onSave }: MapEdit
               }
               value={level.metadata.difficulty}
             >
-              <option value={1}>1 - Easy</option>
-              <option value={2}>2 - Normal</option>
-              <option value={3}>3 - Hard</option>
-              <option value={4}>4 - Very Hard</option>
-              <option value={5}>5 - Expert</option>
+              <option value={1}>1 – Lett</option>
+              <option value={2}>2 – Normal</option>
+              <option value={3}>3 – Vanskelig</option>
+              <option value={4}>4 – Svært vanskelig</option>
+              <option value={5}>5 – Ekspert</option>
             </select>
           </label>
         </div>
 
         <div className="property-group">
           <span>
-            Level Size: {level.dimensions.width} × {level.dimensions.height} tiles
+            Banestørrelse: {level.dimensions.width} × {level.dimensions.height} ruter
           </span>
           <span>
-            Camera: ({Math.floor(cameraX / 32)}, {Math.floor(cameraY / 32)})
+            Kameraposisjon: ({Math.floor(cameraX / 32)}, {Math.floor(cameraY / 32)})
           </span>
-          <span>Selected Tool: {selectedTool.replace('-', ' ')}</span>
+          <span>Valgt verktøy: {TOOL_LABELS[selectedTool]}</span>
         </div>
       </div>
     </div>

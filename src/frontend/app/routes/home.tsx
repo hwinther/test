@@ -1,4 +1,4 @@
-import { type JSX, useState } from 'react'
+import { type JSX, useMemo, useState } from 'react'
 
 import type { VersionInformation } from '~/api/models'
 import type { SpriteTheme } from '~/components/game/mario/mario-types'
@@ -31,7 +31,11 @@ function versionInfoFromQuery(data: unknown): VersionInformation | undefined {
 function Page(): JSX.Element {
   const [showGame, setShowGame] = useState(false)
   const [showMarioGame, setShowMarioGame] = useState(false)
-  const [marioTheme, setMarioTheme] = useState<SpriteTheme>('classic')
+  const [marioTheme, setMarioTheme] = useState<SpriteTheme>('botvar')
+  const campaign = useMemo(
+    () => (showMarioGame ? LevelLoader.createDefaultLevelSequence() : undefined),
+    [showMarioGame],
+  )
   const { data: versionRaw } = useVersion()
   const versionInfo = versionInfoFromQuery(versionRaw)
   const isKonamiActivated = useKonamiCode()
@@ -47,7 +51,8 @@ function Page(): JSX.Element {
   if (showMarioGame) {
     return (
       <MarioGame
-        levelSequence={LevelLoader.createDefaultLevelSequence()}
+        documentCampaign={marioTheme === 'botvar'}
+        levelSequence={campaign}
         onClose={() => setShowMarioGame(false)}
         spriteTheme={marioTheme}
       />
@@ -68,20 +73,20 @@ function Page(): JSX.Element {
         <button
           className="rounded-lg bg-red-600 px-5 py-2.5 text-white font-medium hover:bg-red-700 transition-colors cursor-pointer"
           onClick={() => {
-            setMarioTheme('classic')
-            setShowMarioGame(true)
-          }}
-        >
-          Play Mario Clone
-        </button>
-        <button
-          className="rounded-lg bg-purple-600 px-5 py-2.5 text-white font-medium hover:bg-purple-700 transition-colors cursor-pointer"
-          onClick={() => {
             setMarioTheme('botvar')
             setShowMarioGame(true)
           }}
         >
-          Play Botvar Theme
+          Spill Botvar
+        </button>
+        <button
+          className="rounded-lg bg-purple-600 px-5 py-2.5 text-white font-medium hover:bg-purple-700 transition-colors cursor-pointer"
+          onClick={() => {
+            setMarioTheme('classic')
+            setShowMarioGame(true)
+          }}
+        >
+          Spill med klassisk tema
         </button>
       </div>
 

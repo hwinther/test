@@ -11,6 +11,7 @@ import {
   DEFAULT_PUBLIC_API_BASE_URL,
   type PublicRuntimeConfig,
   readApiBaseUrlFromProcessEnv,
+  readLeaderboardRedisUrl,
 } from '~/public-runtime-config'
 import '~/components/PageLayout.css'
 
@@ -38,6 +39,7 @@ export async function loader(): Promise<{ publicRuntime: PublicRuntimeConfig }> 
         apiBaseUrl: DEFAULT_PUBLIC_API_BASE_URL,
         otelTracesEndpoint: '',
         otelServiceName: '',
+        sharedLeaderboardEnabled: false,
       },
     }
   }
@@ -50,6 +52,7 @@ export async function loader(): Promise<{ publicRuntime: PublicRuntimeConfig }> 
         process.env.VITE_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT?.trim() ||
         '',
       otelServiceName: process.env.PUBLIC_OTEL_SERVICE_NAME?.trim() || process.env.VITE_OTEL_SERVICE_NAME?.trim() || '',
+      sharedLeaderboardEnabled: Boolean(readLeaderboardRedisUrl()),
     },
   }
 }

@@ -9,76 +9,36 @@ export interface SpriteSet {
   goomba: HTMLImageElement | null
   koopa: HTMLImageElement | null
   piranha: HTMLImageElement | null
-  loaded: boolean
   player: HTMLImageElement | null
 }
 
-const cache = new Map<SpriteTheme, SpriteSet>()
+const classicSprites: SpriteSet = { goomba: null, koopa: null, piranha: null, player: null }
+let botvarSprites: SpriteSet | undefined
+
+const botvarUrls = {
+  goomba: commentBubbleUrl,
+  koopa: bugvarUrl,
+  piranha: piranhaParliamentUrl,
+  player: botvarUrl,
+} satisfies Record<keyof SpriteSet, string>
 
 /**
- * Create an `HTMLImageElement` from a Vite-resolved asset URL.
- * @param {string} src - Image URL
- * @returns {HTMLImageElement} Image element with `src` set
- */
-function loadImage(src: string): HTMLImageElement {
-  const img = new Image()
-  img.src = src
-  return img
-}
-
-/**
- * Return the sprite set for a given theme, loading images on first call.
- * Images load asynchronously; callers should check `sprite.loaded` or
- * fall back to the default canvas drawing when images are not yet ready.
- * @param {SpriteTheme} theme - The visual theme to load sprites for
- * @returns {SpriteSet} Sprite images (may still be loading)
+ * Lazily load each mascot asset and expose it as soon as the image is available.
+ * @param {SpriteTheme} theme - Active game art theme
+ * @returns {SpriteSet} Sprite images or null entries while pending
  */
 export function getSprites(theme: SpriteTheme): SpriteSet {
-  if (theme === 'classic') {
-    return { goomba: null, koopa: null, piranha: null, loaded: true, player: null }
+  if (theme === 'classic') return classicSprites
+  if (botvarSprites) return botvarSprites
+
+  const sprites = { ...classicSprites }
+  for (const name of Object.keys(botvarUrls) as (keyof SpriteSet)[]) {
+    const image = new Image()
+    image.addEventListener('load', () => {
+      sprites[name] = image
+    })
+    image.src = botvarUrls[name]
   }
-
-  const existing = cache.get(theme)
-  if (existing) return existing
-
-  const set: SpriteSet = { goomba: null, koopa: null, piranha: null, loaded: false, player: null }
-
-  if (theme === 'botvar') {
-    const playerImg = loadImage(botvarUrl)
-    const goombaImg = loadImage(commentBubbleUrl)
-    const koopaImg = loadImage(bugvarUrl)
-    const piranhaImg = loadImage(piranhaParliamentUrl)
-
-    let loadedCount = 0
-    const onLoad = (): void => {
-      loadedCount++
-      if (loadedCount === 4) {
-        set.player = playerImg
-        set.goomba = goombaImg
-        set.koopa = koopaImg
-        set.piranha = piranhaImg
-        set.loaded = true
-      }
-    }
-
-    playerImg.addEventListener('load', onLoad)
-    goombaImg.addEventListener('load', onLoad)
-    koopaImg.addEventListener('load', onLoad)
-    piranhaImg.addEventListener('load', onLoad)
-    playerImg.addEventListener('error', () => {
-      set.loaded = true
-    })
-    goombaImg.addEventListener('error', () => {
-      set.loaded = true
-    })
-    koopaImg.addEventListener('error', () => {
-      set.loaded = true
-    })
-    piranhaImg.addEventListener('error', () => {
-      set.loaded = true
-    })
-  }
-
-  cache.set(theme, set)
-  return set
+  botvarSprites = sprites
+  return sprites
 }

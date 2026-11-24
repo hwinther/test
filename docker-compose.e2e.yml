@@ -86,6 +86,7 @@ services:
     image: ${FRONTEND_IMAGE}
     environment:
       PUBLIC_API_BASE_URL: http://localhost:5155/
+      REDIS_URL: ""
       NODE_ENV: production
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
     ports:

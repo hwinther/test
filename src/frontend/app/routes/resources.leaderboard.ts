@@ -1,96 +1,126 @@
+import { randomUUID } from 'node:crypto'
 import { createClient } from 'redis'
+
+import { readLeaderboardRedisUrl } from '~/public-runtime-config'
 
 const LEADERBOARD_KEY = 'mario:leaderboard'
 const MAX_ENTRIES = 50
+const REDIS_TIMEOUT_MS = 1000
 
-type RedisClient = ReturnType<typeof createClient>
-let redis: RedisClient | null = null
+type RedisClient = ReturnType<typeof createLeaderboardRedis>
+let connection: { client: RedisClient; ready: Promise<RedisClient> } | undefined
 
 /**
- * Lazily create and connect a shared Redis client from `REDIS_URL`.
- * Accepts the standard `redis://:password@host:port/db` URL format.
- * @returns {Promise<RedisClient>} Connected client.
+ * Creates a client that rejects requests while it is disconnected.
+ * @param {string} url The configured Redis URL
+ * @returns {RedisClient} The new client
  */
-async function getRedis(): Promise<RedisClient> {
-  if (!redis) {
-    const url = process.env.REDIS_URL ?? 'redis://localhost:6379'
-    // node-redis 6 speaks RESP3 by default (Valkey 9 supports it) and then enables Redis Enterprise
-    // maintenance notifications; Valkey has no such thing, so keep them off as in v5.
-    redis = createClient({ url, maintNotifications: 'disabled' })
-    redis.on('error', (err: Error) => {
-      console.warn('[leaderboard] Redis connection error:', err.message)
-    })
-  }
-  if (!redis.isOpen) {
-    await redis.connect()
-  }
-  return redis
+function createLeaderboardRedis(url: string) {
+  return createClient({
+    disableOfflineQueue: true,
+    maintNotifications: 'disabled',
+    socket: { connectTimeout: REDIS_TIMEOUT_MS, reconnectStrategy: false },
+    url,
+  }).on('error', (error: Error) => console.warn('[leaderboard] Redis error:', error.message))
 }
 
 /**
- * Split a sorted-set member id `name|timestamp` used for tie-breaking.
- * @param {string} member - Raw Redis member string
- * @returns {{ name: string; ts: number }} Display name and insert time (ms), or `ts: 0`
+ * Run a leaderboard operation using a shared Redis connection and a request deadline.
+ * @template T
+ * @param {string} url Configured Redis URL
+ * @param {(client: RedisClient) => Promise<T>} operation Redis commands for the request
+ * @returns {Promise<T>} The result of the operation
  */
-function parseMember(member: string): { name: string; ts: number } {
-  const sepIdx = member.lastIndexOf('|')
-  if (sepIdx >= 0) {
-    return { name: member.slice(0, sepIdx), ts: Number.parseInt(member.slice(sepIdx + 1), 10) }
+async function useRedis<T>(url: string, operation: (client: RedisClient) => Promise<T>): Promise<T> {
+  if (!connection?.client.isOpen) {
+    const client = createLeaderboardRedis(url)
+    connection = { client, ready: client.connect() }
   }
-  return { name: member, ts: 0 }
+
+  const { client, ready } = connection
+  let timeout: ReturnType<typeof setTimeout> | undefined
+  try {
+    return await Promise.race([
+      ready.then(operation),
+      new Promise<never>((_, reject) => {
+        timeout = setTimeout(() => {
+          if (client.isOpen) client.destroy()
+          reject(new Error('Redis leaderboard timed out'))
+        }, REDIS_TIMEOUT_MS)
+      }),
+    ])
+  } finally {
+    clearTimeout(timeout)
+  }
 }
 
 /**
- * GET /resources/leaderboard -- return up to MAX_ENTRIES rows.
- * @returns {Promise<Response>} JSON array of `{ name, score, ts }`
+ * Convert sorted-set rows to entries, including members from earlier versions.
+ * @param {{ value: string; score: number }[]} rows Redis sorted-set rows in descending order
+ * @returns {{ id: string; name: string; score: number; ts: number }[]} Entries ready for display
+ */
+function toEntries(
+  rows: { value: string; score: number }[],
+): { id: string; name: string; score: number; ts: number }[] {
+  return rows.map(({ value, score }) => {
+    const separator = value.lastIndexOf('|')
+    const name = separator < 0 ? value : value.slice(0, separator)
+    const ts = separator < 0 ? 0 : Number.parseInt(value.slice(separator + 1), 10)
+    return { id: value, name, score: Math.round(score), ts: Number.isFinite(ts) ? ts : 0 }
+  })
+}
+
+/**
+ * Reads the shared leaderboard.
+ * @returns {Promise<Response>} The leaderboard or its availability status
  */
 export async function loader(): Promise<Response> {
+  const url = readLeaderboardRedisUrl()
+  if (!url) return new Response(null, { status: 404 })
+
   try {
-    const r = await getRedis()
-    const raw = await r.zRangeWithScores(LEADERBOARD_KEY, 0, MAX_ENTRIES - 1, { REV: true })
-    const entries = raw.map(({ value, score }) => {
-      const { name, ts } = parseMember(value)
-      return { name, score: Math.round(score), ts }
-    })
-    return Response.json(entries)
-  } catch (err) {
-    console.error('[leaderboard] API error:', err)
-    return Response.json({ error: 'Leaderboard service unavailable' }, { status: 500 })
+    const rows = await useRedis(url, (client) =>
+      client.zRangeWithScores(LEADERBOARD_KEY, 0, MAX_ENTRIES - 1, { REV: true }),
+    )
+    return Response.json(toEntries(rows))
+  } catch {
+    return Response.json({ error: 'Poenglisten er utilgjengelig' }, { status: 503 })
   }
 }
 
 /**
- * POST /resources/leaderboard -- validate body, upsert score, trim tail, return rank.
- * @param {object} args - Route action args
- * @param {Request} args.request - Incoming request with JSON body `{ name, score }`
- * @returns {Promise<Response>} JSON `{ rank }` or error
+ * Validates and stores a score, then returns the shared board and its new rank.
+ * @param {object} args Route action args
+ * @param {Request} args.request Incoming JSON request
+ * @returns {Promise<Response>} The updated leaderboard or an error response
  */
 export async function action({ request }: { request: Request }): Promise<Response> {
+  const url = readLeaderboardRedisUrl()
+  if (!url) return new Response(null, { status: 404 })
+  if (request.method !== 'POST') return new Response(null, { headers: { Allow: 'POST' }, status: 405 })
+
+  const data = (await request.json().catch(() => null)) as { name?: unknown; score?: unknown } | null
+  const name = typeof data?.name === 'string' ? data.name.trim() : ''
+  const score = data?.score
+  if (!/^[a-zA-ZæøåÆØÅ0-9 ]{1,8}$/.test(name)) {
+    return Response.json({ error: 'Navnet må bestå av 1–8 bokstaver, sifre eller mellomrom' }, { status: 400 })
+  }
+  if (typeof score !== 'number' || !Number.isFinite(score) || score < 0) {
+    return Response.json({ error: 'Poengsummen må være null eller høyere' }, { status: 400 })
+  }
+
+  const member = `${name.toUpperCase()}|${Date.now()}-${randomUUID()}`
   try {
-    const r = await getRedis()
-    const { name, score } = (await request.json()) as { name: string; score: number }
-
-    if (typeof name !== 'string' || name.length === 0 || name.length > 8) {
-      return Response.json({ error: 'Name must be 1-8 characters' }, { status: 400 })
-    }
-    if (typeof score !== 'number' || !Number.isFinite(score) || score < 0) {
-      return Response.json({ error: 'Score must be a non-negative number' }, { status: 400 })
-    }
-
-    const ts = Date.now()
-    const member = `${name.toUpperCase()}|${ts}`
-    await r.zAdd(LEADERBOARD_KEY, { score, value: member })
-
-    const rank = await r.zRevRank(LEADERBOARD_KEY, member)
-    const total = await r.zCard(LEADERBOARD_KEY)
-
-    if (total > MAX_ENTRIES) {
-      await r.zRemRangeByRank(LEADERBOARD_KEY, 0, total - MAX_ENTRIES - 1)
-    }
-
-    return Response.json({ rank: rank ?? -1 })
-  } catch (err) {
-    console.error('[leaderboard] API error:', err)
-    return Response.json({ error: 'Leaderboard service unavailable' }, { status: 500 })
+    const [, , rows] = await useRedis(url, (client) =>
+      client
+        .multi()
+        .zAdd(LEADERBOARD_KEY, { score, value: member })
+        .zRemRangeByRank(LEADERBOARD_KEY, 0, -MAX_ENTRIES - 1)
+        .zRangeWithScores(LEADERBOARD_KEY, 0, MAX_ENTRIES - 1, { REV: true })
+        .execTyped(),
+    )
+    return Response.json({ entries: toEntries(rows), rank: rows.findIndex(({ value }) => value === member) })
+  } catch {
+    return Response.json({ error: 'Poenglisten er utilgjengelig' }, { status: 503 })
   }
 }

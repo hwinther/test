@@ -33,6 +33,7 @@
 }
 
 .leaderboard-prompt {
+  display: block;
   color: #0ff;
   font-size: 16px;
   margin: 0 0 12px;
@@ -90,7 +91,7 @@
 }
 
 .leaderboard-scores-subtitle {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.75);
   font-size: 12px;
   margin: 0 0 16px;
   letter-spacing: 1px;

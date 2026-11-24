@@ -22,8 +22,8 @@ export function buildGameInputSnapshot(
   let run = k.run
   const down = k.down
 
-  const pads = typeof navigator !== 'undefined' ? navigator.getGamepads() : []
-  const pad = pads[0]
+  const pads = typeof navigator !== 'undefined' ? navigator.getGamepads?.() : undefined
+  const pad = pads?.find((candidate) => candidate?.connected)
   if (pad) {
     const axes = mergeGamepadAxes(pad)
     if (axes.left) {
@@ -37,6 +37,9 @@ export function buildGameInputSnapshot(
     if (padJump) {
       jumpHeld = true
     }
+  } else {
+    gamepadJumpPrevRef.current = false
+    gamepadFirePrevRef.current = false
   }
 
   const jumpPressed = jumpLatchedRef.current

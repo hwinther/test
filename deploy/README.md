@@ -64,8 +64,8 @@ In the target namespace:
 
 - `${PG_SECRET}`: key `password`, for `PG_USER`.
 - `${RABBITMQ_SECRET}`: keys `username`, `password`.
-- `test-frontend-valkey`: key `redis-url`, the Valkey/Redis connection URL for frontend sessions
-  and the SignalR backplane.
+- The API uses the `redis-url` key in `test-frontend-valkey` for its SignalR backplane. The frontend
+  uses the same key for the optional shared game leaderboard and can start with browser-local scores alone.
 - ConfigMap `wsh-internal-ca`: key `ca-bundle.crt`, the CA bundle the RabbitMQ certificate chains
   to.
 

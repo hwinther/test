@@ -1,5 +1,15 @@
 import type { Enemy, MarioGameResult, MarioGameState, Player } from './mario-types'
 
+import {
+  BOTVAR_GOAL_STATUS,
+  drawBotvarCollectible,
+  drawBotvarGoal,
+  drawBotvarPlayer,
+  drawBotvarProjectile,
+} from './botvar-actors'
+import { drawBotvarProofroom } from './botvar-proofroom'
+import { getBotvarMilestone } from './botvar-workflow'
+import { drawBotvarBackground, drawBotvarHud, drawBotvarPlatform, drawBotvarWorkflowStations } from './botvar-scenery'
 import { MARIO_CANVAS_HEIGHT, MARIO_CANVAS_WIDTH, themeColors } from './mario-game-logic'
 import { type SpriteSet, getSprites } from './mario-sprites'
 
@@ -140,12 +150,10 @@ function drawEnemy(ctx: CanvasRenderingContext2D, enemy: Enemy, sprites: SpriteS
  * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
  * @param {Player} pl - Player entity
  * @param {SpriteSet} sprites - Loaded sprite images (may be null for classic theme)
- * @param {number} starPowerUntil - Timestamp until which star power is active
+ * @param {boolean} starGlow - Whether star power is active
  * @returns {void}
  */
-function drawPlayer(ctx: CanvasRenderingContext2D, pl: Player, sprites: SpriteSet, starPowerUntil: number): void {
-  const starGlow = performance.now() < starPowerUntil
-
+function drawPlayer(ctx: CanvasRenderingContext2D, pl: Player, sprites: SpriteSet, starGlow: boolean): void {
   if (sprites.player) {
     ctx.save()
     if (starGlow) {
@@ -203,6 +211,7 @@ export function buildMarioGameResult(state: MarioGameState): MarioGameResult {
 /** Optional copy for campaign-aware overlays on the canvas. */
 export interface DrawGameOptions {
   /** When set, level-complete hint mentions another stage vs. starting a new run */
+  readonly workflow?: boolean
   readonly hasNextCampaignLevel?: boolean
 }
 
@@ -217,14 +226,44 @@ export function drawGame(canvas: HTMLCanvasElement, state: MarioGameState, drawO
   const ctx = canvas.getContext('2d')
   if (!ctx) return
 
+  if (state.proofroom) {
+    ctx.save()
+    ctx.imageSmoothingEnabled = false
+    drawBotvarProofroom(ctx, state, getSprites(state.spriteTheme).player)
+    ctx.restore()
+  } else {
+    drawCourse(ctx, state, drawOptions?.workflow === true)
+  }
+  drawStatusOverlay(ctx, state, drawOptions)
+}
+
+/**
+ * Draw the course behind the player and status overlays.
+ * @param {CanvasRenderingContext2D} ctx - Canvas context
+ * @param {MarioGameState} state - Current game
+ * @param {boolean} workflow - Render document stations in the campaign
+ */
+function drawCourse(ctx: CanvasRenderingContext2D, state: MarioGameState, workflow: boolean): void {
+  const botvar = state.spriteTheme === 'botvar'
   const { ground, sky } = themeColors(state.levelTheme)
-  ctx.fillStyle = sky
-  ctx.fillRect(0, 0, MARIO_CANVAS_WIDTH, MARIO_CANVAS_HEIGHT)
+  if (botvar) {
+    drawBotvarBackground(ctx, state, MARIO_CANVAS_WIDTH, MARIO_CANVAS_HEIGHT, workflow)
+  } else {
+    ctx.fillStyle = sky
+    ctx.fillRect(0, 0, MARIO_CANVAS_WIDTH, MARIO_CANVAS_HEIGHT)
+  }
 
   ctx.save()
-  ctx.translate(-state.cameraX, 0)
+  ctx.imageSmoothingEnabled = !botvar
+  ctx.translate(-(botvar ? Math.round(state.cameraX) : state.cameraX), 0)
 
+  if (workflow) drawBotvarWorkflowStations(ctx, state, MARIO_CANVAS_WIDTH)
   state.platforms.forEach((platform) => {
+    if (platform.x + platform.width < state.cameraX || platform.x > state.cameraX + MARIO_CANVAS_WIDTH) return
+    if (botvar) {
+      drawBotvarPlatform(ctx, platform)
+      return
+    }
     switch (platform.type) {
       case 'brick':
         ctx.fillStyle = '#CD853F'
@@ -247,18 +286,31 @@ export function drawGame(canvas: HTMLCanvasElement, state: MarioGameState, drawO
     ctx.strokeRect(platform.x, platform.y, platform.width, platform.height)
   })
 
-  const flagPole = state.flagPole
-  ctx.fillStyle = '#8B4513'
-  ctx.fillRect(flagPole.x, flagPole.y, flagPole.width, flagPole.height)
-  ctx.fillStyle = flagPole.reached ? '#32CD32' : '#FF0000'
-  ctx.fillRect(flagPole.flag.x, flagPole.flag.y, flagPole.flag.width, flagPole.flag.height)
-  ctx.fillStyle = '#FFD700'
-  ctx.beginPath()
-  ctx.arc(flagPole.x + flagPole.width / 2, flagPole.y, 8, 0, 2 * Math.PI)
-  ctx.fill()
+  if (botvar) {
+    drawBotvarGoal(ctx, state, workflow)
+  } else {
+    const flagPole = state.flagPole
+    ctx.fillStyle = '#8B4513'
+    ctx.fillRect(flagPole.x, flagPole.y, flagPole.width, flagPole.height)
+    ctx.fillStyle = flagPole.reached ? '#32CD32' : '#FF0000'
+    ctx.fillRect(flagPole.flag.x, flagPole.flag.y, flagPole.flag.width, flagPole.flag.height)
+    ctx.fillStyle = '#FFD700'
+    ctx.beginPath()
+    ctx.arc(flagPole.x + flagPole.width / 2, flagPole.y, 8, 0, 2 * Math.PI)
+    ctx.fill()
+  }
 
   state.collectibles.forEach((collectible) => {
-    if (collectible.collected) return
+    if (
+      collectible.collected ||
+      collectible.x + collectible.width < state.cameraX ||
+      collectible.x > state.cameraX + MARIO_CANVAS_WIDTH
+    )
+      return
+    if (botvar) {
+      drawBotvarCollectible(ctx, collectible, state.gameTime)
+      return
+    }
     switch (collectible.type) {
       case 'coin':
         ctx.fillStyle = '#FFD700'
@@ -306,6 +358,10 @@ export function drawGame(canvas: HTMLCanvasElement, state: MarioGameState, drawO
   })
 
   state.fireballs.forEach((fb) => {
+    if (botvar) {
+      drawBotvarProjectile(ctx, fb)
+      return
+    }
     ctx.fillStyle = '#FF6600'
     ctx.beginPath()
     ctx.arc(fb.x + fb.width / 2, fb.y + fb.height / 2, fb.width / 2, 0, 2 * Math.PI)
@@ -319,10 +375,15 @@ export function drawGame(canvas: HTMLCanvasElement, state: MarioGameState, drawO
   const sprites = getSprites(state.spriteTheme)
 
   state.enemies.forEach((enemy) => {
+    if (enemy.x + enemy.width < state.cameraX || enemy.x > state.cameraX + MARIO_CANVAS_WIDTH) return
     drawEnemy(ctx, enemy, sprites, state.gameTime)
   })
 
-  drawPlayer(ctx, state.player, sprites, state.starPowerUntil)
+  if (botvar) {
+    drawBotvarPlayer(ctx, state, sprites.player)
+  } else {
+    drawPlayer(ctx, state.player, sprites, state.gameTime * 1000 < state.starPowerUntil)
+  }
 
   state.particles.forEach((particle) => {
     const alpha = particle.life / particle.maxLife
@@ -368,50 +429,70 @@ export function drawGame(canvas: HTMLCanvasElement, state: MarioGameState, drawO
 
   ctx.restore()
 
-  ctx.fillStyle = '#000000'
-  ctx.font = '20px Arial'
-  ctx.textAlign = 'left'
-  ctx.fillText(`Score: ${state.score}`, 10, 30)
-  ctx.fillText(`Lives: ${state.player.lives}`, 10, 55)
-  ctx.fillText(`Level: ${state.level}`, 10, 80)
-  if (state.timeRemaining !== null) {
-    ctx.fillText(`Time: ${Math.ceil(state.timeRemaining)}`, 10, 105)
+  if (botvar) {
+    drawBotvarHud(ctx, state, MARIO_CANVAS_WIDTH, workflow)
+  } else {
+    ctx.fillStyle = '#000000'
+    ctx.font = '20px Arial'
+    ctx.textAlign = 'left'
+    ctx.fillText(`Poeng: ${state.score}`, 10, 30)
+    ctx.fillText(`Liv: ${state.player.lives}`, 10, 55)
+    ctx.fillText(`Bane: ${state.level}`, 10, 80)
+    if (state.timeRemaining !== null) {
+      ctx.fillText(`Tid: ${Math.ceil(state.timeRemaining)}`, 10, 105)
+    }
+    const fireHintY = state.timeRemaining === null ? 105 : 130
+    if (state.player.powerUp === 'fire') {
+      ctx.fillText('Z for å kaste ildkule', 10, fireHintY)
+    }
   }
-  const fireHintY = state.timeRemaining === null ? 105 : 130
-  if (state.player.powerUp === 'fire') {
-    ctx.fillText('Fire — Z: fireball', 10, fireHintY)
-  }
+}
 
+/**
+ * Draw pause, completion or game-over information above either play mode.
+ * @param {CanvasRenderingContext2D} ctx - Canvas context
+ * @param {MarioGameState} state - Current game
+ * @param {DrawGameOptions} [drawOptions] - Campaign hints
+ */
+function drawStatusOverlay(ctx: CanvasRenderingContext2D, state: MarioGameState, drawOptions?: DrawGameOptions): void {
+  const botvar = state.spriteTheme === 'botvar'
   if (state.gameStatus === 'gameOver') {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
     ctx.fillRect(0, 0, MARIO_CANVAS_WIDTH, MARIO_CANVAS_HEIGHT)
     ctx.fillStyle = '#FFFFFF'
     ctx.font = '36px Arial'
     ctx.textAlign = 'center'
-    ctx.fillText('GAME OVER', MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 - 20)
+    ctx.fillText('SPILLET ER OVER', MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 - 20)
     ctx.font = '18px Arial'
-    ctx.fillText(`Final Score: ${state.score}`, MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 + 20)
-    ctx.fillText('Press R to restart or ESC to exit', MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 + 50)
+    ctx.fillText(`Sluttpoeng: ${state.score}`, MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 + 20)
+    ctx.fillText(
+      'Trykk R for å starte på nytt eller Esc for å avslutte',
+      MARIO_CANVAS_WIDTH / 2,
+      MARIO_CANVAS_HEIGHT / 2 + 50,
+    )
     ctx.textAlign = 'left'
   }
 
   if (state.gameStatus === 'complete') {
-    ctx.fillStyle = 'rgba(0, 100, 0, 0.8)'
+    ctx.fillStyle = botvar ? 'rgba(31, 25, 45, 0.87)' : 'rgba(0, 100, 0, 0.8)'
     ctx.fillRect(0, 0, MARIO_CANVAS_WIDTH, MARIO_CANVAS_HEIGHT)
-    ctx.fillStyle = '#FFFF00'
+    ctx.fillStyle = botvar ? '#9de5c3' : '#FFFF00'
     ctx.font = '36px Arial'
     ctx.textAlign = 'center'
-    ctx.fillText('LEVEL COMPLETE!', MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 - 60)
+    const status = BOTVAR_GOAL_STATUS[state.level - 1] ?? BOTVAR_GOAL_STATUS[0]
+    const themeTitle = botvar ? `Forslaget er ${status.toLowerCase()}` : 'BANEN ER FULLFØRT!'
+    const completeTitle = drawOptions?.workflow ? getBotvarMilestone(state).title : themeTitle
+    ctx.fillText(completeTitle, MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 - 60)
     ctx.fillStyle = '#FFFFFF'
     ctx.font = '24px Arial'
-    ctx.fillText('Flag Captured!', MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 - 20)
+    if (!botvar) ctx.fillText('Du tok flagget!', MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 - 20)
     ctx.font = '18px Arial'
-    ctx.fillText(`Final Score: ${state.score}`, MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 + 20)
-    ctx.fillText(`Time: ${Math.floor(state.gameTime)}s`, MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 + 50)
+    ctx.fillText(`Sluttpoeng: ${state.score}`, MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 + 20)
+    ctx.fillText(`Tid: ${Math.floor(state.gameTime)} s`, MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 + 50)
     const completeHint =
       drawOptions?.hasNextCampaignLevel === true
-        ? 'Press Enter to continue to the next level — Esc to exit'
-        : 'Press Enter to continue — Esc to exit'
+        ? 'Trykk Enter for neste bane eller Esc for å avslutte'
+        : 'Trykk Enter for å fortsette eller Esc for å avslutte'
     ctx.fillText(completeHint, MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 + 80)
     ctx.textAlign = 'left'
   }
@@ -422,9 +503,9 @@ export function drawGame(canvas: HTMLCanvasElement, state: MarioGameState, drawO
     ctx.fillStyle = '#FFFFFF'
     ctx.font = '32px Arial'
     ctx.textAlign = 'center'
-    ctx.fillText('PAUSED', MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2)
+    ctx.fillText('PAUSE', MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2)
     ctx.font = '16px Arial'
-    ctx.fillText('Press P to resume', MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 + 36)
+    ctx.fillText('Trykk P for å fortsette', MARIO_CANVAS_WIDTH / 2, MARIO_CANVAS_HEIGHT / 2 + 36)
     ctx.textAlign = 'left'
   }
 }

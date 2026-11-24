@@ -46,12 +46,12 @@ export class LevelLoader {
       },
       id: `level-${Date.now()}`,
       metadata: {
-        author: 'Player',
-        description: 'A custom level',
+        author: 'Spiller',
+        description: 'En egendefinert bane',
         difficulty: 1,
         theme: 'overworld',
       },
-      name: 'New Level',
+      name: 'Ny bane',
       objects: {
         collectibles: [],
         enemies: [],

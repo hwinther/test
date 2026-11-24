@@ -1,6 +1,6 @@
 # Mario Game Map System
 
-This Mario game now features a flexible map system that separates the game engine from level data, allowing for easy creation and sharing of custom levels.
+Choose **Spill Botvar** on the home page to follow a representantforslag through drafting, delivery, presentation at a sitting, committee assignment, and provisional publication. In the final course, Botvar collects two proofreading marks before a third caseworker approves the document for final publication and a case is opened. **Spill med klassisk tema** opens the same courses with classic graphics. Both use the map format described below.
 
 ## Architecture
 
@@ -109,7 +109,12 @@ Visual level creation tool:
 - **Shift**: Run
 - **E**: Open Map Editor
 - **ESC**: Exit Game
-- **R**: Restart (when game over/complete)
+- **P** pauses and resumes.
+- **F** or **Z** fires after collecting the fire power-up.
+- **Enter** advances to the next course with the current score and lives.
+- After the final course or game over, enter a name to save the score. Press **Enter** or **R** on the leaderboard to play again.
+
+Scores are stored in the browser. Setting `REDIS_URL` on the frontend server also enables shared scores. A failed shared request leaves the local leaderboard available.
 
 ### **Editor Mode**
 

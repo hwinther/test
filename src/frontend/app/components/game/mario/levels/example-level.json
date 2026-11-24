@@ -1,10 +1,10 @@
 {
   "id": "example-custom-level",
-  "name": "Example Custom Level",
+  "name": "Eksempelbane",
   "version": "1.0.0",
   "metadata": {
-    "author": "Map Editor",
-    "description": "A demo level showcasing the new level format",
+    "author": "Baneredigering",
+    "description": "En eksempelbane som viser baneformatet",
     "difficulty": 2,
     "theme": "overworld"
   },

@@ -83,6 +83,7 @@ spec:
             secretKeyRef:
               name: test-frontend-valkey
               key: redis-url
+              optional: true
 ---
 apiVersion: v1
 kind: Service

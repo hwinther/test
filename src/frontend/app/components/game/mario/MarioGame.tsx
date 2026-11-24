@@ -3,6 +3,8 @@ import { type JSX, useCallback, useEffect, useRef, useState } from 'react'
 import type { LevelData } from './level-format'
 import type { GameInputSnapshot, KeyState, MarioGameResult, MarioGameState, SpriteTheme } from './mario-types'
 
+import { startBotvarProofroom } from './botvar-proofroom'
+import { BOTVAR_STAGE_TITLES, getBotvarMilestone } from './botvar-workflow'
 import { LeaderboardOverlay } from './LeaderboardOverlay'
 import { LevelLoader } from './level-loader'
 import { MapEditor } from './MapEditor'
@@ -15,11 +17,12 @@ import {
   MARIO_CANVAS_WIDTH,
 } from './mario-game-logic'
 import { buildGameInputSnapshot } from './mario-input-helpers'
-import { handleMarioKeyDown, handleMarioKeyUp } from './mario-keyboard'
+import { clearMarioKeyboardInput, handleMarioKeyDown, handleMarioKeyUp } from './mario-keyboard'
 import './MarioGame.css'
 
 /** Props for the Mario canvas game shell (play, editor, level chain, callbacks). */
 export interface MarioGameProps {
+  readonly documentCampaign?: boolean
   readonly customLevel?: LevelData
   readonly levelSequence?: LevelData[]
   readonly onClose?: () => void
@@ -40,18 +43,27 @@ export interface MarioGameProps {
  */
 export function MarioGame({
   customLevel,
+  documentCampaign = false,
   levelSequence,
   onClose,
   onLevelComplete,
   showEditor,
-  spriteTheme = 'classic',
+  spriteTheme = 'botvar',
 }: MarioGameProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const resolvedLevel = customLevel ?? levelSequence?.[0] ?? LevelLoader.createDefaultLevel()
-  const [currentLevel, setCurrentLevel] = useState<LevelData>(() => resolvedLevel)
+  const [currentLevel, setCurrentLevel] = useState<LevelData>(
+    () => customLevel ?? levelSequence?.[0] ?? LevelLoader.createDefaultLevel(),
+  )
   const [editorMode, setEditorMode] = useState(Boolean(showEditor))
 
-  const gameStateRef = useRef<MarioGameState>(createInitialGameState(currentLevel, { spriteTheme }))
+  const [initialGameState] = useState(() => createInitialGameState(currentLevel, { spriteTheme }))
+  const gameStateRef = useRef(initialGameState)
+  const workflowRef = useRef(documentCampaign && !customLevel && Boolean(levelSequence?.length))
+  const [milestone, setMilestone] = useState(() => (workflowRef.current ? getBotvarMilestone(initialGameState) : null))
+  const displayedMilestoneRef = useRef(milestone)
+  const [history, setHistory] = useState(() => (milestone ? [milestone] : []))
+  const [status, setStatus] = useState<MarioGameState['gameStatus']>('playing')
+  const displayedStatusRef = useRef(status)
   const keyStateRef = useRef<KeyState>({
     down: false,
     jump: false,
@@ -99,12 +111,14 @@ export function MarioGame({
       sequenceIndexRef.current++
       const next = seq[sequenceIndexRef.current]
       setCurrentLevel(next)
-      gameStateRef.current = createInitialGameState(next, {
+      const nextState = createInitialGameState(next, {
         levelNumber: sequenceIndexRef.current + 1,
         lives: st.player.lives,
         score: st.score,
         spriteTheme,
       })
+      gameStateRef.current =
+        workflowRef.current && sequenceIndexRef.current === 2 ? startBotvarProofroom(nextState) : nextState
     } else {
       if (levelSequence && (st.gameStatus === 'gameOver' || sequenceIndexRef.current >= levelSequence.length - 1)) {
         sequenceIndexRef.current = 0
@@ -112,19 +126,27 @@ export function MarioGame({
       const level =
         customLevel ?? levelSequence?.[sequenceIndexRef.current] ?? currentLevel ?? LevelLoader.createDefaultLevel()
       setCurrentLevel(level)
+      workflowRef.current = documentCampaign && !customLevel && Boolean(seq?.includes(level))
       gameStateRef.current = createInitialGameState(level, {
         levelNumber: levelSequence ? sequenceIndexRef.current + 1 : 1,
         spriteTheme,
       })
     }
+    const opening = workflowRef.current ? getBotvarMilestone(gameStateRef.current) : null
+    displayedMilestoneRef.current = opening
+    setMilestone(opening)
+    setHistory(opening ? [opening] : [])
+    clearMarioKeyboardInput({ keyStateRef, jumpLatchedRef, fireLatchedRef })
+    canvasRef.current?.focus()
     completeNotifiedRef.current = false
     gameOverHandledRef.current = false
     setShowLeaderboard(false)
     showLeaderboardRef.current = false
-  }, [currentLevel, customLevel, levelSequence, spriteTheme])
+  }, [currentLevel, customLevel, documentCampaign, levelSequence, spriteTheme])
 
   const handlePlayTestLevel = useCallback(
     (level: LevelData) => {
+      workflowRef.current = false
       setCurrentLevel(level)
       gameStateRef.current = createInitialGameState(level, { spriteTheme })
       sequenceIndexRef.current = 0
@@ -161,7 +183,7 @@ export function MarioGame({
       while (accRef.current >= FIXED_DT) {
         const before = gameStateRef.current.gameStatus
         const input = syncKeysToInput()
-        gameStateRef.current = advanceGameState(gameStateRef.current, input, performance.now())
+        gameStateRef.current = advanceGameState(gameStateRef.current, input)
         accRef.current -= FIXED_DT
 
         const after = gameStateRef.current.gameStatus
@@ -187,9 +209,20 @@ export function MarioGame({
       }
 
       const seq = levelSequenceRef.current
+      const nextStatus = gameStateRef.current.gameStatus
+      if (displayedStatusRef.current !== nextStatus) {
+        displayedStatusRef.current = nextStatus
+        setStatus(nextStatus)
+      }
       const hasNextCampaignLevel =
         gameStateRef.current.gameStatus === 'complete' && seq !== undefined && sequenceIndexRef.current < seq.length - 1
-      drawGame(canvas, gameStateRef.current, { hasNextCampaignLevel })
+      const nextMilestone = workflowRef.current ? getBotvarMilestone(gameStateRef.current) : null
+      if (displayedMilestoneRef.current !== nextMilestone) {
+        displayedMilestoneRef.current = nextMilestone
+        setMilestone(nextMilestone)
+        if (nextMilestone) setHistory((previous) => [...previous, nextMilestone])
+      }
+      drawGame(canvas, gameStateRef.current, { hasNextCampaignLevel, workflow: workflowRef.current })
       rafRef.current = requestAnimationFrame(loop)
     }
 
@@ -222,9 +255,17 @@ export function MarioGame({
       handleMarioKeyUp(event, keyStateRef)
     }
 
+    const clearKeys = () => clearMarioKeyboardInput(deps)
+    const onVisibility = () => {
+      if (document.hidden) clearKeys()
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    globalThis.addEventListener('blur', clearKeys)
     globalThis.addEventListener('keydown', onKeyDown)
     globalThis.addEventListener('keyup', onKeyUp)
     return () => {
+      globalThis.removeEventListener('blur', clearKeys)
+      document.removeEventListener('visibilitychange', onVisibility)
       globalThis.removeEventListener('keydown', onKeyDown)
       globalThis.removeEventListener('keyup', onKeyUp)
     }
@@ -241,23 +282,32 @@ export function MarioGame({
     )
   }
 
-  return (
-    <div className="mario-game">
-      <div className="mario-game-header">
-        <h1>Super Mario Bros Clone</h1>
-        <button className="close-button" onClick={onClose} type="button">
-          ✕
-        </button>
-      </div>
+  const botvar = spriteTheme === 'botvar'
+  const stageName = milestone ? BOTVAR_STAGE_TITLES[sequenceIndexRef.current] : currentLevel.name
 
-      <div className="mario-game-canvas-container" style={{ position: 'relative' }}>
+  return (
+    <div className="mario-game" lang="nb">
+      <header className="mario-game-header">
+        <div>
+          <h1>{botvar ? 'Botvar' : 'Super Mario Bros. – klassisk tema'}</h1>
+          <p>{currentLevel.name === stageName ? stageName : `${currentLevel.name} · ${stageName}`}</p>
+        </div>
+        <button className="game-exit" onClick={onClose} type="button">
+          Avslutt <kbd>Esc</kbd>
+        </button>
+      </header>
+      <div className="mario-game-canvas-container">
         <canvas
+          aria-label={`Spillflate for ${botvar ? 'Botvar' : 'Mario'}`}
           className="mario-game-canvas"
           height={MARIO_CANVAS_HEIGHT}
           ref={canvasRef}
           tabIndex={0}
           width={MARIO_CANVAS_WIDTH}
         />
+        <span aria-label="Spillstatus" className="sr-only" role="status">
+          {{ playing: 'Spiller', paused: 'Pause', complete: 'Fullført', gameOver: 'Spillet er slutt' }[status]}
+        </span>
         {showLeaderboard && (
           <LeaderboardOverlay
             onDone={restartOrAdvance}
@@ -266,24 +316,41 @@ export function MarioGame({
           />
         )}
       </div>
-
-      <div className="mario-game-controls">
-        <h3>Controls:</h3>
-        <p>Arrow Keys / WASD: Move</p>
-        <p>Space / Up Arrow: Jump</p>
-        <p>Shift: Run</p>
-        <p>Z / F: Fireball (with fire flower)</p>
-        <p>P: Pause / resume</p>
-        <p>Goal: Reach the flag pole at the end.</p>
-        <p>Higher on the pole = more points (100–5000).</p>
-        <p>Gamepad: stick / d-pad, A jump, B fire, shoulder buttons run.</p>
-        <p>E: Open Map Editor</p>
-        <p>ESC: Exit Game</p>
-        <p>R: Restart after game over</p>
-        <p>Enter: Continue after you clear a level (score and lives carry over in campaign)</p>
-        {levelSequence && levelSequence.length > 1 ? (
-          <p>Campaign: {levelSequence.length} levels (press Enter at the level-clear screen to go on).</p>
-        ) : null}
+      {milestone && (
+        <section className="document-status" role="status" aria-label="Dokumentstatus" aria-atomic="true">
+          <strong>{milestone.title}</strong>
+          <p>{milestone.detail}</p>
+        </section>
+      )}
+      {milestone && history.length > 1 && status === 'paused' && (
+        <details className="document-history">
+          <summary>Hendelser på banen</summary>
+          <ol>
+            {history.map((entry) => (
+              <li key={entry.title + entry.detail}>{entry.detail}</li>
+            ))}
+          </ol>
+        </details>
+      )}
+      <div className="mario-game-controls" aria-label="Tastaturkontroller">
+        <span>
+          <kbd>← →</kbd> eller <kbd>A D</kbd> Flytt
+        </span>
+        <span>
+          <kbd>Mellomrom</kbd> Hopp
+        </span>
+        <span>
+          <kbd>Shift</kbd> Løp
+        </span>
+        <span>
+          <kbd>F</kbd> Skyt
+        </span>
+        <span>
+          <kbd>P</kbd> Pause
+        </span>
+        <span>
+          <kbd>E</kbd> Baneredigering
+        </span>
       </div>
     </div>
   )
