@@ -71,7 +71,7 @@ services:
       rabbitmq:
         condition: service_healthy
 
-  # mcr.microsoft.com/dotnet/aspnet:10.0 has no curl baked in; the api also runs
+  # mcr.microsoft.com/dotnet/aspnet:11.0 has no curl baked in; the api also runs
   # EF migrations on startup so /healthz only goes green once that completes.
   # Sidecar polls from outside and gates the frontend on api readiness.
   api-ready:

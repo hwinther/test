@@ -1,4 +1,4 @@
-# Test API (ASP.NET Core 10 Web API + EF Core on PostgreSQL, SignalR with a Redis backplane). It runs
+# Test API (ASP.NET Core 11 Web API + EF Core on PostgreSQL, SignalR with a Redis backplane). It runs
 # Database.Migrate() at startup, so a new release migrates before /healthz goes ready; each
 # release's migrations must work with the previous release's code, which still serves during the
 # rolling update.
