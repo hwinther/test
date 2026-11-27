@@ -30,6 +30,7 @@ jobs:
       node_version: "26.x"
       node_working_directory: "src/frontend"
       dotnet_enabled: true
+      dotnet_version: 11.0.x
       dotnet_working_directory: "src/backend"
       dotnet_changes_regex: "^src/backend|^tests/backend"
       dotnet_solution_file: "Backend.slnx"
