@@ -8,13 +8,22 @@ namespace WebApi.Entities;
 /// </summary>
 public record BlogDto : IBlog, IValidatableObject
 {
-    /// <inheritdoc />
+    /// <summary>
+    ///     Gets or sets the unique identifier for the blog.
+    /// </summary>
+    /// <example>1</example>
     public int BlogId { get; set; }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Gets or sets the title of the blog.
+    /// </summary>
+    /// <example>My blog title</example>
     public required string Title { get; set; }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Gets or sets the URL of the blog.
+    /// </summary>
+    /// <example>https://localhost/a-test-blog</example>
     public required string Url { get; set; }
 
     /// <inheritdoc />

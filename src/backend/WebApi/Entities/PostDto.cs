@@ -8,16 +8,28 @@ namespace WebApi.Entities;
 /// </summary>
 public record PostDto : IPost, IValidatableObject
 {
-    /// <inheritdoc />
+    /// <summary>
+    ///     Gets or sets the unique identifier for the post.
+    /// </summary>
+    /// <example>1</example>
     public int PostId { get; set; }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Gets or sets the title of the post.
+    /// </summary>
+    /// <example>Bob Loblaw's Law Blog</example>
     public required string Title { get; set; }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Gets or sets the content of the post.
+    /// </summary>
+    /// <example>Example blog post content</example>
     public required string Content { get; set; }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Gets or sets the unique identifier of the blog to which the post belongs.
+    /// </summary>
+    /// <example>1</example>
     public required int BlogId { get; set; }
 
     /// <inheritdoc />

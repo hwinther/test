@@ -178,8 +178,11 @@ builder.Services.AddSwaggerGen(options =>
                            Description = "An ASP.NET Core Web API example instance"
                        });
 
-    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+    // Only when the doc file was published: a missing file would make every request fail
+    // (Swashbuckle loads it lazily), not just the OpenAPI document.
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+    if (File.Exists(xmlPath))
+        options.IncludeXmlComments(xmlPath);
 
     options.SwaggerGeneratorOptions.XmlCommentEndOfLine = "\n";
 
